@@ -30,5 +30,9 @@ public interface TicketRepository  extends JpaRepository<Ticket, Integer> {
     @Query("UPDATE ticket  SET state = 'processed' WHERE e.date < :oldDate AND state = 'unprocessed' ")
     void proccessTickets(@Param("oldDate") LocalDateTime oldDate);
 
-    void payoutTickets();
+    @Query("SELECT SUM(wager) FROM Payment WHERE user_id = :userId")
+    Double getWagerAmoutForUser(int userId);
+
+    @Query("SELECT SUM(total_win) FROM Payment WHERE user_id = :userId AND state = 'win'")
+    Double getTotalWinAmountForUser(int userId);
 }

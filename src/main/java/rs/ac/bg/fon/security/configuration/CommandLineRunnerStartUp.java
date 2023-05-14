@@ -16,8 +16,8 @@ import rs.ac.bg.fon.service.FootballApiService;
 import rs.ac.bg.fon.service.LeagueService;
 import rs.ac.bg.fon.service.UserService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 
 @Component
 public class CommandLineRunnerStartUp implements CommandLineRunner {
@@ -53,7 +53,7 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
         userService.saveRole(new Role(null, "ROLE_CLIENT"));
         userService.saveRole(new Role(null, "ROLE_ADMIN"));
         userService.saveUser(new User(null, initialAdminConfig.getName(), initialAdminConfig.getSurname(),
-                initialAdminConfig.getEmail(), new Date(1999, 06, 23), initialAdminConfig.getUsername(), initialAdminConfig.getPassword(),
+                initialAdminConfig.getEmail(), LocalDate.of(1999, 6, 23), initialAdminConfig.getUsername(), initialAdminConfig.getPassword(),
                 new ArrayList<>()));
 
         userService.addRoleToUser("janko", "ROLE_CLIENT");

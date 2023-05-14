@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.AUTO;
@@ -28,7 +28,7 @@ public class User {
     @Column(name="email")
     private String email;
     @Column(name="birthday")
-    private Date birthday=null;
+    private LocalDate birthday=null;
     @Column(name="username")
     private String username;
     @Column(name="password")

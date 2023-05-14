@@ -13,5 +13,6 @@ public interface TicketService{
 
     void proccessTickets();
 
-    void payoutTickets();
+    Double getWagerAmoutForUser(int userId);
+    Double getTotalWinAmountForUser(int userId);
 }

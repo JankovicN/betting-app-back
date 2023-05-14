@@ -42,12 +42,4 @@ public class TicketUpdaterJob {
         }
     }
 
-    @Scheduled(initialDelay = 30 * 1000, fixedRate = 30 * 1000)
-    public void payoutTickets(){
-        try {
-            ticketService.payoutTickets();
-        }catch (Exception e){
-            logger.error("Error while updating ticket! \n"+ e.getMessage());
-        }
-    }
 }

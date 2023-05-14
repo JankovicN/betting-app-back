@@ -13,8 +13,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class BetGroupServiceImpl implements BetGroupService{
-    BetGroupRepository betGroupRepository;
+public class BetGroupServiceImpl implements BetGroupService {
+    private BetGroupRepository betGroupRepository;
+
     @Autowired
     public void setBetGroupRepository(BetGroupRepository betGroupRepository) {
         this.betGroupRepository = betGroupRepository;
@@ -38,7 +39,7 @@ public class BetGroupServiceImpl implements BetGroupService{
     @Override
     public BetGroup getBetGroupWithId(int betGroupId) {
         Optional<BetGroup> betGroup = betGroupRepository.findById(betGroupId);
-        if(betGroup.isPresent()){
+        if (betGroup.isPresent()) {
             return betGroup.get();
         }
         return new BetGroup();
@@ -61,8 +62,9 @@ public class BetGroupServiceImpl implements BetGroupService{
 
     @Override
     public boolean exists() {
-        return betGroupRepository.count()>0;
+        return betGroupRepository.count() > 0;
     }
+
     @Override
     public boolean existsWithId(int betGroupId) {
         return betGroupRepository.existsById(betGroupId);

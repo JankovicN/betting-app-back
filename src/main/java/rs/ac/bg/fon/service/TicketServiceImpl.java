@@ -41,12 +41,14 @@ public class TicketServiceImpl implements TicketService{
         ticketRepository.proccessTickets(oldDate);
     }
 
+
     @Override
-    public void payoutTickets() {
-        ticketRepository.payoutTickets();
+    public Double getWagerAmoutForUser(int userId) {
+        return ticketRepository.getWagerAmoutForUser(userId);
     }
 
-    public TicketServiceImpl(TicketRepository ticketRepository) {
-        this.ticketRepository = ticketRepository;
+    @Override
+    public Double getTotalWinAmountForUser(int userId) {
+        return ticketRepository.getTotalWinAmountForUser(userId);
     }
 }
