@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "name": "Match Winner",
+    "odds": []
+  },
+  {
+    "id": 12,
+    "name": "Double Chance",
+    "odds": []
+  },
+  {
+    "id": 5,
+    "name": "Goals Over/Under",
+    "odds": []
+  },
+  {
+    "id": 8,
+    "name": "Both Teams Score",
+    "odds": []
+  },
+  {
+    "id": 10,
+    "name": "Exact Score",
+    "odds": []
+  },
+  {
+    "id": 16,
+    "name": "Total - Home",
+    "odds": []
+  },
+  {
+    "id": 17,
+    "name": "Total - Away",
+    "odds": []
+  },
+  {
+    "id": 21,
+    "name": "Odd/Even",
+    "odds": []
+  },
+  {
+    "id": 43,
+    "name": "Home Team Score a Goal",
+    "odds": []
+  },
+  {
+    "id": 44,
+    "name": "Away Team Score a Goal",
+    "odds": []
+  }
+]
