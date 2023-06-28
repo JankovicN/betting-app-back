@@ -38,6 +38,6 @@ public interface BetRepository extends JpaRepository<Bet, Integer> {
             "\tTHEN 'win' \n" +
             "    ELSE 'loss' \n" +
             "  END\n" +
-            "  WHERE f.state='FT'", nativeQuery = true)
+            "  WHERE f.state='FT' AND b.state='PROCESSED'", nativeQuery = true)
     void updateAllBets();
 }

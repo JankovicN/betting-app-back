@@ -1,5 +1,9 @@
 package rs.ac.bg.fon.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -80,7 +84,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User registerUser(User user) {
-        if (!userRepository.existsByEmail(user.getEmail())) {
+        if (!userRepository.existsByEmail(user.getEmail()) && !userRepository.existsByUsername(user.getUsername())) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             System.out.println(user.getPassword());
             userRepository.save(user);
@@ -93,6 +97,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User deleteUser(String username) {
         User user = userRepository.findByUsername(username);
         userRepository.delete(user);
+        return user;
+    }
+
+    @Override
+    public User createUserFromTicketJson(String ticketJson) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonElement responseEl = gson.fromJson(ticketJson, JsonElement.class);
+
+        String username = responseEl.getAsJsonObject().get("ticket").getAsJsonObject().get("username").toString();
+        User user = getUser(username.substring(1, username.length() - 1));
         return user;
     }
 

@@ -8,4 +8,6 @@ import java.util.List;
 public interface BetGroupRepository  extends JpaRepository<BetGroup, Integer> {
 
     List<BetGroup> findByOddsFixtureId(int fixture);
+
+    BetGroup findByName(String name);
 }

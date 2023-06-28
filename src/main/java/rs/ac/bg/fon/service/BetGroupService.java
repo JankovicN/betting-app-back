@@ -15,6 +15,7 @@ public interface BetGroupService {
 
     BetGroup getBetGroupWithId(int betGroupId);
     List<BetGroup> getBetGroupsByFixture(int fixture);
+    BetGroup getBetGroupMatchWinner();
 
     long countRows();
 

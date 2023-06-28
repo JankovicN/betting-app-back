@@ -18,25 +18,5 @@ import java.io.FileReader;
 @RequestMapping("api/league")
 public class LeagueController {
 
-    private LeagueService leagueService;
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/get/leagues")
-    public ResponseEntity<?> getLeaguesFromAPI(Authentication auth){
-        String userEmail = auth.getPrincipal().toString();
-        try ( FileReader in = new FileReader("object.json")) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            JsonElement responseEl=gson.fromJson(in, JsonElement.class);
-            JsonArray arr = responseEl.getAsJsonObject().getAsJsonArray("response");
-            for (JsonElement jsonElement : arr) {
-                System.out.println(jsonElement);
-                int leagueID=jsonElement.getAsJsonObject().get("league").getAsJsonObject().get("id").getAsInt();
-                String leagueName=jsonElement.getAsJsonObject().get("league").getAsJsonObject().get("name").getAsString();
-                System.out.println("League: "+leagueName+" \nLeague id: "+leagueID);
-            }} catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().build();
-    }
 
 }

@@ -8,6 +8,7 @@ import rs.ac.bg.fon.repository.OddRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +40,15 @@ public class OddServiceImpl implements OddService{
     @Override
     public List<Odd> getOddsForFixture(int fixture) {
         return oddRepository.findByFixtureStateAndFixtureId("NS", fixture);
+    }
+
+    @Override
+    public List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId) {
+        return oddRepository.findByFixtureIdAndBetGroupId(fixtureId, betGroupId);
+    }
+
+    @Override
+    public Optional<Odd> getOddById(int oddId) {
+        return oddRepository.findById(oddId);
     }
 }

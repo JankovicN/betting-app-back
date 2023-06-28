@@ -34,7 +34,7 @@ public class Ticket {
     @Column(name="date")
     private LocalDateTime date;
     @Column(name="state")
-    private String state;
+    private String state="UNPROCESSED";
 
     @JsonIgnore
     @OneToMany(mappedBy="ticket")

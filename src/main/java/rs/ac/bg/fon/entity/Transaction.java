@@ -12,16 +12,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Payment {
+public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "payment_id")
     private Integer id;
-    @Column(name="amount")
+    @Column(name = "amount")
     private Double amount;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

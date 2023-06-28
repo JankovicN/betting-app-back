@@ -3,8 +3,9 @@ package rs.ac.bg.fon.service;
 import rs.ac.bg.fon.entity.Ticket;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface TicketService{
+public interface TicketService {
     Ticket save(Ticket ticket);
 
     void updateAllTickets();
@@ -13,6 +14,13 @@ public interface TicketService{
 
     void proccessTickets();
 
-    Double getWagerAmoutForUser(int userId);
-    Double getTotalWinAmountForUser(int userId);
+    Double getWagerAmoutForUser(String username);
+
+    Double getTotalWinAmountForUser(String username);
+
+    void cancelTicket(int ticketId);
+
+    Optional<Ticket> getTicketById(int ticketId);
+
+    Ticket createTicketFromJsonString(String ticketJson);
 }

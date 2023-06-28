@@ -16,5 +16,7 @@ public interface UserService {
 
     User deleteUser(String username);
 
+    User createUserFromTicketJson(String ticketJson);
+
 
 }

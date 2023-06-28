@@ -15,7 +15,7 @@ public interface TicketRepository  extends JpaRepository<Ticket, Integer> {
             "SET state = \n" +
             "    CASE \n" +
             "        WHEN EXISTS (\n" +
-            "            SELECT 1 FROM bet  WHERE ticket_id = ticket.ticket_id AND state = 'loss'\n" +
+            "            SELECT 1 FROM bet WHERE ticket_id = ticket.ticket_id AND state = 'loss'\n" +
             "        ) THEN 'loss'\n" +
             "        WHEN NOT EXISTS (\n" +
             "            SELECT 1 FROM bet WHERE ticket_id = ticket.ticket_id AND state <> 'win'\n" +
@@ -27,12 +27,16 @@ public interface TicketRepository  extends JpaRepository<Ticket, Integer> {
     List<Ticket> findByUserUsername(String username);
 
     @Modifying
-    @Query("UPDATE ticket  SET state = 'processed' WHERE e.date < :oldDate AND state = 'unprocessed' ")
+    @Query("UPDATE ticket  SET state = 'PROCESSED' WHERE date < :oldDate AND state = 'UNPROCESSED' ")
     void proccessTickets(@Param("oldDate") LocalDateTime oldDate);
 
-    @Query("SELECT SUM(wager) FROM Payment WHERE user_id = :userId")
-    Double getWagerAmoutForUser(int userId);
+    @Query("SELECT SUM(wager) FROM Payment WHERE username = :username")
+    Double getWagerAmoutForUser(String username);
 
-    @Query("SELECT SUM(total_win) FROM Payment WHERE user_id = :userId AND state = 'win'")
-    Double getTotalWinAmountForUser(int userId);
+    @Query("SELECT SUM(total_win) FROM Payment WHERE username = :username AND state = 'win'")
+    Double getTotalWinAmountForUser(String username);
+
+    @Modifying
+    @Query("UPDATE ticket  SET state = 'CANCELED' WHERE ticket_id = :ticketId AND state = 'UNPROCESSED' ")
+    void cancelTicket(int ticketId);
 }

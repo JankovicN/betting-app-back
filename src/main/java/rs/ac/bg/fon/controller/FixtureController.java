@@ -17,19 +17,4 @@ import java.util.List;
 public class FixtureController {
 
 
-    private final FixtureService fixtureService;
-
-    @GetMapping("/ns/{league}")
-    public ResponseEntity<List<Fixture>> getAllFixtures(@PathVariable int league) {
-        List<Fixture> fixtures = fixtureService.getNotStartedByLeague(league);
-        return ResponseEntity.ok().body(fixtures);
-    }
-
-
-    @GetMapping("/get")
-    public ResponseEntity<List<Fixture>> getFixtures() {
-
-        List<Fixture> fixtures = fixtureService.getNotStarted();
-        return ResponseEntity.ok().body(fixtures);
-    }
 }

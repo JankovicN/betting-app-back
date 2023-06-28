@@ -56,6 +56,11 @@ public class BetGroupServiceImpl implements BetGroupService {
     }
 
     @Override
+    public BetGroup getBetGroupMatchWinner() {
+        return betGroupRepository.findByName("Match Winner");
+    }
+
+    @Override
     public long countRows() {
         return betGroupRepository.count();
     }

@@ -19,7 +19,7 @@ public class Bet {
     @Column(name = "bet_id")
     private Integer id;
     @Column(name="state")
-    private String state="NS";
+    private String state="UNPROCESSED";
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "odds_id", nullable = false)

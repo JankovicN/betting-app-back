@@ -17,20 +17,4 @@ import java.util.List;
 @RequestMapping("api/betgroup")
 public class BetGroupController {
 
-    private final BetGroupService betGroupService;
-
-    @GetMapping("/get")
-    public ResponseEntity<List<BetGroup>> getBetGroups() {
-        return ResponseEntity.ok().body(betGroupService.getAllBetGroups());
-    }
-    @GetMapping("/get/{fixture}")
-    public ResponseEntity<List<BetGroup>> getBetGroups(@PathVariable int fixture) {
-        return ResponseEntity.ok().body(betGroupService.getBetGroupsByFixture(fixture));
-    }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteBetGroup(@PathVariable String id){
-        int groupId=Integer.parseInt(id);
-        betGroupService.deleteBetGroup(groupId);
-        return ResponseEntity.ok().build();
-    }
 }

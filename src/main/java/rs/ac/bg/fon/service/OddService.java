@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.entity.Odd;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public interface OddService {
@@ -13,4 +14,8 @@ public interface OddService {
     List<Odd> getALlOdds();
 
     List<Odd> getOddsForFixture(int fixture);
+
+    List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId);
+
+    Optional<Odd> getOddById(int oddID);
 }
