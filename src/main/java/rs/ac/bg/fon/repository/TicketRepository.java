@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.entity.Ticket;
 
 import java.time.LocalDateTime;
@@ -19,24 +20,25 @@ public interface TicketRepository  extends JpaRepository<Ticket, Integer> {
             "SET state = \n" +
             "    CASE \n" +
             "        WHEN EXISTS (\n" +
-            "            SELECT 1 FROM Bet  WHERE ticket_id = t.id AND state = 'loss'\n" +
-            "        ) THEN 'loss'\n" +
+            "            SELECT 1 FROM Bet  WHERE ticket_id = t.id AND state = '"+ Constants.BET_LOSS +"'\n" +
+            "        ) THEN '"+Constants.TICKET_LOSS+"'\n" +
             "        WHEN NOT EXISTS (\n" +
-            "            SELECT 1 FROM Bet WHERE ticket_id = t.id AND state <> 'win'\n" +
-            "        ) THEN 'win'\n" +
-            "        ELSE '-'\n" +
-            "    END")
+            "            SELECT 1 FROM Bet WHERE ticket_id = t.id AND state <> '"+ Constants.BET_WIN +"'\n" +
+            "        ) THEN '"+Constants.TICKET_WIN+"'\n" +
+            "        ELSE '"+Constants.WAITING_FOR_RESULTS+"'\n" +
+            "    END"+
+            "  WHERE t.state='"+ Constants.WAITING_FOR_RESULTS +"' OR t.state='"+ Constants.TICKET_PROCESSED +"' ", nativeQuery = true)
     void updateAllTickets();
 
     List<Ticket> findByUserUsername(String username);
 
     @Modifying
-    @Query("UPDATE Ticket  SET state = 'processed' WHERE date < :date AND state = 'unprocessed'")
+    @Query("UPDATE Ticket  SET state = '"+Constants.TICKET_PROCESSED+"' WHERE date < :date AND state = '"+Constants.TICKET_UNPROCESSED+"'")
     void processTickets(@Param("date") LocalDateTime oldDate);
 
     @Query("SELECT SUM(wager) FROM Ticket WHERE user.id = :userId ")
     Double getWagerAmountForUser(@Param("userId") int userId);
 
-    @Query("SELECT SUM(totalWin) FROM Ticket WHERE user.id = :userId AND state = 'win'")
+    @Query("SELECT SUM(totalWin) FROM Ticket WHERE user.id = :userId AND state = '"+Constants.TICKET_WIN+"'")
     Double getTotalWinAmountForUser(@Param("userId") int userId);
 }

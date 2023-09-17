@@ -17,7 +17,7 @@ public class TicketUpdaterJob {
     @Scheduled(initialDelay = 10 * 1000, fixedRate = 60 * 60 * 1000)
     public void updateBets(){
         try {
-            betService.upadateAllBets();
+            betService.updateAllBets();
         }catch (Exception e){
             logger.error("Error while updating bets on ticket! \n"+ e.getMessage());
         }

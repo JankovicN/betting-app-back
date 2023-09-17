@@ -13,9 +13,15 @@ public interface PaymentService {
 
     void addPayment(Payment payment);
 
-    void addPayment(Integer userId, Double amount);
+    void addPayment(Integer userId, BigDecimal amount);
+
+    void addPayment(Integer userId, BigDecimal amount, String type);
+
+    boolean canUserPay(Integer userId, Double amount);
+    boolean canUserPay(Integer userId, BigDecimal amount);
 
     ApiResponse<?> getUserPaymentsApiResponse(Integer userId);
 
     ApiResponse<?> addPaymentApiResponse(Integer userId, Double amount);
+    ApiResponse<?> addPaymentApiResponse(Integer userId, Double amount, String type);
 }

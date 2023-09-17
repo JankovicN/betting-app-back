@@ -94,7 +94,7 @@ public class FootballApiServiceImpl implements FootballApiService {
                     }
                     for (JsonElement jsonElement : jsonArr) {
                         Fixture fixture = fixtureService.getFixtureById(jsonElement.getAsJsonObject().get("fixture").getAsJsonObject().get("id").getAsInt());
-                        if (fixture.getState().equals("NS")) {
+                        if (fixture.getState().equals(Constants.FIXTURE_NOT_STARTED)) {
                             JsonArray betsArray = getBetsArrayFromBookmakerJsonElement(jsonElement);
                             if (betsArray == null || betsArray.isJsonNull() || betsArray.isEmpty()) {
                                 continue;

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.entity.Bet;
 
 @Repository
@@ -38,9 +39,9 @@ public interface BetRepository extends JpaRepository<Bet, Integer> {
             "    bg.bet_group_name='Home Team Score a Goal' AND o.odd_name='No' AND f.home_goals = 0 OR\n" +
             "    bg.bet_group_name='Away Team Score a Goal' AND o.odd_name='Yes' AND  f.away_goals > 0 OR\n" +
             "    bg.bet_group_name='Away Team Score a Goal' AND o.odd_name='No' AND  f.away_goals = 0 \n" +
-            "\tTHEN 'win' \n" +
-            "    ELSE 'loss' \n" +
+            "\tTHEN '"+ Constants.BET_WIN +"' \n" +
+            "    ELSE '"+ Constants.BET_LOSS +"' \n" +
             "  END\n" +
-            "  WHERE f.state='FT'", nativeQuery = true)
+            "  WHERE f.state='"+ Constants.FIXTURE_FULL_TIME +"'", nativeQuery = true)
     void updateAllBets();
 }

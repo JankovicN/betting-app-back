@@ -21,6 +21,14 @@ public class PaymentServiceImpl implements PaymentService {
     TicketService ticketService;
 
     @Override
+    public boolean canUserPay(Integer userId, Double amount) {
+        return getUserPayments(userId).compareTo(BigDecimal.valueOf(amount)) >= 0;
+    }
+    @Override
+    public boolean canUserPay(Integer userId, BigDecimal amount) {
+        return getUserPayments(userId).compareTo(amount) >= 0;
+    }
+    @Override
     public BigDecimal getUserPayments(Integer userId) {
         return BigDecimal.valueOf(paymentRepository.getUserPayments(userId));
     }
@@ -31,12 +39,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void addPayment(Integer userId, Double amount) {
+    public void addPayment(Integer userId, BigDecimal amount) {
         Payment payment = new Payment();
-        payment.setAmount(BigDecimal.valueOf(amount));
+        payment.setAmount(amount);
         payment.setUser(userService.getUser(userId));
         paymentRepository.saveAndFlush(payment);
-
+    }
+    @Override
+    public void addPayment(Integer userId, BigDecimal amount, String type) {
+        Payment payment = new Payment();
+        payment.setAmount(amount);
+        payment.setUser(userService.getUser(userId));
+        payment.setPaymentType(type);
+        paymentRepository.saveAndFlush(payment);
     }
 
     @Override
@@ -47,11 +62,23 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public ApiResponse<?> addPaymentApiResponse(Integer userId, Double amount) {
         ApiResponse<?> response = new ApiResponse<>();
-        if (getUserPayments(userId).compareTo(BigDecimal.valueOf(amount)) < 0) {
-            response.addErrorMessage("Insufficient funds!");
-        } else {
-            addPayment(userId, amount);
+        if (canUserPay(userId, amount)) {
+            addPayment(userId, BigDecimal.valueOf(amount));
             response.addInfoMessage("Successful payment!");
+        } else {
+            response.addErrorMessage("Insufficient funds!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> addPaymentApiResponse(Integer userId, Double amount, String type) {
+        ApiResponse<?> response = new ApiResponse<>();
+        if (canUserPay(userId, amount)) {
+            addPayment(userId, BigDecimal.valueOf(amount), type);
+            response.addInfoMessage("Successful payment!");
+        } else {
+            response.addErrorMessage("Insufficient funds!");
         }
         return response;
     }

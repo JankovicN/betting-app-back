@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.entity;
 
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ public class Payment {
     private Integer id;
     @Column(name = "amount")
     private BigDecimal amount;
+    @Column(name = "payment_type")
+    private String paymentType;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

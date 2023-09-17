@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
@@ -54,7 +55,7 @@ public class FixtureServiceImpl implements FixtureService {
 
     @Override
     public List<Fixture> getNotStarted() {
-        List<Fixture> fixtures = this.fixtureRepository.findByState("NS");
+        List<Fixture> fixtures = this.fixtureRepository.findByState(Constants.FIXTURE_NOT_STARTED);
         if(fixtures == null || fixtures.isEmpty()){
             logger.warn("getNotStarted: No fixture is found for state = NS");
         }else{
@@ -77,7 +78,7 @@ public class FixtureServiceImpl implements FixtureService {
 
     @Override
     public List<Fixture> getNotStartedByLeague(Integer league) {
-        List<Fixture> fixtures = this.fixtureRepository.findByStateAndLeagueId("NS", league);
+        List<Fixture> fixtures = this.fixtureRepository.findByStateAndLeagueId(Constants.FIXTURE_NOT_STARTED, league);
         for (Fixture f : fixtures) {
             Optional<Team> home = teamService.findById(f.getHome().getId());
             Optional<Team> away = teamService.findById(f.getAway().getId());

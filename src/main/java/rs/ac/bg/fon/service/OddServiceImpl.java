@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
 import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.mappers.OddMapper;
@@ -38,17 +39,17 @@ public class OddServiceImpl implements OddService {
 
     @Override
     public List<Odd> getALlOdds() {
-        return oddRepository.findByBetGroupIdAndFixtureState(1, "NS");
+        return oddRepository.findByBetGroupIdAndFixtureState(1, Constants.FIXTURE_NOT_STARTED);
     }
 
     @Override
     public List<Odd> getOddsForFixture(Integer fixture) {
-        return oddRepository.findByFixtureStateAndFixtureId("NS", fixture);
+        return oddRepository.findByFixtureStateAndFixtureId(Constants.FIXTURE_NOT_STARTED, fixture);
     }
 
     @Override
     public List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId) {
-        return oddRepository.findByFixtureStateAndFixtureIdAndBetGroupId("NS", fixtureId, betGroupId);
+        return oddRepository.findByFixtureStateAndFixtureIdAndBetGroupId(Constants.FIXTURE_NOT_STARTED, fixtureId, betGroupId);
     }
 
 

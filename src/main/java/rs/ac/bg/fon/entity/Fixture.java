@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import rs.ac.bg.fon.constants.Constants;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -38,7 +39,7 @@ public class Fixture {
     @Column(name = "away_goals")
     private int awayGoals;
     @Column(name = "state")
-    private String state = "NS";
+    private String state = Constants.FIXTURE_NOT_STARTED;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)

@@ -1,12 +1,13 @@
 package rs.ac.bg.fon.mappers;
 
 import org.springframework.stereotype.Component;
-import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
-import rs.ac.bg.fon.entity.BetGroup;
+import rs.ac.bg.fon.entity.Bet;
 import rs.ac.bg.fon.entity.Ticket;
+import rs.ac.bg.fon.entity.User;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Component
 public class TicketMapper {
@@ -23,6 +24,13 @@ public class TicketMapper {
         ticket.setWager(ticketDTO.getWager());
         ticket.setTotalWin(ticketDTO.getTotalWin());
         ticket.setOdd(ticketDTO.getTotalOdd());
+
+        return ticket;
+    }
+    public Ticket ticketDTOToTicket(TicketDTO ticketDTO, List<Bet> bets, User user) throws Exception {
+        Ticket ticket = ticketDTOToTicket(ticketDTO);
+        ticket.setBets(bets);
+        ticket.setUser(user);
 
         return ticket;
     }

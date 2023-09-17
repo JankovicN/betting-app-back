@@ -3,9 +3,9 @@ package rs.ac.bg.fon.dtos.Fixture;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
-import rs.ac.bg.fon.entity.Fixture;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class FixtureDTO implements Serializable {
 
     private int awayGoals;
 
-    private String state = "NS";
+    private String state = Constants.FIXTURE_NOT_STARTED;
 
     List<BetGroupDTO> betGroupList;
 
