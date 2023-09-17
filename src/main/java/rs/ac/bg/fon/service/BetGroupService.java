@@ -1,11 +1,15 @@
 package rs.ac.bg.fon.service;
 
+import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.entity.BetGroup;
+import rs.ac.bg.fon.utility.ApiResponse;
 
 import java.util.List;
 
 
 public interface BetGroupService {
+    ApiResponse<?> getAllBetGroupsApiResponse();
+    ApiResponse<?> getBetGroupsByFixtureApiResponse(Integer fixture);
 
     BetGroup saveBetGroup(BetGroup betGroup);
 
@@ -13,15 +17,18 @@ public interface BetGroupService {
 
     List<BetGroup> getAllBetGroups();
 
-    BetGroup getBetGroupWithId(int betGroupId);
-    List<BetGroup> getBetGroupsByFixture(int fixture);
+    BetGroup getBetGroupWithId(Integer betGroupId);
+    List<BetGroup> getBetGroupsByFixture(Integer fixture);
 
     long countRows();
 
     boolean exists();
 
-    boolean existsWithId(int betGroupId);
+    boolean existsWithId(Integer betGroupId);
 
-    void deleteBetGroup(int id);
+    void deleteBetGroup(Integer id);
 
+    List<BetGroupDTO> createBetGroupDTOList(Integer fixtureId);
+
+    ApiResponse<?> deleteBetGroupApiResponse(Integer id);
 }

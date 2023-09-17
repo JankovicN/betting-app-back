@@ -7,10 +7,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import rs.ac.bg.fon.entity.BetGroup;
 import rs.ac.bg.fon.service.BetGroupService;
-
-import java.util.List;
+import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,17 +18,21 @@ public class BetGroupController {
     private final BetGroupService betGroupService;
 
     @GetMapping("/get")
-    public ResponseEntity<List<BetGroup>> getBetGroups() {
-        return ResponseEntity.ok().body(betGroupService.getAllBetGroups());
+    public ResponseEntity<?> getBetGroups() {
+        return ApiResponseUtil.handleApiResponse(betGroupService.getAllBetGroupsApiResponse());
     }
     @GetMapping("/get/{fixture}")
-    public ResponseEntity<List<BetGroup>> getBetGroups(@PathVariable int fixture) {
-        return ResponseEntity.ok().body(betGroupService.getBetGroupsByFixture(fixture));
+    public ResponseEntity<?> getBetGroups(@PathVariable Integer fixtureId) {
+        if (fixtureId == null) {
+            return ResponseEntity.badRequest().body("Fixture ID is missing");
+        }
+        return ApiResponseUtil.handleApiResponse(betGroupService.getBetGroupsByFixtureApiResponse(fixtureId));
     }
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteBetGroup(@PathVariable String id){
-        int groupId=Integer.parseInt(id);
-        betGroupService.deleteBetGroup(groupId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteBetGroup(@PathVariable Integer betGroupId){
+        if (betGroupId == null) {
+            return ResponseEntity.badRequest().body("Bet group ID is missing");
+        }
+        return ApiResponseUtil.handleApiResponse(betGroupService.deleteBetGroupApiResponse(betGroupId));
     }
 }

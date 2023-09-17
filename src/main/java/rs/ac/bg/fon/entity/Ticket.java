@@ -23,30 +23,30 @@ public class Ticket {
 
     @Id
     @GeneratedValue(strategy = AUTO)
-    @Column(name="ticket_id")
+    @Column(name = "ticket_id")
     private Integer id;
-    @Column(name="wager")
+    @Column(name = "wager")
     private BigDecimal wager;
-    @Column(name="odd")
+    @Column(name = "odd")
     private double odd;
-    @Column(name="total_win")
+    @Column(name = "total_win")
     private BigDecimal totalWin;
-    @Column(name="date")
+    @Column(name = "date")
     private LocalDateTime date;
-    @Column(name="state")
+    @Column(name = "state")
     private String state;
 
     @JsonIgnore
-    @OneToMany(mappedBy="ticket")
+    @OneToMany(mappedBy = "ticket")
     private List<Bet> bets;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public List<Bet> getBets() {
-        if(this.bets==null){
-            bets=new ArrayList<>();
+        if (this.bets == null) {
+            bets = new ArrayList<>();
         }
         return bets;
     }

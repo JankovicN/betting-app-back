@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,9 +19,9 @@ import java.util.List;
 @Table(name = "bet_group")
 public class BetGroup {
     @Id
-    @Column(name="bet_group_id")
+    @Column(name = "bet_group_id")
     private Integer id;
-    @Column(name="bet_group_name")
+    @Column(name = "bet_group_name")
     private String name;
 
     @JsonManagedReference
@@ -28,10 +29,17 @@ public class BetGroup {
     private List<Odd> odds;
 
     public List<Odd> getOdds() {
-        if (odds==null){
-            odds=new ArrayList<>();
+        if (odds == null) {
+            odds = new ArrayList<>();
         }
         return odds;
     }
 
+    @Override
+    public String toString() {
+        if (StringUtils.isBlank(name)) {
+            return super.toString();
+        }
+        return name;
+    }
 }

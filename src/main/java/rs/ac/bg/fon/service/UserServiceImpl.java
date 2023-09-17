@@ -73,6 +73,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public User getUser(Integer userId) {
+        log.info("Fetcing  user {}", userId);
+        return userRepository.findById(userId).get();
+    }
+
+    @Override
     public List<User> getUsers() {
         log.info("Fetcing all users");
         return userRepository.findAll();

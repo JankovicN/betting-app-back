@@ -1,9 +1,10 @@
 package rs.ac.bg.fon.service;
 
-import org.springframework.http.ResponseEntity;
+import rs.ac.bg.fon.utility.ApiResponse;
 
 public interface FootballApiService {
-    ResponseEntity<?> getBetGroupsFromAPI();
-    ResponseEntity<?>  getOddsFromAPI();
-    ResponseEntity<?> getFixturesFromAPI();
+    ApiResponse<?> getBetGroupsFromAPI();
+    ApiResponse<?>  getOddsFromAPI();
+    ApiResponse<?> getFixturesFromAPI();
+    ApiResponse<?> test();
 }

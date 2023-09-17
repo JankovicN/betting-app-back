@@ -36,7 +36,7 @@ public class TicketUpdaterJob {
     @Scheduled(initialDelay = 1000, fixedRate = 1000)
     public void proccessTickets(){
         try {
-            ticketService.proccessTickets();
+            ticketService.processTickets();
         }catch (Exception e){
             logger.error("Error while updating ticket! \n"+ e.getMessage());
         }

@@ -3,10 +3,13 @@ package rs.ac.bg.fon.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.entity.Bet;
 
+@Repository
 public interface BetRepository extends JpaRepository<Bet, Integer> {
-
+    @Transactional
     @Modifying
     @Query(value = "UPDATE bet b \n" +
             "JOIN odd o ON b.odds_id = o.odd_id \n" +

@@ -6,10 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.service.FixtureService;
-
-import java.util.List;
+import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,16 +18,16 @@ public class FixtureController {
     private final FixtureService fixtureService;
 
     @GetMapping("/ns/{league}")
-    public ResponseEntity<List<Fixture>> getAllFixtures(@PathVariable int league) {
-        List<Fixture> fixtures = fixtureService.getNotStartedByLeague(league);
-        return ResponseEntity.ok().body(fixtures);
+    public ResponseEntity<?> getAllFixtures(@PathVariable Integer league) {
+        if(league == null){
+            return ResponseEntity.badRequest().body("League id is missing");
+        }
+        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeagueApiCall(league));
     }
 
 
     @GetMapping("/get")
-    public ResponseEntity<List<Fixture>> getFixtures() {
-
-        List<Fixture> fixtures = fixtureService.getNotStarted();
-        return ResponseEntity.ok().body(fixtures);
+    public ResponseEntity<?> getFixtures() {
+        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedApiCall());
     }
 }

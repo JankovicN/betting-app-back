@@ -3,8 +3,7 @@
 		"id": 2,
 		"name": "UEFA Champions League",
 		"fixtures": []
-	},
-	{
+	},{
 		"id": 39,
 		"name": "Premier League",
 		"fixtures": []

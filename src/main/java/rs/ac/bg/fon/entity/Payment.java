@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -18,10 +19,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "payment_id")
     private Integer id;
-    @Column(name="amount")
-    private Double amount;
+    @Column(name = "amount")
+    private BigDecimal amount;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

@@ -5,10 +5,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
+import rs.ac.bg.fon.dtos.League.LeagueDTO;
+import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.League;
+import rs.ac.bg.fon.mappers.LeagueMapper;
 import rs.ac.bg.fon.repository.LeagueRepository;
+import rs.ac.bg.fon.utility.ApiResponse;
+import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,6 +24,15 @@ import java.util.List;
 public class LeagueServiceImpl implements LeagueService{
     private static final Logger logger = LoggerFactory.getLogger(LeagueServiceImpl.class);
     LeagueRepository leagueRepository;
+
+    private LeagueMapper leagueMapper;
+
+    private FixtureService fixtureService;
+
+    @Autowired
+    public void setFixtureService(FixtureService fixtureService) {
+        this.fixtureService = fixtureService;
+    }
 
     @Autowired
     public void setLeagueRepository(LeagueRepository leagueRepository) {
@@ -45,5 +61,37 @@ public class LeagueServiceImpl implements LeagueService{
     @Override
     public boolean exists() {
         return leagueRepository.count()>0;
+    }
+
+    @Override
+    public ApiResponse<?> getAllLeaguesDTOS() {
+        List<LeagueDTO> leagueDTOS = new ArrayList<>();
+        List<League> allLeagues = getAllLeagues();
+
+        for (League league : allLeagues) {
+
+            if (league == null ) {
+                continue;
+            }
+            List<Fixture> fixturesList = fixtureService.getNotStartedByLeague(league.getId());
+            if ( fixturesList == null || fixturesList.isEmpty()) {
+                continue;
+            }
+            List<FixtureDTO> fixtureDTOS = fixtureService.createFixtureDTOList(fixturesList);
+            try{
+                LeagueDTO leagueDTO = leagueMapper.leagueToLeagueDTO(league, fixtureDTOS);
+                leagueDTOS.add(leagueDTO);
+            }catch(Exception e){
+                logger.error(e.getMessage());
+            }
+        }
+        return ApiResponseUtil.transformListToApiResponse(leagueDTOS, "leagues");
+    }
+
+
+
+    @Autowired
+    public void setLeagueMapper(LeagueMapper leagueMapper) {
+        this.leagueMapper = leagueMapper;
     }
 }

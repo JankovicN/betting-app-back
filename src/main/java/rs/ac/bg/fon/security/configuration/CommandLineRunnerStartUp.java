@@ -12,7 +12,6 @@ import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.repository.RoleRepository;
 import rs.ac.bg.fon.repository.UserRepository;
 import rs.ac.bg.fon.service.BetGroupService;
-import rs.ac.bg.fon.service.FootballApiService;
 import rs.ac.bg.fon.service.LeagueService;
 import rs.ac.bg.fon.service.UserService;
 
@@ -25,7 +24,6 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
     private UserService userService;
     private RoleRepository roleRepository;
     private UserRepository userRepository;
-    private FootballApiService footballApiService;
     private LeagueService leagueService;
     private BetGroupService betGroupService;
     private InitialAdminConfig initialAdminConfig;
@@ -73,11 +71,6 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setFootballApiService(FootballApiService footballApiService) {
-        this.footballApiService = footballApiService;
     }
 
     @Autowired

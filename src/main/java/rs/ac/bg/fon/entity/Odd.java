@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -21,24 +22,31 @@ public class Odd {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "odd_id")
     private Integer id;
-    @Column(name="odd_value")
+    @Column(name = "odd_value")
     private BigDecimal odd;
-    @Column(name="odd_name")
+    @Column(name = "odd_name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fixture_id")
     private Fixture fixture;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bet_group_id")
     private BetGroup betGroup;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY,
-            cascade =  CascadeType.ALL,
+            cascade = CascadeType.ALL,
             mappedBy = "odd")
     private Bet bet;
 
+    @Override
+    public String toString() {
+        if (StringUtils.isBlank(name)) {
+            return super.toString();
+        }
+        return name + " " + odd;
+    }
 }
