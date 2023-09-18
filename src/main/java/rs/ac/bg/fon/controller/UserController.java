@@ -13,6 +13,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import rs.ac.bg.fon.entity.Role;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.service.UserService;
+import rs.ac.bg.fon.utility.ApiResponse;
+import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,43 +39,59 @@ public class UserController {
     private final UserService userService;
 
     @DeleteMapping("/delete/{username}")
-    public ResponseEntity<User> deleteUser(@PathVariable String username) {
-        return ResponseEntity.ok(userService.deleteUser(username));
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        if (username == null || username.isBlank()) {
+            return ResponseEntity.badRequest().body("Username is missing");
+        }
+        return ApiResponseUtil.handleApiResponse(userService.deleteUserApiResponse(username));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        return ResponseEntity.ok(userService.registerUser(user));
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Invalid user!");
+        }
+        return ApiResponseUtil.handleApiResponse(userService.registerUserApiResponse(user));
     }
 
     @GetMapping("/get/{username}")
-    public ResponseEntity<User> getUser(@PathVariable String username) {
-        System.out.println(username);
-        return ResponseEntity.ok().body(userService.getUser(username));
+    public ResponseEntity<?> getUser(@PathVariable String username) {
+        if (username == null || username.isBlank()) {
+            return ResponseEntity.badRequest().body("Username is missing");
+        }
+        return ApiResponseUtil.handleApiResponse(userService.getUserApiResponse(username));
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers() {
-        return ResponseEntity.ok().body(userService.getUsers());
+    public ResponseEntity<?> getUsers() {
+        return ApiResponseUtil.handleApiResponse(userService.getUsersApiResponse());
     }
 
 
     @PostMapping("/save")
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
+    public ResponseEntity<?> saveUser(@RequestBody User user) {
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Invalid user!");
+        }
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(user));
+        return ApiResponseUtil.handleApiResponse(userService.getUsersApiResponse(), uri);
     }
 
     @PostMapping("/role/save")
-    public ResponseEntity<Role> saveRole(@RequestBody Role role) {
+    public ResponseEntity<?> saveRole(@RequestBody Role role) {
+        if (role == null || role.getName()==null || role.getName().isBlank()) {
+            return ResponseEntity.badRequest().body("Invalid role!");
+        }
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveRole(role));
+        return ApiResponseUtil.handleApiResponse(userService.saveRoleApiResponse(role), uri);
     }
 
     @PostMapping("/role/addToUser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) {
-        userService.addRoleToUser(form.getUsername(), form.getRoleName());
-        return ResponseEntity.ok().build();
+        if (form == null) {
+            return ResponseEntity.badRequest().body("Invalid data!");
+        }
+        return ApiResponseUtil.handleApiResponse(userService.addRoleToUserApiResponse(form.getUsername(), form.getRoleName()));
     }
 
     @GetMapping("/token/refresh")
@@ -84,7 +102,6 @@ public class UserController {
             try {
                 String refresh_token = authorizationHeader.substring("Bearer ".length());
 
-                // TODO -> UTILITY KLASA U KOJOJ IMAMO ALGORITAM
                 Algorithm algorithm = getAlgorithm();
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = verifier.verify(refresh_token);

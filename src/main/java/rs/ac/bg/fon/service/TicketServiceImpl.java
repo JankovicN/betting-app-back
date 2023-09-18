@@ -37,13 +37,26 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void updateAllTickets() {
-        ticketRepository.updateAllTickets();
+    public ApiResponse<?> updateAllTickets() {
+        ApiResponse<List<Ticket>> response = new ApiResponse<>();
+        try{
+            ticketRepository.updateAllTickets();
+            response.addInfoMessage("Successfully updated tickets!");
+        }catch(Exception e){
+            response.addErrorMessage("Error updating tickets, try again later!");
+        }
+        return response;
     }
 
     @Override
-    public List<Ticket> getUserTickets(String username) {
-        return ticketRepository.findByUserUsername(username);
+    public ApiResponse<?> getUserTickets(String username) {
+        ApiResponse<List<Ticket>> response = new ApiResponse<>();
+        try{
+            response.setData(ticketRepository.findByUserUsername(username));
+        }catch(Exception e){
+            response.addErrorMessage("Error getting user tickets, try again later!");
+        }
+        return response;
     }
 
     @Override

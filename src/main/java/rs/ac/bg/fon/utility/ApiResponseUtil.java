@@ -1,7 +1,9 @@
 package rs.ac.bg.fon.utility;
 
 import org.springframework.http.ResponseEntity;
+import rs.ac.bg.fon.entity.User;
 
+import java.net.URI;
 import java.util.List;
 
 public class ApiResponseUtil {
@@ -32,5 +34,13 @@ public class ApiResponseUtil {
             response.setData(object);
         }
         return response;
+    }
+
+    public static ResponseEntity<?> handleApiResponse(ApiResponse<?> apiResponse, URI uri) {
+        if (apiResponse.getErrorMessages().isEmpty()) {
+            return ResponseEntity.created(uri).body(apiResponse);
+        } else {
+            return ResponseEntity.badRequest().body(apiResponse);
+        }
     }
 }

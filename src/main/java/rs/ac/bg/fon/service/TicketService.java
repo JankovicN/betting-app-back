@@ -10,9 +10,9 @@ import java.util.List;
 public interface TicketService {
     Ticket save(Ticket ticket);
 
-    void updateAllTickets();
+    ApiResponse<?> updateAllTickets();
 
-    List<Ticket> getUserTickets(String username);
+    ApiResponse<?> getUserTickets(String username);
 
     void processTickets();
 

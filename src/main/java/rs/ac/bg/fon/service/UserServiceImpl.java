@@ -9,9 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.entity.Role;
+import rs.ac.bg.fon.entity.Ticket;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.repository.RoleRepository;
 import rs.ac.bg.fon.repository.UserRepository;
+import rs.ac.bg.fon.utility.ApiResponse;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -100,6 +102,76 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = userRepository.findByUsername(username);
         userRepository.delete(user);
         return user;
+    }
+
+    @Override
+    public ApiResponse<?> deleteUserApiResponse(String username) {
+        ApiResponse<User> response = new ApiResponse<>();
+        try{
+            response.setData(deleteUser(username));
+            response.addInfoMessage("Successfully deleted user \""+username+"\".");
+        }catch(Exception e){
+            response.addErrorMessage("Unable to delete user at this time, try again later!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> registerUserApiResponse(User user) {
+        ApiResponse<User> response = new ApiResponse<>();
+        try{
+            response.setData(registerUser(user));
+            response.addInfoMessage("Successfully registered!\nWelcome "+user.getUsername()+"!");
+        }catch(Exception e){
+            response.addErrorMessage("Unable to register user at this time, try again later!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> getUsersApiResponse() {
+        ApiResponse<List<User>> response = new ApiResponse<>();
+        try{
+            response.setData(getUsers());
+        }catch(Exception e){
+            response.addErrorMessage("Unable to get users at this time, try again later!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> getUserApiResponse(String username) {
+        ApiResponse<User> response = new ApiResponse<>();
+        try{
+            response.setData(getUser(username));
+        }catch(Exception e){
+            response.addErrorMessage("Unable to get user at this time, try again later!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> addRoleToUserApiResponse(String username, String roleName) {
+        ApiResponse<User> response = new ApiResponse<>();
+        try{
+            addRoleToUser(username,roleName);
+            response.addInfoMessage("Successfully added role "+roleName+"to user "+username+"!");
+        }catch(Exception e){
+            response.addErrorMessage("Unable to add role "+roleName+" to user "+username+" at this time, try again later!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> saveRoleApiResponse(Role role) {
+        ApiResponse<Role> response = new ApiResponse<>();
+        try{
+            response.setData(saveRole(role));
+            response.addInfoMessage("Successfully added new role "+role.getName()+"!");
+        }catch(Exception e){
+            response.addErrorMessage("Unable to add new role "+role.getName()+" at this time, try again later!");
+        }
+        return response;
     }
 
 

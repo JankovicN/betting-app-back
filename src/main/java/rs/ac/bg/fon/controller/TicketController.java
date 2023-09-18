@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
 import rs.ac.bg.fon.entity.Ticket;
 import rs.ac.bg.fon.service.BetService;
@@ -18,19 +19,19 @@ import java.util.List;
 @RequestMapping("api/ticket")
 public class TicketController {
 
-    private final UserService userService;
-    private final BetService betService;
     private final TicketService ticketService;
 
     @PatchMapping("/update")
-    public ResponseEntity<?> updateAllTickets(){
-        ticketService.updateAllTickets();
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> updateAllTickets() {
+        return ApiResponseUtil.handleApiResponse(ticketService.updateAllTickets());
     }
 
     @GetMapping("/get/user/tickets/{username}")
-    public ResponseEntity<List<Ticket>> getUserTickets(@PathVariable String username){
-        return ResponseEntity.ok().body(ticketService.getUserTickets(username));
+    public ResponseEntity<?> getUserTickets(@PathVariable String username) {
+        if (username == null || username.isBlank()) {
+            return ResponseEntity.badRequest().body("Username is missing");
+        }
+        return ApiResponseUtil.handleApiResponse(ticketService.getUserTickets(username));
     }
 
     @PostMapping(path = "/new/ticket")
