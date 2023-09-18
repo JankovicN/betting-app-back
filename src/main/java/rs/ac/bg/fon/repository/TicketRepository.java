@@ -41,4 +41,7 @@ public interface TicketRepository  extends JpaRepository<Ticket, Integer> {
 
     @Query("SELECT SUM(totalWin) FROM Ticket WHERE user.id = :userId AND state = '"+Constants.TICKET_WIN+"'")
     Double getTotalWinAmountForUser(@Param("userId") int userId);
+
+    List<Ticket> findByState(String state);
+
 }

@@ -22,12 +22,20 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public boolean canUserPay(Integer userId, Double amount) {
+        if(amount>=0.0){
+            return true;
+        }
         return getUserPayments(userId).compareTo(BigDecimal.valueOf(amount)) >= 0;
     }
+
     @Override
     public boolean canUserPay(Integer userId, BigDecimal amount) {
+        if(amount.compareTo(BigDecimal.ZERO)>=0){
+            return true;
+        }
         return getUserPayments(userId).compareTo(amount) >= 0;
     }
+
     @Override
     public BigDecimal getUserPayments(Integer userId) {
         return BigDecimal.valueOf(paymentRepository.getUserPayments(userId));
@@ -35,7 +43,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void addPayment(Payment payment) {
-        paymentRepository.saveAndFlush(payment);
+        if(canUserPay(payment.getUser().getId(), payment.getAmount())) {
+            paymentRepository.saveAndFlush(payment);
+        }else{
+            //TODO add logging
+        }
     }
 
     @Override
@@ -45,6 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setUser(userService.getUser(userId));
         paymentRepository.saveAndFlush(payment);
     }
+
     @Override
     public void addPayment(Integer userId, BigDecimal amount, String type) {
         Payment payment = new Payment();

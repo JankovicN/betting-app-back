@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import rs.ac.bg.fon.service.BetService;
+import rs.ac.bg.fon.service.PaymentService;
 import rs.ac.bg.fon.service.TicketService;
 
 @RequiredArgsConstructor
@@ -23,6 +24,14 @@ public class TicketUpdaterJob {
         }
     }
 
+    @Scheduled(initialDelay = 30 * 1000, fixedRate = 60 * 60 * 1000)
+    public void payoutUsers(){
+        try {
+            ticketService.payoutUsers();
+        }catch (Exception e){
+            logger.error("Error while paying out users! \n"+ e.getMessage());
+        }
+    }
 
     @Scheduled(initialDelay = 30 * 1000, fixedRate = 60 * 60 * 1000)
     public void updateTickets(){

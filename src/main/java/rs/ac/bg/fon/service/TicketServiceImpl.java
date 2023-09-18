@@ -2,9 +2,11 @@ package rs.ac.bg.fon.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
 import rs.ac.bg.fon.entity.Bet;
+import rs.ac.bg.fon.entity.Payment;
 import rs.ac.bg.fon.entity.Ticket;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.mappers.BetMapper;
@@ -12,10 +14,8 @@ import rs.ac.bg.fon.mappers.TicketMapper;
 import rs.ac.bg.fon.repository.TicketRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,27 +61,28 @@ public class TicketServiceImpl implements TicketService {
     public BigDecimal getTotalWinAmountForUser(int userId) {
         return BigDecimal.valueOf(ticketRepository.getTotalWinAmountForUser(userId));
     }
+
     @Transactional
     @Override
     public ApiResponse<?> addNewTicketApiResponse(TicketDTO ticketDTO) {
 
         ApiResponse<?> response = new ApiResponse<>();
         try {
-            if(ticketDTO.getUsername()==null || ticketDTO.getUsername().isBlank()){
+            if (ticketDTO.getUsername() == null || ticketDTO.getUsername().isBlank()) {
                 response.addErrorMessage("Username is missing!");
-            }else {
+            } else {
                 User user = userService.getUser(ticketDTO.getUsername());
                 List<Bet> betList = betMapper.betDTOListToBetList(ticketDTO.getBets());
                 Ticket ticket = ticketMapper.ticketDTOToTicket(ticketDTO);
 
-                if(paymentService.canUserPay(user.getId(), ticketDTO.getWager())){
+                if (paymentService.canUserPay(user.getId(), ticketDTO.getWager())) {
                     setNewTicketFields(ticket);
                     ticket.setUser(user);
 
                     paymentService.addPayment(user.getId(), ticket.getWager().negate(), Constants.PAYMENT_WAGER);
                     ticketRepository.save(ticket);
                     betService.saveBetsForTicket(betList, ticket);
-                }else{
+                } else {
                     response.addErrorMessage("Insufficient funds!");
                 }
             }
@@ -91,17 +92,42 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    @Override
+    public void payoutUsers() {
+        List<Ticket> listOfTickets = ticketRepository.findByState(Constants.TICKET_WIN);
+        for (Ticket ticket : listOfTickets) {
+            try {
+                payoutUser(ticket);
+            } catch (Exception e) {
+                //TODO add logging
+            }
+        }
+    }
+
+    @Transactional
+    private void payoutUser(Ticket ticket) {
+        ticket.setState(Constants.TICKET_PAYOUT);
+        ticketRepository.save(ticket);
+        Payment payment = new Payment();
+        payment.setUser(ticket.getUser());
+        payment.setPaymentType(Constants.PAYMENT_PAYOUT);
+        payment.setAmount(ticket.getTotalWin());
+        paymentService.addPayment(payment);
+    }
+
     private void setNewTicketFields(Ticket ticket) {
         ticket.setDate(LocalDateTime.now());
         ticket.setState(Constants.TICKET_UNPROCESSED);
     }
 
     @Autowired
-    public void setTicketRepository(TicketRepository ticketRepository) {
+    public TicketServiceImpl(TicketRepository ticketRepository, TicketMapper ticketMapper, BetMapper betMapper, PaymentService paymentService, UserService userService, BetService betService) {
         this.ticketRepository = ticketRepository;
-    }
-    @Autowired
-    public void setTicketMapper(TicketMapper ticketMapper) {
         this.ticketMapper = ticketMapper;
+        this.betMapper = betMapper;
+        this.paymentService = paymentService;
+        this.userService = userService;
+        this.betService = betService;
     }
+
 }

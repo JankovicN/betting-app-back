@@ -21,4 +21,6 @@ public interface TicketService {
     BigDecimal getTotalWinAmountForUser(int userId);
 
     ApiResponse<?> addNewTicketApiResponse(TicketDTO ticketDTO);
+
+    void payoutUsers();
 }
