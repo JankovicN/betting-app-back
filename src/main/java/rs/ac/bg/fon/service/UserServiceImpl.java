@@ -104,13 +104,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return user;
     }
 
+
     @Override
     public ApiResponse<?> deleteUserApiResponse(String username) {
         ApiResponse<User> response = new ApiResponse<>();
-        try{
+        try {
             response.setData(deleteUser(username));
-            response.addInfoMessage("Successfully deleted user \""+username+"\".");
-        }catch(Exception e){
+            response.addInfoMessage("Successfully deleted user \"" + username + "\".");
+        } catch (Exception e) {
             response.addErrorMessage("Unable to delete user at this time, try again later!");
         }
         return response;
@@ -119,10 +120,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ApiResponse<?> registerUserApiResponse(User user) {
         ApiResponse<User> response = new ApiResponse<>();
-        try{
+        try {
             response.setData(registerUser(user));
-            response.addInfoMessage("Successfully registered!\nWelcome "+user.getUsername()+"!");
-        }catch(Exception e){
+            response.addInfoMessage("Successfully registered!\nWelcome " + user.getUsername() + "!");
+        } catch (Exception e) {
             response.addErrorMessage("Unable to register user at this time, try again later!");
         }
         return response;
@@ -131,9 +132,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ApiResponse<?> getUsersApiResponse() {
         ApiResponse<List<User>> response = new ApiResponse<>();
-        try{
+        try {
             response.setData(getUsers());
-        }catch(Exception e){
+        } catch (Exception e) {
             response.addErrorMessage("Unable to get users at this time, try again later!");
         }
         return response;
@@ -142,9 +143,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ApiResponse<?> getUserApiResponse(String username) {
         ApiResponse<User> response = new ApiResponse<>();
-        try{
+        try {
             response.setData(getUser(username));
-        }catch(Exception e){
+        } catch (Exception e) {
             response.addErrorMessage("Unable to get user at this time, try again later!");
         }
         return response;
@@ -153,11 +154,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ApiResponse<?> addRoleToUserApiResponse(String username, String roleName) {
         ApiResponse<User> response = new ApiResponse<>();
-        try{
-            addRoleToUser(username,roleName);
-            response.addInfoMessage("Successfully added role "+roleName+"to user "+username+"!");
-        }catch(Exception e){
-            response.addErrorMessage("Unable to add role "+roleName+" to user "+username+" at this time, try again later!");
+        try {
+            addRoleToUser(username, roleName);
+            response.addInfoMessage("Successfully added role " + roleName + "to user " + username + "!");
+        } catch (Exception e) {
+            response.addErrorMessage("Unable to add role " + roleName + " to user " + username + " at this time, try again later!");
         }
         return response;
     }
@@ -165,11 +166,30 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ApiResponse<?> saveRoleApiResponse(Role role) {
         ApiResponse<Role> response = new ApiResponse<>();
-        try{
+        try {
             response.setData(saveRole(role));
-            response.addInfoMessage("Successfully added new role "+role.getName()+"!");
-        }catch(Exception e){
-            response.addErrorMessage("Unable to add new role "+role.getName()+" at this time, try again later!");
+            response.addInfoMessage("Successfully added new role " + role.getName() + "!");
+        } catch (Exception e) {
+            response.addErrorMessage("Unable to add new role " + role.getName() + " at this time, try again later!");
+        }
+        return response;
+    }
+
+    @Override
+    public User updateUser(User updatedUser) {
+        User user = userRepository.findByUsername(updatedUser.getUsername());
+        updatedUser.setId(user.getId());
+        return userRepository.save(updatedUser);
+    }
+
+    @Override
+    public ApiResponse<?> updateUserApiResponse(User user) {
+        ApiResponse<User> response = new ApiResponse<>();
+        try {
+            response.setData(updateUser(user));
+            response.addInfoMessage("Successfully updated user " + user.getUsername() + "!");
+        } catch (Exception e) {
+            response.addErrorMessage("Unable to update user " + user.getUsername() + " at this time, try again later!");
         }
         return response;
     }

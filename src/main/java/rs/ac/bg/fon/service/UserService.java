@@ -23,6 +23,7 @@ public interface UserService {
     User registerUser(User user);
 
     User deleteUser(String username);
+    User updateUser(User user);
 
     ApiResponse<?> deleteUserApiResponse(String username);
 
@@ -35,4 +36,6 @@ public interface UserService {
     ApiResponse<?> addRoleToUserApiResponse(String username, String roleName);
 
     ApiResponse<?> saveRoleApiResponse(Role role);
+
+    ApiResponse<?> updateUserApiResponse(User user);
 }

@@ -49,7 +49,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         if (user == null) {
-            return ResponseEntity.badRequest().body("Invalid user!");
+            return ResponseEntity.badRequest().body("Invalid user data!");
         }
         return ApiResponseUtil.handleApiResponse(userService.registerUserApiResponse(user));
     }
@@ -71,16 +71,23 @@ public class UserController {
     @PostMapping("/save")
     public ResponseEntity<?> saveUser(@RequestBody User user) {
         if (user == null) {
-            return ResponseEntity.badRequest().body("Invalid user!");
+            return ResponseEntity.badRequest().body("Invalid user data!");
         }
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
         return ApiResponseUtil.handleApiResponse(userService.getUsersApiResponse(), uri);
+    }
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Invalid user data!");
+        }
+        return ApiResponseUtil.handleApiResponse(userService.updateUserApiResponse(user));
     }
 
     @PostMapping("/role/save")
     public ResponseEntity<?> saveRole(@RequestBody Role role) {
         if (role == null || role.getName()==null || role.getName().isBlank()) {
-            return ResponseEntity.badRequest().body("Invalid role!");
+            return ResponseEntity.badRequest().body("Invalid role data!");
         }
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
         return ApiResponseUtil.handleApiResponse(userService.saveRoleApiResponse(role), uri);
