@@ -8,7 +8,7 @@ import java.util.List;
 public interface BetService {
 
     Bet save(Bet bet);
-    void updateAllBets();
+    void updateAllBets() throws Exception;
 
     void saveBetsForTicket(List<Bet> betList, Ticket ticket) throws Exception;
 }

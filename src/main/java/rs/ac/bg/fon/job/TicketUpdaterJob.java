@@ -20,7 +20,7 @@ public class TicketUpdaterJob {
         try {
             betService.updateAllBets();
         }catch (Exception e){
-            logger.error("Error while updating bets on ticket! \n"+ e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
