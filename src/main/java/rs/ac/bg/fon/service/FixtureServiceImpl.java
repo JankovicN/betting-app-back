@@ -9,6 +9,8 @@ import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
+import rs.ac.bg.fon.entity.Bet;
+import rs.ac.bg.fon.entity.BetGroup;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Team;
 import rs.ac.bg.fon.mappers.FixtureMapper;
@@ -38,78 +40,105 @@ public class FixtureServiceImpl implements FixtureService {
 
     @Override
     public Fixture save(Fixture fixture) {
-        logger.info("Saving fixture: {}", fixture);
-        return fixtureRepository.save(fixture);
+        try {
+            Fixture savedFixture = fixtureRepository.save(fixture);
+            logger.info("Successfully saved Fixture " + savedFixture + "!");
+            return savedFixture;
+        } catch (Exception e) {
+            logger.error("Error while trying to save Fixture " + fixture + "!\n" + e.getMessage());
+            return null;
+        }
     }
 
     @Override
-    public Fixture getFixtureById(int fixtureId) {
-        Optional<Fixture> fixture = fixtureRepository.findById(fixtureId);
-        if (fixture.isPresent()) {
-            logger.info("getFixtureById: Found fixture with id = " + fixtureId);
-            return fixture.get();
+    public Fixture getFixtureById(Integer fixtureID) {
+        try {
+            Optional<Fixture> fixture = fixtureRepository.findById(fixtureID);
+
+            if (fixture.isPresent()) {
+                logger.info("Successfully found Fixture with ID = " + fixtureID + "!");
+                return fixture.get();
+            }
+            logger.warn("No fixture is found for ID = " + fixtureID);
+            return null;
+        } catch (Exception e) {
+            logger.error("Error while trying to find Fixture with ID = " + fixtureID + "!\n" + e.getMessage());
+            return null;
         }
-        logger.warn("getFixtureById: No fixture is found for id = " + fixtureId);
-        return new Fixture();
     }
 
     @Override
     public List<Fixture> getNotStarted() {
-        List<Fixture> fixtures = this.fixtureRepository.findByState(Constants.FIXTURE_NOT_STARTED);
-        if(fixtures == null || fixtures.isEmpty()){
-            logger.warn("getNotStarted: No fixture is found for state = NS");
-        }else{
-            for (Fixture f : fixtures) {
-                Optional<Team> home = teamService.findById(f.getHome().getId());
-                Optional<Team> away = teamService.findById(f.getAway().getId());
-                f.setHome(home.get());
-                f.setAway(away.get());
+        try {
+            List<Fixture> fixtures = fixtureRepository.findByState(Constants.FIXTURE_NOT_STARTED);
+            if (fixtures == null || fixtures.isEmpty()) {
+                logger.warn("No Fixtures were found for STATE = " + Constants.FIXTURE_NOT_STARTED);
+            } else {
+                logger.info("Successfully found all Fixtures that have STATE = " + Constants.FIXTURE_NOT_STARTED + "!");
+                for (Fixture f : fixtures) {
+                    Optional<Team> home = teamService.findById(f.getHome().getId());
+                    Optional<Team> away = teamService.findById(f.getAway().getId());
+                    f.setHome(home.get());
+                    f.setAway(away.get());
+                }
             }
+            return fixtures;
+        } catch (Exception e) {
+            logger.error("Error while trying to find Fixtures with STATE = " + Constants.FIXTURE_NOT_STARTED + "!\n" + e.getMessage());
+            return new ArrayList<>();
         }
-        return fixtures;
     }
 
     @Override
-    public boolean existsByDate(LocalDateTime date) {
-        List<Fixture> fixtures = fixtureRepository.findByDate(java.sql.Timestamp.valueOf(date));
-        return fixtures.size() > 0;
-    }
+    public List<Fixture> getNotStartedByLeague(Integer leagueID) {
 
-
-    @Override
-    public List<Fixture> getNotStartedByLeague(Integer league) {
-        List<Fixture> fixtures = this.fixtureRepository.findByStateAndLeagueId(Constants.FIXTURE_NOT_STARTED, league);
-        for (Fixture f : fixtures) {
-            Optional<Team> home = teamService.findById(f.getHome().getId());
-            Optional<Team> away = teamService.findById(f.getAway().getId());
-            f.setHome(home.get());
-            f.setAway(away.get());
+        try {
+            List<Fixture> fixtures = fixtureRepository.findByStateAndLeagueId(Constants.FIXTURE_NOT_STARTED, leagueID);
+            if (fixtures == null || fixtures.isEmpty()) {
+                logger.warn("No Fixtures were found for LEAGUE ID = " + leagueID + " and STATE = " + Constants.FIXTURE_NOT_STARTED);
+            } else {
+                logger.info("Successfully found all Fixtures that have LEAGUE ID = " + leagueID + " and STATE = " + Constants.FIXTURE_NOT_STARTED + "!");
+                for (Fixture f : fixtures) {
+                    Optional<Team> home = teamService.findById(f.getHome().getId());
+                    Optional<Team> away = teamService.findById(f.getAway().getId());
+                    f.setHome(home.get());
+                    f.setAway(away.get());
+                }
+            }
+            return fixtures;
+        } catch (Exception e) {
+            logger.error("Error while trying to find Fixtures with LEAGUE ID = " + leagueID + " and STATE = " + Constants.FIXTURE_NOT_STARTED + "!\n" + e.getMessage());
+            return new ArrayList<>();
         }
-        return fixtures;
     }
 
     @Override
     public List<FixtureDTO> createFixtureDTOList(List<Fixture> fixtures) {
-        List<FixtureDTO> fixtureDTOS = new ArrayList<>();
-        for (Fixture fixture : fixtures) {
-            List<BetGroupDTO> betGroupDTOList = betGroupService.createBetGroupDTOList(fixture.getId());
-            Optional<Team> home = teamService.findById(fixture.getHome().getId());
-            Optional<Team> away = teamService.findById(fixture.getAway().getId());
+        try {
+            List<FixtureDTO> fixtureDTOS = new ArrayList<>();
+            for (Fixture fixture : fixtures) {
+                List<BetGroupDTO> betGroupDTOList = betGroupService.createBetGroupDTOList(fixture.getId());
+                Optional<Team> home = teamService.findById(fixture.getHome().getId());
+                Optional<Team> away = teamService.findById(fixture.getAway().getId());
 
-            if (home==null || home.isEmpty() || away==null || away.isEmpty() || betGroupDTOList==null || betGroupDTOList.isEmpty()) {
-                continue;
-            }
+                if (home == null || home.isEmpty() || away == null || away.isEmpty() || betGroupDTOList == null || betGroupDTOList.isEmpty()) {
+                    continue;
+                }
 
-            try {
-                TeamDTO homeDTO = teamService.createBetGroupDTO(home.get());
-                TeamDTO awayDTO = teamService.createBetGroupDTO(away.get());
-                FixtureDTO fixtureDTO = fixtureMapper.fixtureToFixtureDTO(fixture, homeDTO, awayDTO, betGroupDTOList);
-                fixtureDTOS.add(fixtureDTO);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
+                try {
+                    TeamDTO homeDTO = teamService.createBetGroupDTO(home.get());
+                    TeamDTO awayDTO = teamService.createBetGroupDTO(away.get());
+                    FixtureDTO fixtureDTO = fixtureMapper.fixtureToFixtureDTO(fixture, homeDTO, awayDTO, betGroupDTOList);
+                    fixtureDTOS.add(fixtureDTO);
+                } catch (Exception e) {
+                    logger.error("Error while trying to create FixtureDTO for Fixture " + fixture + "!\n" + e.getMessage());
+                }
             }
+            return fixtureDTOS;
+        } catch (Exception e) {
+            logger.error("Error while trying to create FixtureDTO list from Fixture list!\n" + e.getMessage());
+            return new ArrayList<>();
         }
-        return fixtureDTOS;
     }
 
     @Override

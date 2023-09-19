@@ -11,15 +11,16 @@ import java.util.List;
 public interface FixtureService {
 
     Fixture save(Fixture fixture);
-    Fixture getFixtureById(int fixtureId);
+
+    Fixture getFixtureById(Integer fixtureID);
 
     List<Fixture> getNotStarted();
-
-    boolean existsByDate(LocalDateTime date);
 
     List<Fixture> getNotStartedByLeague(Integer league);
 
     List<FixtureDTO> createFixtureDTOList(List<Fixture> fixtures);
+
     ApiResponse<?> getNotStartedByLeagueApiCall(Integer league);
+
     ApiResponse<?> getNotStartedApiCall();
 }

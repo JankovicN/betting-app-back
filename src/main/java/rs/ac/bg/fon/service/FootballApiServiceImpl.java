@@ -95,6 +95,9 @@ public class FootballApiServiceImpl implements FootballApiService {
                     }
                     for (JsonElement jsonElement : jsonArr) {
                         Fixture fixture = fixtureService.getFixtureById(jsonElement.getAsJsonObject().get("fixture").getAsJsonObject().get("id").getAsInt());
+                        if (fixture == null) {
+                            continue;
+                        }
                         if (fixture.getState().equals(Constants.FIXTURE_NOT_STARTED)) {
                             JsonArray betsArray = getBetsArrayFromBookmakerJsonElement(jsonElement);
                             if (betsArray == null || betsArray.isJsonNull() || betsArray.isEmpty()) {
@@ -177,6 +180,10 @@ public class FootballApiServiceImpl implements FootballApiService {
                     fixture.setLeague(league);
 
                     fixtureService.save(fixture);
+                    if (fixtureService == null) {
+                        logger.info("Error while trying to save Fixture " + fixture + "!");
+                        apiResponse.addInfoMessage("Error while trying to save Fixture " + fixture + "!");
+                    }
                 }
                 apiResponse.addInfoMessage("Successfully added new fixtures!");
                 logger.info("Successful FootballAPI Fixtures call for getting fixtures");

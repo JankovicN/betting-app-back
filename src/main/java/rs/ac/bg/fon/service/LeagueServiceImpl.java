@@ -78,6 +78,9 @@ public class LeagueServiceImpl implements LeagueService{
                 continue;
             }
             List<FixtureDTO> fixtureDTOS = fixtureService.createFixtureDTOList(fixturesList);
+            if ( fixtureDTOS == null || fixtureDTOS.isEmpty()) {
+                continue;
+            }
             try{
                 LeagueDTO leagueDTO = leagueMapper.leagueToLeagueDTO(league, fixtureDTOS);
                 leagueDTOS.add(leagueDTO);
