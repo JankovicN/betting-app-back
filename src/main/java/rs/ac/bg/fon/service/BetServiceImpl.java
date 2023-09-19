@@ -1,6 +1,8 @@
 package rs.ac.bg.fon.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class BetServiceImpl implements BetService{
+    private static final Logger logger = LoggerFactory.getLogger(BetServiceImpl.class);
 
     private BetRepository betRepository;
 
@@ -38,7 +41,7 @@ public class BetServiceImpl implements BetService{
     public void saveBetsForTicket(List<Bet> betList, Ticket ticket) throws Exception {
         for (Bet bet : betList) {
             if (bet ==null || bet.getOdd()==null){
-                throw new Exception("Invalid bet!");
+                throw new Exception("Unable to save all Bets for Ticket!");
             }
             Odd odd = bet.getOdd();
             bet.setOdd(odd);

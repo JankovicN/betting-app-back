@@ -29,7 +29,7 @@ public class ApiResponseUtil {
     }
     public static ApiResponse<?> transformListToApiResponse(List<?> listOfObjects, String objectName) {
         ApiResponse response = new ApiResponse();
-        if (listOfObjects.isEmpty()) {
+        if (listOfObjects==null || listOfObjects.isEmpty()) {
             response.addInfoMessage("There are no " + objectName + " to show!");
             response.setData(listOfObjects);
         } else {

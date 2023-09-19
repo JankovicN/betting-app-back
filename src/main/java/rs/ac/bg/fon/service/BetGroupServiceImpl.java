@@ -39,67 +39,123 @@ public class BetGroupServiceImpl implements BetGroupService {
 
     @Override
     public BetGroup getBetGroupWithId(Integer betGroupId) {
-        Optional<BetGroup> betGroup = betGroupRepository.findById(betGroupId);
-        if (betGroup.isPresent()) {
-            return betGroup.get();
+        try {
+            Optional<BetGroup> betGroup = betGroupRepository.findById(betGroupId);
+            if (betGroup.isPresent()) {
+                logger.info("Found Bet Group with ID = " + betGroupId + "!");
+                return betGroup.get();
+            }
+            logger.warn("No Bet Group found for ID = " + betGroupId + "!");
+            return null;
+        } catch (Exception e) {
+            logger.error("Error while trying to find Bet Group with ID = " + betGroupId + "!\n" + e.getMessage());
+            return null;
         }
-        return new BetGroup();
     }
 
     @Override
-    public void deleteBetGroup(Integer id) {
-        this.betGroupRepository.deleteById(id);
+    public void deleteBetGroup(Integer betGroupId) throws Exception {
+        try {
+            betGroupRepository.deleteById(betGroupId);
+            logger.info("Deleting Bet Group with ID = " + betGroupId + "!");
+        } catch (Exception e) {
+            logger.error("Error while trying to delete Bet Group with ID = " + betGroupId + "!\n" + e.getMessage());
+            throw new Exception("Error while trying to delete Bet Group with ID = " + betGroupId + "!");
+        }
     }
 
     @Override
     public List<BetGroupDTO> createBetGroupDTOList(Integer fixtureId) {
-        List<BetGroupDTO> betGroupDTOList = new ArrayList<>();
-        List<BetGroup> betGroupList=getAllBetGroups();
-        for (BetGroup betGroup : betGroupList) {
-            List<OddDTO> oddList = oddService.createOddDTOList(fixtureId,betGroup.getId());
-            try {
-                BetGroupDTO betGroupDTO = betGroupMapper.betGroupToBetGroupDTO(betGroup,oddList);
-                betGroupDTOList.add(betGroupDTO);
-            } catch (Exception e) {
-                // TODO add to api response
-                //logger.error(e.getMessage());
+        try {
+            List<BetGroupDTO> betGroupDTOList = new ArrayList<>();
+            List<BetGroup> betGroupList = getAllBetGroups();
+            for (BetGroup betGroup : betGroupList) {
+                List<OddDTO> oddList = oddService.createOddDTOList(fixtureId, betGroup.getId());
+                try {
+                    BetGroupDTO betGroupDTO = betGroupMapper.betGroupToBetGroupDTO(betGroup, oddList);
+                    betGroupDTOList.add(betGroupDTO);
+                } catch (Exception e) {
+                    logger.error("Error adding Bet Group with ID = " + betGroup.getId() + " to list!\n" + e.getMessage());
+                }
             }
+            return betGroupDTOList;
+        } catch (Exception e) {
+            logger.error("Error while trying to create Bet Group DTO list!\n" + e.getMessage());
+            return new ArrayList<>();
         }
-        return betGroupDTOList;
     }
 
     @Override
     public ApiResponse<?> deleteBetGroupApiResponse(Integer id) {
-        deleteBetGroup(id);
         ApiResponse response = new ApiResponse();
-        response.addInfoMessage("Successfully deleted bet group with id = " + id);
+        try {
+            deleteBetGroup(id);
+            response.addInfoMessage("Successfully deleted bet group with ID = " + id);
+        } catch (Exception e) {
+            response.addErrorMessage(e.getMessage());
+        }
         return response;
     }
 
     @Override
-    public List<BetGroup> getBetGroupsByFixture(Integer fixture) {
-        return betGroupRepository.findByOddsFixtureId(fixture);
+    public List<BetGroup> getBetGroupsByFixture(Integer fixtureID) {
+        try {
+            List<BetGroup> betGroupList = betGroupRepository.findByOddsFixtureId(fixtureID);
+            logger.info("Successfully found Bet Groups for Fixture ID = " + fixtureID + "!");
+            return betGroupList;
+        } catch (Exception e) {
+            logger.error("Error while trying to find Bet Groups with Fixture ID = " + fixtureID + "!\n" + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
 
     @Override
     public BetGroup saveBetGroup(BetGroup betGroup) {
-        return betGroupRepository.saveAndFlush(betGroup);
+        try {
+            BetGroup savedBetGroup = betGroupRepository.saveAndFlush(betGroup);
+            logger.info("Successfully saved Bet Group " + savedBetGroup + "!");
+            return savedBetGroup;
+        } catch (Exception e) {
+            logger.error("Error while trying to save Bet Group " + betGroup + "!\n" + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<BetGroup> saveBetGroups(List<BetGroup> betGroups) {
-        return betGroupRepository.saveAllAndFlush(betGroups);
+        try {
+            List<BetGroup> savedBetGroups = betGroupRepository.saveAllAndFlush(betGroups);
+            logger.info("Successfully saved Bet Groups!");
+            return savedBetGroups;
+        } catch (Exception e) {
+            logger.error("Error while trying to save Bet Group!\n" + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     @Override
     public List<BetGroup> getAllBetGroups() {
-        return this.betGroupRepository.findAll();
+        try {
+            List<BetGroup> savedBetGroups = betGroupRepository.findAll();
+            logger.info("Successfully found all Bet Groups!");
+            return savedBetGroups;
+        } catch (Exception e) {
+            logger.error("Error while trying to find all Bet Groups!\n" + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     @Override
     public long countRows() {
-        return betGroupRepository.count();
+        try {
+            long betGroupSize = betGroupRepository.count();
+            logger.info("Success, Bet Group size is " + betGroupSize + "!");
+            return betGroupSize;
+        } catch (Exception e) {
+            logger.error("Error while trying to count Bet Groups!\n" + e.getMessage());
+            return 0;
+        }
     }
 
     @Override
@@ -109,7 +165,14 @@ public class BetGroupServiceImpl implements BetGroupService {
 
     @Override
     public boolean existsWithId(Integer betGroupId) {
-        return betGroupRepository.existsById(betGroupId);
+        try {
+            boolean exists = betGroupRepository.existsById(betGroupId);
+            logger.info("Successfully checked if Bet Group with ID = " + betGroupId + " exists = " + exists + "!");
+            return exists;
+        } catch (Exception e) {
+            logger.error("Error while checking if Bet Group with ID = " + betGroupId + ", exists!\n" + e.getMessage());
+            return false;
+        }
     }
 
 

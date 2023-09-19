@@ -96,7 +96,7 @@ public class FixtureServiceImpl implements FixtureService {
             Optional<Team> home = teamService.findById(fixture.getHome().getId());
             Optional<Team> away = teamService.findById(fixture.getAway().getId());
 
-            if (home.isEmpty() || away.isEmpty() || betGroupDTOList.isEmpty()) {
+            if (home==null || home.isEmpty() || away==null || away.isEmpty() || betGroupDTOList==null || betGroupDTOList.isEmpty()) {
                 continue;
             }
 

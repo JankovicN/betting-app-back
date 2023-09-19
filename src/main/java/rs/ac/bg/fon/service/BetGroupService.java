@@ -26,7 +26,7 @@ public interface BetGroupService {
 
     boolean existsWithId(Integer betGroupId);
 
-    void deleteBetGroup(Integer id);
+    void deleteBetGroup(Integer id) throws Exception;
 
     List<BetGroupDTO> createBetGroupDTOList(Integer fixtureId);
 

@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.constants.SecretKeys;
 import rs.ac.bg.fon.entity.*;
 import rs.ac.bg.fon.utility.ApiResponse;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -73,13 +73,14 @@ public class FootballApiServiceImpl implements FootballApiService {
                 apiResponse.addErrorMessage("Error getting bet groups from Football API [Exception]");
                 logger.error("Exception: FootballAPI BetGroups Error when getting bet groups", e);
             }
-        }else{
+        } else {
             logger.info("Bet groups are already fetched!");
             apiResponse.addInfoMessage("No new bet groups were added!");
         }
         return apiResponse;
     }
 
+    @Transactional
     @Override
     public ApiResponse<?> getOddsFromAPI() {
         LocalDateTime[] dateRange = getDateRange(currentDateAddOffset(0), currentDateAddOffset(5));
@@ -106,6 +107,9 @@ public class FootballApiServiceImpl implements FootballApiService {
                                         continue;
                                     }
                                     BetGroup betGroup = betGroupService.getBetGroupWithId(betGroupId);
+                                    if (betGroup == null) {
+                                        continue;
+                                    }
                                     JsonArray oddsArr = betGroupEl.getAsJsonObject().get("values").getAsJsonArray();
                                     List<Odd> oddList = new ArrayList<>();
                                     if (oddsArr == null || oddsArr.isJsonNull() || oddsArr.isEmpty()) {
@@ -119,7 +123,9 @@ public class FootballApiServiceImpl implements FootballApiService {
                                         logger.info("Adding odd to list " + odd.getName() + " for fixture " + fixture.getHome().getName() + " - " + fixture.getAway().getName());
                                     }
                                     betGroup.getOdds().addAll(oddList);
-                                    betGroupService.saveBetGroup(betGroup);
+                                    if (betGroupService.saveBetGroup(betGroup) == null) {
+                                        continue;
+                                    }
                                     oddService.saveOddList(oddList);
                                     logger.info("Saving odd list for bet group " + betGroup.getName());
                                 }
