@@ -25,8 +25,7 @@ public class OddController {
     @GetMapping("/get/odds/{fixture}")
     public ResponseEntity<?> getOddsForFixture(@PathVariable Integer fixture){
         if (fixture == null) {
-            // Handle the case where the "id" path variable is missing
-            return ResponseEntity.badRequest().body("ID is missing");
+            return ApiResponseUtil.errorApiResponse("Fixture data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(oddService.getOddsForFixtureApiResponse(Integer.valueOf(fixture)));
     }

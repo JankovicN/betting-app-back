@@ -25,11 +25,6 @@ public class FootballApiController {
         return ApiResponseUtil.handleApiResponse(footballApiService.getBetGroupsFromAPI());
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<?> test() {
-        return ApiResponseUtil.handleApiResponse(footballApiService.test());
-    }
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/get/apiFixtures")
     public ResponseEntity<?> getFixturesFromAPI(Authentication auth) {

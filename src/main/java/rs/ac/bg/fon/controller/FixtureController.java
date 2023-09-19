@@ -20,7 +20,7 @@ public class FixtureController {
     @GetMapping("/ns/{league}")
     public ResponseEntity<?> getAllFixtures(@PathVariable Integer league) {
         if(league == null){
-            return ResponseEntity.badRequest().body("League id is missing");
+            return ApiResponseUtil.errorApiResponse("League data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeagueApiCall(league));
     }

@@ -24,14 +24,14 @@ public class BetGroupController {
     @GetMapping("/get/{fixture}")
     public ResponseEntity<?> getBetGroups(@PathVariable Integer fixtureId) {
         if (fixtureId == null) {
-            return ResponseEntity.badRequest().body("Fixture ID is missing");
+            return ApiResponseUtil.errorApiResponse("Fixture data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(betGroupService.getBetGroupsByFixtureApiResponse(fixtureId));
     }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteBetGroup(@PathVariable Integer betGroupId){
         if (betGroupId == null) {
-            return ResponseEntity.badRequest().body("Bet group ID is missing");
+            return ApiResponseUtil.errorApiResponse("Bet group data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(betGroupService.deleteBetGroupApiResponse(betGroupId));
     }

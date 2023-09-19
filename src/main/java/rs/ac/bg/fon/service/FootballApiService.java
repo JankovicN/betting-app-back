@@ -6,5 +6,4 @@ public interface FootballApiService {
     ApiResponse<?> getBetGroupsFromAPI();
     ApiResponse<?>  getOddsFromAPI();
     ApiResponse<?> getFixturesFromAPI();
-    ApiResponse<?> test();
 }

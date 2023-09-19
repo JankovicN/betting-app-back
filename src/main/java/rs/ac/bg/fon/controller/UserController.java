@@ -41,7 +41,7 @@ public class UserController {
     @DeleteMapping("/delete/{username}")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
         if (username == null || username.isBlank()) {
-            return ResponseEntity.badRequest().body("Username is missing");
+            return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(userService.deleteUserApiResponse(username));
     }
@@ -49,7 +49,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         if (user == null) {
-            return ResponseEntity.badRequest().body("Invalid user data!");
+            return ApiResponseUtil.errorApiResponse("Invalid user data!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(userService.registerUserApiResponse(user));
     }
@@ -57,7 +57,7 @@ public class UserController {
     @GetMapping("/get/{username}")
     public ResponseEntity<?> getUser(@PathVariable String username) {
         if (username == null || username.isBlank()) {
-            return ResponseEntity.badRequest().body("Username is missing");
+            return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(userService.getUserApiResponse(username));
     }
@@ -71,7 +71,7 @@ public class UserController {
     @PostMapping("/save")
     public ResponseEntity<?> saveUser(@RequestBody User user) {
         if (user == null) {
-            return ResponseEntity.badRequest().body("Invalid user data!");
+            return ApiResponseUtil.errorApiResponse("Invalid user data!\nContact support for more information!");
         }
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
         return ApiResponseUtil.handleApiResponse(userService.getUsersApiResponse(), uri);
@@ -79,7 +79,7 @@ public class UserController {
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestBody User user) {
         if (user == null) {
-            return ResponseEntity.badRequest().body("Invalid user data!");
+            return ApiResponseUtil.errorApiResponse("Invalid user data!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(userService.updateUserApiResponse(user));
     }
@@ -87,7 +87,7 @@ public class UserController {
     @PostMapping("/role/save")
     public ResponseEntity<?> saveRole(@RequestBody Role role) {
         if (role == null || role.getName()==null || role.getName().isBlank()) {
-            return ResponseEntity.badRequest().body("Invalid role data!");
+            return ApiResponseUtil.errorApiResponse("Invalid role data!\nContact support for more information!");
         }
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
         return ApiResponseUtil.handleApiResponse(userService.saveRoleApiResponse(role), uri);
@@ -96,7 +96,7 @@ public class UserController {
     @PostMapping("/role/addToUser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) {
         if (form == null) {
-            return ResponseEntity.badRequest().body("Invalid data!");
+            return ApiResponseUtil.errorApiResponse("Invalid data!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(userService.addRoleToUserApiResponse(form.getUsername(), form.getRoleName()));
     }

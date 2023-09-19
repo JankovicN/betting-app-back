@@ -29,7 +29,7 @@ public class TicketController {
     @GetMapping("/get/user/tickets/{username}")
     public ResponseEntity<?> getUserTickets(@PathVariable String username) {
         if (username == null || username.isBlank()) {
-            return ResponseEntity.badRequest().body("Username is missing");
+            return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(ticketService.getUserTickets(username));
     }
@@ -38,7 +38,7 @@ public class TicketController {
     public ResponseEntity<?> addNewTicket(@RequestBody TicketDTO ticket) {
 
         if (ticket == null) {
-            return ResponseEntity.badRequest().body("Ticket is empty!");
+            return ApiResponseUtil.errorApiResponse("Ticket data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(ticketService.addNewTicketApiResponse(ticket));
     }

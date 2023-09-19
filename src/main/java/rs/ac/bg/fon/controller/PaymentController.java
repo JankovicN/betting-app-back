@@ -23,7 +23,7 @@ public class PaymentController {
     public ResponseEntity<?> getBalanceForUser(@PathVariable Integer userId) {
 
         if (userId == null) {
-            return ResponseEntity.badRequest().body("User ID is missing");
+            return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(paymentService.getUserPaymentsApiResponse(userId));
     }
@@ -32,10 +32,10 @@ public class PaymentController {
     public ResponseEntity<?> depositAmount(@PathVariable Integer userId, @PathVariable Double amount) {
 
         if (userId == null) {
-            return ResponseEntity.badRequest().body("User ID is missing");
+            return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
         if (amount == null || amount.isNaN()) {
-            return ResponseEntity.badRequest().body("Amount is missing");
+            return ApiResponseUtil.errorApiResponse("Deposit amount is missing!");
         }
         return ApiResponseUtil.handleApiResponse(paymentService.addPaymentApiResponse(userId, amount, Constants.PAYMENT_DEPOSIT));
     }
@@ -44,10 +44,10 @@ public class PaymentController {
     public ResponseEntity<?> withdrawAmount(@PathVariable Integer userId, @PathVariable Double amount) {
 
         if (userId == null) {
-            return ResponseEntity.badRequest().body("User ID is missing");
+            return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
         if (amount == null || amount.isNaN()) {
-            return ResponseEntity.badRequest().body("Amount is missing");
+            return ApiResponseUtil.errorApiResponse("Withdraw amount is missing!");
         }
         return ApiResponseUtil.handleApiResponse(paymentService.addPaymentApiResponse(userId, -amount, Constants.PAYMENT_WITHDRAW));
     }
