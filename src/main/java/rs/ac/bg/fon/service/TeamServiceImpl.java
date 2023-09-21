@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
 import rs.ac.bg.fon.entity.Team;
 import rs.ac.bg.fon.mappers.TeamMapper;
@@ -17,6 +18,7 @@ public class TeamServiceImpl implements TeamService {
     TeamRepository teamRepository;
     TeamMapper teamMapper;
 
+    @Transactional
     @Override
     public Team save(Team team) {
         return teamRepository.save(team);

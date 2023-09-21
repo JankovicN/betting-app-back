@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface BetGroupService {
     ApiResponse<?> getAllBetGroupsApiResponse();
+
     ApiResponse<?> getBetGroupsByFixtureApiResponse(Integer fixture);
 
     BetGroup saveBetGroup(BetGroup betGroup);
@@ -18,9 +19,8 @@ public interface BetGroupService {
     List<BetGroup> getAllBetGroups();
 
     BetGroup getBetGroupWithId(Integer betGroupId);
-    List<BetGroup> getBetGroupsByFixture(Integer fixture);
 
-    long countRows();
+    List<BetGroup> getBetGroupsByFixture(Integer fixture);
 
     boolean exists();
 

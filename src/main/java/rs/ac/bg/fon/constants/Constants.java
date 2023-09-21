@@ -2,7 +2,10 @@ package rs.ac.bg.fon.constants;
 
 public class Constants {
     public static final String RESOURCE_FOLDER = "src/main/resources/";
+
+    // Football API specific constants
     public static final String SEASON = "2023";
+    public static final Integer BET_365_ID = 8;
 
     // Waiting for result state
     public static final String WAITING_FOR_RESULTS = "-";

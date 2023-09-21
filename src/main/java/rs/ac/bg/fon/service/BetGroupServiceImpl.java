@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
 import rs.ac.bg.fon.entity.BetGroup;
@@ -13,14 +14,12 @@ import rs.ac.bg.fon.repository.BetGroupRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BetGroupServiceImpl implements BetGroupService {
     private static final Logger logger = LoggerFactory.getLogger(BetGroupServiceImpl.class);
     private BetGroupRepository betGroupRepository;
@@ -92,7 +91,8 @@ public class BetGroupServiceImpl implements BetGroupService {
             deleteBetGroup(id);
             response.addInfoMessage("Successfully deleted bet group with ID = " + id);
         } catch (Exception e) {
-            response.addErrorMessage(e.getMessage());
+            logger.error("Error while trying to delete Bet Group with ID = "+id+"!\n" + e.getMessage());
+            response.addErrorMessage("Unable to delete Bet Group with ID = "+id+"!");
         }
         return response;
     }
@@ -109,7 +109,7 @@ public class BetGroupServiceImpl implements BetGroupService {
         }
     }
 
-
+    @Transactional
     @Override
     public BetGroup saveBetGroup(BetGroup betGroup) {
         try {
@@ -122,6 +122,7 @@ public class BetGroupServiceImpl implements BetGroupService {
         }
     }
 
+    @Transactional
     @Override
     public List<BetGroup> saveBetGroups(List<BetGroup> betGroups) {
         try {
@@ -143,18 +144,6 @@ public class BetGroupServiceImpl implements BetGroupService {
         } catch (Exception e) {
             logger.error("Error while trying to find all Bet Groups!\n" + e.getMessage());
             return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public long countRows() {
-        try {
-            long betGroupSize = betGroupRepository.count();
-            logger.info("Success, Bet Group size is " + betGroupSize + "!");
-            return betGroupSize;
-        } catch (Exception e) {
-            logger.error("Error while trying to count Bet Groups!\n" + e.getMessage());
-            return 0;
         }
     }
 
