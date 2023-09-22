@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
+import rs.ac.bg.fon.entity.League;
 import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.mappers.OddMapper;
 import rs.ac.bg.fon.repository.OddRepository;
@@ -28,28 +29,39 @@ public class OddServiceImpl implements OddService {
 
     @Override
     public Odd save(Odd odd) {
-
-        logger.info("Saving odd: {}", odd);return this.oddRepository.saveAndFlush(odd);
+        try {
+            Odd savedOdd = oddRepository.saveAndFlush(odd);
+            logger.info("Successfully saved Odd " + savedOdd + "!");
+            return savedOdd;
+        } catch (Exception e) {
+            logger.error("Error while trying to save Odd " + odd + "!\n" + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<Odd> saveOddList(List<Odd> odds) {
-        return this.oddRepository.saveAllAndFlush(odds);
+        try {
+            List<Odd> savedOdds = oddRepository.saveAllAndFlush(odds);
+            logger.info("Successfully saved list of Odds!");
+            return savedOdds;
+        } catch (Exception e) {
+            logger.error("Error while trying to save list of Odds!!\n" + e.getMessage());
+            return null;
+        }
     }
 
-    @Override
-    public List<Odd> getALlOdds() {
-        return oddRepository.findByBetGroupIdAndFixtureState(1, Constants.FIXTURE_NOT_STARTED);
-    }
-
-    @Override
-    public List<Odd> getOddsForFixture(Integer fixture) {
-        return oddRepository.findByFixtureStateAndFixtureId(Constants.FIXTURE_NOT_STARTED, fixture);
-    }
 
     @Override
     public List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId) {
-        return oddRepository.findByFixtureStateAndFixtureIdAndBetGroupId(Constants.FIXTURE_NOT_STARTED, fixtureId, betGroupId);
+        try {
+            List<Odd> oddList = oddRepository.findByFixtureStateAndFixtureIdAndBetGroupId(Constants.FIXTURE_NOT_STARTED, fixtureId, betGroupId);
+            logger.info("Successfully found list of Odds!");
+            return oddList;
+        } catch (Exception e) {
+            logger.error("Error while trying to save list of Odds!!\n" + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
 
@@ -57,32 +69,34 @@ public class OddServiceImpl implements OddService {
     public List<OddDTO> createOddDTOList(Integer fixtureId, Integer betGroupId) {
 
         List<OddDTO> oddDTOList = new ArrayList<>();
-        List<Odd> oddList = getOddsForFixtureAndBetGroup(fixtureId, betGroupId);
-        for (Odd odd : oddList) {
-            try {
-                OddDTO oddDTO = oddMapper.oddToOddDTO(odd);
-                oddDTOList.add(oddDTO);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
+        try {
+            List<Odd> oddList = getOddsForFixtureAndBetGroup(fixtureId, betGroupId);
+            for (Odd odd : oddList) {
+                try {
+                    OddDTO oddDTO = oddMapper.oddToOddDTO(odd);
+                    oddDTOList.add(oddDTO);
+                } catch (Exception e) {
+                    logger.error("Error while trying to map Odd to OddDTO!\n" + e.getMessage());
+                }
             }
+        } catch (Exception e) {
+            logger.error("Error while trying to save list of Odds!\n" + e.getMessage());
+            return new ArrayList<>();
         }
         return oddDTOList;
     }
 
     @Override
-    public boolean existsWithFixtureIdAndBetGroupId(Integer fixtureId, Integer betGroupId){
-        return oddRepository.existsByFixtureIdAndBetGroupId(fixtureId, betGroupId);
+    public boolean existsWithFixtureIdAndBetGroupId(Integer fixtureId, Integer betGroupId) {
+
+        try {
+            return oddRepository.existsByFixtureIdAndBetGroupId(fixtureId, betGroupId);
+        } catch (Exception e) {
+            logger.error("Error while trying to check if Odds exits for Fixture ID = " + fixtureId + " and Bet Group ID = " + betGroupId + "!\n" + e.getMessage());
+            return false;
+        }
     }
 
-    @Override
-    public ApiResponse<?> getOddsForFixtureApiResponse(Integer integer) {
-        return ApiResponseUtil.transformListToApiResponse(getOddsForFixture(integer), "Odds");
-    }
-
-    @Override
-    public ApiResponse<?> getALlOddsApiResponse() {
-        return ApiResponseUtil.transformListToApiResponse(getALlOdds(), "Odds");
-    }
 
     @Autowired
     public void setOddMapper(OddMapper oddMapper) {

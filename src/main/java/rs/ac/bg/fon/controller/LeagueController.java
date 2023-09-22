@@ -21,7 +21,11 @@ public class LeagueController {
 
     @GetMapping("/get/fixtures")
     public ResponseEntity<?> getAllLeaguesWithFixtures() {
-        return ApiResponseUtil.handleApiResponse(leagueService.getAllLeaguesDTOS());
+        return ApiResponseUtil.handleApiResponse(leagueService.getAllLeaguesWithFixturesApiResponse());
+    }
+    @GetMapping("/get/all")
+    public ResponseEntity<?> getAllLeagues() {
+        return ApiResponseUtil.handleApiResponse(leagueService.getAllLeaguesApiResponse());
     }
 
 }

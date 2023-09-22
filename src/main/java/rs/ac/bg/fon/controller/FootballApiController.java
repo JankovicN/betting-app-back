@@ -20,19 +20,20 @@ public class FootballApiController {
     private final FootballApiService footballApiService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/get/apiBetGroups")
+    @GetMapping("/get/betGroups")
     public ResponseEntity<?> getBetGroupsFromAPI(Authentication auth) {
         return ApiResponseUtil.handleApiResponse(footballApiService.getBetGroupsFromAPI());
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/get/apiFixtures")
+    @GetMapping("/new/fixtures")
     public ResponseEntity<?> getFixturesFromAPI(Authentication auth) {
         return ApiResponseUtil.handleApiResponse(footballApiService.getFixturesFromAPI());
     }
 
-    @PostMapping(path = "/matches")
-    public ResponseEntity<?> getNewFixtures() {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping(path = "/new/odds")
+    public ResponseEntity<?> getNewOdds() {
         return ApiResponseUtil.handleApiResponse(footballApiService.getOddsFromAPI());
     }
 }

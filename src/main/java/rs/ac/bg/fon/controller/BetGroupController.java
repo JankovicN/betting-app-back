@@ -17,10 +17,6 @@ public class BetGroupController {
 
     private final BetGroupService betGroupService;
 
-    @GetMapping("/get")
-    public ResponseEntity<?> getBetGroups() {
-        return ApiResponseUtil.handleApiResponse(betGroupService.getAllBetGroupsApiResponse());
-    }
     @GetMapping("/get/{fixture}")
     public ResponseEntity<?> getBetGroups(@PathVariable Integer fixtureId) {
         if (fixtureId == null) {

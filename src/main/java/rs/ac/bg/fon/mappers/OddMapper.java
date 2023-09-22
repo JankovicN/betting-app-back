@@ -5,6 +5,8 @@ import rs.ac.bg.fon.dtos.Odd.OddDTO;
 import rs.ac.bg.fon.entity.Odd;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class OddMapper {
@@ -19,5 +21,17 @@ public class OddMapper {
         oddDTO.setOdd(odd.getOdd());
         oddDTO.setName(odd.getName());
         return oddDTO;
+    }
+
+    public List<OddDTO> oddListToOddDTOList(List<Odd> oddList) throws Exception {
+        if (oddList == null || oddList.isEmpty()) {
+            throw new Exception("List of Odds is Empty!");
+        }
+        List<OddDTO> oddDTOList = new ArrayList<>();
+        for (Odd odd : oddList) {
+            OddDTO oddDTO = oddToOddDTO(odd);
+            oddDTOList.add(oddDTO);
+        }
+        return oddDTOList;
     }
 }

@@ -18,16 +18,10 @@ public class FixtureController {
     private final FixtureService fixtureService;
 
     @GetMapping("/ns/{league}")
-    public ResponseEntity<?> getAllFixtures(@PathVariable Integer league) {
+    public ResponseEntity<?> getFixturesForLeague(@PathVariable Integer league) {
         if(league == null){
             return ApiResponseUtil.errorApiResponse("League data is missing!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeagueApiCall(league));
-    }
-
-
-    @GetMapping("/get")
-    public ResponseEntity<?> getFixtures() {
-        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedApiCall());
     }
 }

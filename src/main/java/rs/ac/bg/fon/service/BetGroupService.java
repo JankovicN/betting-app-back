@@ -8,7 +8,6 @@ import java.util.List;
 
 
 public interface BetGroupService {
-    ApiResponse<?> getAllBetGroupsApiResponse();
 
     ApiResponse<?> getBetGroupsByFixtureApiResponse(Integer fixture);
 
@@ -20,7 +19,7 @@ public interface BetGroupService {
 
     BetGroup getBetGroupWithId(Integer betGroupId);
 
-    List<BetGroup> getBetGroupsByFixture(Integer fixture);
+    List<BetGroupDTO> getBetGroupsByFixture(Integer fixture);
 
     boolean exists();
 
@@ -29,6 +28,7 @@ public interface BetGroupService {
     void deleteBetGroup(Integer id) throws Exception;
 
     List<BetGroupDTO> createBetGroupDTOList(Integer fixtureId);
+    List<BetGroupDTO> createBetGroupDTOList(Integer fixtureID, Integer betGroupID);
 
     ApiResponse<?> deleteBetGroupApiResponse(Integer id);
 }

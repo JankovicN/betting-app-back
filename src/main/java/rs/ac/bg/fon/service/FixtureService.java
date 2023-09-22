@@ -14,13 +14,10 @@ public interface FixtureService {
 
     Fixture getFixtureById(Integer fixtureID);
 
-    List<Fixture> getNotStarted();
-
     List<Fixture> getNotStartedByLeague(Integer league);
 
     List<FixtureDTO> createFixtureDTOList(List<Fixture> fixtures);
 
     ApiResponse<?> getNotStartedByLeagueApiCall(Integer league);
 
-    ApiResponse<?> getNotStartedApiCall();
 }

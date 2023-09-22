@@ -68,28 +68,6 @@ public class FixtureServiceImpl implements FixtureService {
     }
 
     @Override
-    public List<Fixture> getNotStarted() {
-        try {
-            List<Fixture> fixtures = fixtureRepository.findByState(Constants.FIXTURE_NOT_STARTED);
-            if (fixtures == null || fixtures.isEmpty()) {
-                logger.warn("No Fixtures were found for STATE = " + Constants.FIXTURE_NOT_STARTED);
-            } else {
-                logger.info("Successfully found all Fixtures that have STATE = " + Constants.FIXTURE_NOT_STARTED + "!");
-                for (Fixture f : fixtures) {
-                    Optional<Team> home = teamService.findById(f.getHome().getId());
-                    Optional<Team> away = teamService.findById(f.getAway().getId());
-                    f.setHome(home.get());
-                    f.setAway(away.get());
-                }
-            }
-            return fixtures;
-        } catch (Exception e) {
-            logger.error("Error while trying to find Fixtures with STATE = " + Constants.FIXTURE_NOT_STARTED + "!\n" + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
     public List<Fixture> getNotStartedByLeague(Integer leagueID) {
 
         try {
@@ -117,11 +95,14 @@ public class FixtureServiceImpl implements FixtureService {
         try {
             List<FixtureDTO> fixtureDTOS = new ArrayList<>();
             for (Fixture fixture : fixtures) {
-                List<BetGroupDTO> betGroupDTOList = betGroupService.createBetGroupDTOList(fixture.getId());
+                List<BetGroupDTO> betGroupDTOList = betGroupService.createBetGroupDTOList(fixture.getId(), 1);
                 Optional<Team> home = teamService.findById(fixture.getHome().getId());
                 Optional<Team> away = teamService.findById(fixture.getAway().getId());
 
-                if (home == null || home.isEmpty() || away == null || away.isEmpty() || betGroupDTOList == null || betGroupDTOList.isEmpty()) {
+                if (!home.isPresent()
+                        || !away.isPresent()
+                        || betGroupDTOList == null
+                        || betGroupDTOList.isEmpty()) {
                     continue;
                 }
 
@@ -144,11 +125,6 @@ public class FixtureServiceImpl implements FixtureService {
     @Override
     public ApiResponse<?> getNotStartedByLeagueApiCall(Integer league) {
         return ApiResponseUtil.transformListToApiResponse(getNotStartedByLeague(league), "fixtures");
-    }
-
-    @Override
-    public ApiResponse<?> getNotStartedApiCall() {
-        return ApiResponseUtil.transformListToApiResponse(getNotStarted(), "fixtures");
     }
 
     @Autowired

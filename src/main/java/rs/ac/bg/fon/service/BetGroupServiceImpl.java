@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
 import rs.ac.bg.fon.entity.BetGroup;
+import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.mappers.BetGroupMapper;
 import rs.ac.bg.fon.repository.BetGroupRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
@@ -26,10 +27,6 @@ public class BetGroupServiceImpl implements BetGroupService {
     private OddService oddService;
     private BetGroupMapper betGroupMapper;
 
-    @Override
-    public ApiResponse<?> getAllBetGroupsApiResponse() {
-        return ApiResponseUtil.transformListToApiResponse(getAllBetGroups(), "bet groups");
-    }
 
     @Override
     public ApiResponse<?> getBetGroupsByFixtureApiResponse(Integer fixture) {
@@ -85,24 +82,56 @@ public class BetGroupServiceImpl implements BetGroupService {
     }
 
     @Override
+    public List<BetGroupDTO> createBetGroupDTOList(Integer fixtureID, Integer betGroupID) {
+        try {
+            List<BetGroupDTO> betGroupDTOList = new ArrayList<>();
+            BetGroup betGroup = getBetGroupWithId(1);
+            List<OddDTO> oddList = oddService.createOddDTOList(fixtureID, betGroupID);
+            try {
+                BetGroupDTO betGroupDTO = betGroupMapper.betGroupToBetGroupDTO(betGroup, oddList);
+                betGroupDTOList.add(betGroupDTO);
+            } catch (Exception e) {
+                logger.error("Error adding Bet Group with ID = " + betGroup.getId() + " to list!\n" + e.getMessage());
+            }
+            return betGroupDTOList;
+        } catch (Exception e) {
+            logger.error("Error while trying to create Bet Group DTO list!\n" + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
     public ApiResponse<?> deleteBetGroupApiResponse(Integer id) {
         ApiResponse response = new ApiResponse();
         try {
             deleteBetGroup(id);
             response.addInfoMessage("Successfully deleted bet group with ID = " + id);
         } catch (Exception e) {
-            logger.error("Error while trying to delete Bet Group with ID = "+id+"!\n" + e.getMessage());
-            response.addErrorMessage("Unable to delete Bet Group with ID = "+id+"!");
+            logger.error("Error while trying to delete Bet Group with ID = " + id + "!\n" + e.getMessage());
+            response.addErrorMessage("Unable to delete Bet Group with ID = " + id + "!");
         }
         return response;
     }
 
     @Override
-    public List<BetGroup> getBetGroupsByFixture(Integer fixtureID) {
+    public List<BetGroupDTO> getBetGroupsByFixture(Integer fixtureID) {
         try {
             List<BetGroup> betGroupList = betGroupRepository.findByOddsFixtureId(fixtureID);
+            List<BetGroupDTO> betGroupDTOList = new ArrayList<>();
+            for (BetGroup betGroup : betGroupList) {
+                List<OddDTO> oddDTOList = oddService.createOddDTOList(fixtureID,betGroup.getId());
+                if(oddDTOList.isEmpty()){
+                    continue;
+                }
+                try{
+                    BetGroupDTO betGroupDTO = betGroupMapper.betGroupToBetGroupDTO(betGroup,oddDTOList);
+                    betGroupDTOList.add(betGroupDTO);
+                }catch (Exception e){
+                    logger.error("Error while trying to create Bet Group " + betGroup + "!\n" + e.getMessage());
+                }
+            }
             logger.info("Successfully found Bet Groups for Fixture ID = " + fixtureID + "!");
-            return betGroupList;
+            return betGroupDTOList;
         } catch (Exception e) {
             logger.error("Error while trying to find Bet Groups with Fixture ID = " + fixtureID + "!\n" + e.getMessage());
             return new ArrayList<>();

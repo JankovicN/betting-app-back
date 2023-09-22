@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
+import rs.ac.bg.fon.dtos.League.LeagueBasicDTO;
 import rs.ac.bg.fon.dtos.League.LeagueDTO;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.League;
@@ -82,7 +83,7 @@ public class LeagueServiceImpl implements LeagueService {
     }
 
     @Override
-    public ApiResponse<?> getAllLeaguesDTOS() {
+    public ApiResponse<?> getAllLeaguesWithFixturesApiResponse() {
         List<LeagueDTO> leagueDTOS = new ArrayList<>();
         List<League> allLeagues = getAllLeagues();
         if (allLeagues != null) {
@@ -105,6 +106,20 @@ public class LeagueServiceImpl implements LeagueService {
                 } catch (Exception e) {
                     logger.error("Error creating LeagueDTO for League " + league + "!", e);
                 }
+            }
+        }
+        return ApiResponseUtil.transformListToApiResponse(leagueDTOS, "leagues");
+    }
+
+    @Override
+    public ApiResponse<?> getAllLeaguesApiResponse() {
+        List<LeagueBasicDTO> leagueDTOS = new ArrayList<>();
+        List<League> allLeagues = getAllLeagues();
+        if (allLeagues != null) {
+            try{
+                leagueDTOS = leagueMapper.leagueListToLeagueBasicDTOList(allLeagues);
+            }catch (Exception e){
+                logger.error("Unable to create League DTO List!\n"+e.getMessage());
             }
         }
         return ApiResponseUtil.transformListToApiResponse(leagueDTOS, "leagues");

@@ -12,5 +12,6 @@ public interface LeagueService {
     List<League> saveLeagues(List<League> leagues);
      List<League> getAllLeagues();
      boolean exists();
-    ApiResponse<?> getAllLeaguesDTOS();
+    ApiResponse<?> getAllLeaguesWithFixturesApiResponse();
+    ApiResponse<?> getAllLeaguesApiResponse();
 }

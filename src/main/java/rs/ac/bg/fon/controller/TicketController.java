@@ -42,4 +42,7 @@ public class TicketController {
         }
         return ApiResponseUtil.handleApiResponse(ticketService.addNewTicketApiResponse(ticket));
     }
+
+    // TODO delete ticket
+    // TODO return tickets that can be deleted
 }

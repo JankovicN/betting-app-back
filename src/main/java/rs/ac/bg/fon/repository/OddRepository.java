@@ -8,9 +8,6 @@ import java.util.List;
 
 @Repository
 public interface OddRepository  extends JpaRepository<Odd, Integer> {
-    List<Odd> findByBetGroupIdAndFixtureState(Integer id, String state);
-
-    List<Odd> findByFixtureStateAndFixtureId(String ns, Integer fixture);
 
     List<Odd> findByFixtureStateAndFixtureIdAndBetGroupId(String ns, Integer fixtureId, Integer betGroupId);
 

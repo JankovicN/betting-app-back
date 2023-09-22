@@ -12,9 +12,7 @@ public interface OddService {
 
     Odd save(Odd odd);
     List<Odd> saveOddList(List<Odd> odds);
-    List<Odd> getALlOdds();
 
-    List<Odd> getOddsForFixture(Integer fixture);
 
     List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId);
 
@@ -23,7 +21,4 @@ public interface OddService {
 
     boolean existsWithFixtureIdAndBetGroupId(Integer betGroupId, Integer id);
 
-    ApiResponse<?> getOddsForFixtureApiResponse(Integer integer);
-
-    ApiResponse<?> getALlOddsApiResponse();
 }
