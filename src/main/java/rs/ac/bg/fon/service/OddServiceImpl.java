@@ -92,7 +92,7 @@ public class OddServiceImpl implements OddService {
         try {
             return oddRepository.existsByFixtureIdAndBetGroupId(fixtureId, betGroupId);
         } catch (Exception e) {
-            logger.error("Error while trying to check if Odds exits for Fixture ID = " + fixtureId + " and Bet Group ID = " + betGroupId + "!\n" + e.getMessage());
+            logger.error("Error unnecessary while trying to check if Odds exits for Fixture ID = " + fixtureId + " and Bet Group ID = " + betGroupId + "!\n" + e.getMessage());
             return false;
         }
     }
