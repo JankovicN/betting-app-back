@@ -33,7 +33,6 @@ public class FootballApiController {
 
     @PostMapping(path = "/matches")
     public ResponseEntity<?> getNewFixtures() {
-        ApiResponse<?> response = footballApiService.getFixturesFromAPI();
         return ApiResponseUtil.handleApiResponse(footballApiService.getOddsFromAPI());
     }
 }

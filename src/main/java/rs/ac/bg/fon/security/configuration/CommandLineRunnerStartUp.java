@@ -39,7 +39,6 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
 
         if (!leagueService.exists()) {
             leagueService.saveLeagues(allLeagues.getAllLeagues());
-            logger.info("Successfully saved all leagues");
         }
         if (!betGroupService.exists()) {
             betGroupService.saveBetGroups(allBetGroups.getAllBetGroupsList());

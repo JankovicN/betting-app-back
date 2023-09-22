@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class LeagueServiceImpl implements LeagueService{
+public class LeagueServiceImpl implements LeagueService {
     private static final Logger logger = LoggerFactory.getLogger(LeagueServiceImpl.class);
     LeagueRepository leagueRepository;
 
@@ -41,56 +41,74 @@ public class LeagueServiceImpl implements LeagueService{
 
     @Override
     public League save(League league) {
-        logger.info("Saving league: {}", league);
-        return leagueRepository.save(league);
+        try {
+            League savedLeague = leagueRepository.save(league);
+            logger.info("Successfully saved League " + savedLeague + "!");
+            return savedLeague;
+        } catch (Exception e) {
+            logger.error("Error while trying to save League " + league + "!\n" + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<League> saveLeagues(List<League> leagues) {
-        logger.info("Saving leagues!");
-        return leagueRepository.saveAll(leagues);
+        try {
+            List<League> savedLeagues = leagueRepository.saveAll(leagues);
+            logger.info("Successfully saved Leagues!");
+            return savedLeagues;
+        } catch (Exception e) {
+            logger.error("Error while trying to save Leagues !\n" + e.getMessage());
+            return null;
+        }
     }
 
     @Override
-    public List<League> getAllLeagues(){
-        logger.info("Getting all leagues!");
-        return leagueRepository.findAll();
+    public List<League> getAllLeagues() {
+        try {
+            List<League> leagueList = leagueRepository.findAll();
+            logger.info("Successfully found all Leagues!");
+            return leagueList;
+        } catch (Exception e) {
+            logger.error("Error while trying to find all Leagues !\n" + e.getMessage());
+            return null;
+        }
     }
 
 
     @Override
     public boolean exists() {
-        return leagueRepository.count()>0;
+        return leagueRepository.count() > 0;
     }
 
     @Override
     public ApiResponse<?> getAllLeaguesDTOS() {
         List<LeagueDTO> leagueDTOS = new ArrayList<>();
         List<League> allLeagues = getAllLeagues();
+        if (allLeagues != null) {
+            for (League league : allLeagues) {
 
-        for (League league : allLeagues) {
-
-            if (league == null ) {
-                continue;
-            }
-            List<Fixture> fixturesList = fixtureService.getNotStartedByLeague(league.getId());
-            if ( fixturesList == null || fixturesList.isEmpty()) {
-                continue;
-            }
-            List<FixtureDTO> fixtureDTOS = fixtureService.createFixtureDTOList(fixturesList);
-            if ( fixtureDTOS == null || fixtureDTOS.isEmpty()) {
-                continue;
-            }
-            try{
-                LeagueDTO leagueDTO = leagueMapper.leagueToLeagueDTO(league, fixtureDTOS);
-                leagueDTOS.add(leagueDTO);
-            }catch(Exception e){
-                logger.error(e.getMessage());
+                if (league == null) {
+                    continue;
+                }
+                List<Fixture> fixturesList = fixtureService.getNotStartedByLeague(league.getId());
+                if (fixturesList == null || fixturesList.isEmpty()) {
+                    continue;
+                }
+                List<FixtureDTO> fixtureDTOS = fixtureService.createFixtureDTOList(fixturesList);
+                if (fixtureDTOS == null || fixtureDTOS.isEmpty()) {
+                    continue;
+                }
+                try {
+                    LeagueDTO leagueDTO = leagueMapper.leagueToLeagueDTO(league, fixtureDTOS);
+                    leagueDTOS.add(leagueDTO);
+                } catch (Exception e) {
+                    logger.error("Error creating LeagueDTO for League " + league + "!", e);
+                }
             }
         }
         return ApiResponseUtil.transformListToApiResponse(leagueDTOS, "leagues");
     }
-
 
 
     @Autowired

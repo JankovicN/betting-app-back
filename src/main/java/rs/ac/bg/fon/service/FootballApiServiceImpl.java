@@ -106,7 +106,12 @@ public class FootballApiServiceImpl implements FootballApiService {
         try {
             LocalDateTime[] dateRange = getDateRange(currentDateAddOffset(0), currentDateAddOffset(5));
             for (LocalDateTime localDateTime : dateRange) {
-                for (League league : leagueService.getAllLeagues()) {
+                List<League> leagueList = leagueService.getAllLeagues();
+                if(leagueList == null){
+                    logger.warn("List of Leagues is empty!");
+                    continue;
+                }
+                for (League league : leagueList) {
                     try {
                         String responseBody = oddsApiCall(league.getId(), dateFormatter.format(localDateTime));
                         if (responseBody == null || responseBody.isEmpty()) {
@@ -149,7 +154,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         try {
             String dateFromString = currentDateAddOffsetInFormat(-1);
             String dateToString = currentDateAddOffsetInFormat(5);
-            for (League league : leagueService.getAllLeagues()) {
+            List<League> leagueList = leagueService.getAllLeagues();
+            if(leagueList == null){
+                logger.warn("List of Leagues is empty!");
+                apiResponse.addInfoMessage("No Leagues found!\nContact support for more information!");
+                return apiResponse;
+            }
+            for (League league : leagueList) {
                 try {
                     String responseBody = fixturesApiCall(league.getId(), dateFromString, dateToString);
                     if (responseBody == null || responseBody.isEmpty()) {
