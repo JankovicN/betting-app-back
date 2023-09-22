@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface TeamService {
     Team save(Team team);
 
-    TeamDTO createBetGroupDTO(Team home);
+    TeamDTO createTeamDTO(Team home);
 
     Optional<Team> findById(Integer id);
 }

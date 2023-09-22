@@ -9,8 +9,6 @@ import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
-import rs.ac.bg.fon.entity.Bet;
-import rs.ac.bg.fon.entity.BetGroup;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Team;
 import rs.ac.bg.fon.mappers.FixtureMapper;
@@ -19,7 +17,6 @@ import rs.ac.bg.fon.utility.ApiResponse;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -99,7 +96,8 @@ public class FixtureServiceImpl implements FixtureService {
                 Optional<Team> home = teamService.findById(fixture.getHome().getId());
                 Optional<Team> away = teamService.findById(fixture.getAway().getId());
 
-                if (!home.isPresent()
+                if (home==null || away==null
+                        || !home.isPresent()
                         || !away.isPresent()
                         || betGroupDTOList == null
                         || betGroupDTOList.isEmpty()) {
@@ -107,8 +105,8 @@ public class FixtureServiceImpl implements FixtureService {
                 }
 
                 try {
-                    TeamDTO homeDTO = teamService.createBetGroupDTO(home.get());
-                    TeamDTO awayDTO = teamService.createBetGroupDTO(away.get());
+                    TeamDTO homeDTO = teamService.createTeamDTO(home.get());
+                    TeamDTO awayDTO = teamService.createTeamDTO(away.get());
                     FixtureDTO fixtureDTO = fixtureMapper.fixtureToFixtureDTO(fixture, homeDTO, awayDTO, betGroupDTOList);
                     fixtureDTOS.add(fixtureDTO);
                 } catch (Exception e) {
