@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.entity.Bet;
 import rs.ac.bg.fon.entity.BetGroup;
@@ -12,12 +13,10 @@ import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.entity.Ticket;
 import rs.ac.bg.fon.repository.BetRepository;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BetServiceImpl implements BetService {
     private static final Logger logger = LoggerFactory.getLogger(BetServiceImpl.class);
 
@@ -46,6 +45,7 @@ public class BetServiceImpl implements BetService {
         }
     }
 
+    @Transactional
     @Override
     public void saveBetsForTicket(List<Bet> betList, Ticket ticket) throws Exception {
         try{

@@ -1,14 +1,13 @@
 package rs.ac.bg.fon.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
-import rs.ac.bg.fon.entity.Bet;
-import rs.ac.bg.fon.entity.Payment;
-import rs.ac.bg.fon.entity.Ticket;
-import rs.ac.bg.fon.entity.User;
+import rs.ac.bg.fon.entity.*;
 import rs.ac.bg.fon.mappers.BetMapper;
 import rs.ac.bg.fon.mappers.TicketMapper;
 import rs.ac.bg.fon.repository.TicketRepository;
@@ -21,6 +20,7 @@ import java.util.List;
 @Service
 @Transactional
 public class TicketServiceImpl implements TicketService {
+    private static final Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
 
     private TicketRepository ticketRepository;
     private TicketMapper ticketMapper;
@@ -33,17 +33,39 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Ticket save(Ticket ticket) {
-        return ticketRepository.save(ticket);
+        try {
+            if (ticket == null
+                    || ticket.getUser() == null
+                    || ticket.getDate() == null
+                    || ticket.getState() == null
+                    || ticket.getWager() == null
+                    || ticket.getWager().compareTo(BigDecimal.valueOf(20)) < 0
+                    || ticket.getBets() == null
+                    || ticket.getBets().isEmpty()
+                    || ticket.getTotalWin() == null
+                    || ticket.getTotalWin().compareTo(BigDecimal.valueOf(20)) < 0
+                    || ticket.getOdd() <= 0.0) {
+                return null;
+            }
+            Ticket savedTicket = ticketRepository.save(ticket);
+            logger.info("Successfully saved Ticket " + savedTicket + "!");
+            return savedTicket;
+        } catch (Exception e) {
+            logger.error("Error while trying to save Ticket " + ticket + "!\n" + e.getMessage(), e);
+            return null;
+        }
     }
 
     @Override
     public ApiResponse<?> updateAllTickets() {
         ApiResponse<List<Ticket>> response = new ApiResponse<>();
-        try{
+        try {
             ticketRepository.updateAllTickets();
-            response.addInfoMessage("Successfully updated tickets!");
-        }catch(Exception e){
-            response.addErrorMessage("Error updating tickets, try again later!");
+            response.addInfoMessage("Successfully updated Tickets!");
+            logger.info("Successfully updated Tickets!");
+        } catch (Exception e) {
+            response.addErrorMessage("Error updating Tickets, try again later!");
+            logger.error("Error updating Tickets, try again later!", e);
         }
         return response;
     }
@@ -51,28 +73,25 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public ApiResponse<?> getUserTickets(String username) {
         ApiResponse<List<Ticket>> response = new ApiResponse<>();
-        try{
+        try {
             response.setData(ticketRepository.findByUserUsername(username));
-        }catch(Exception e){
-            response.addErrorMessage("Error getting user tickets, try again later!");
+            logger.info("Successfully got Tickets for user = " + username + "!");
+        } catch (Exception e) {
+            response.addErrorMessage("Error getting Tickets, try again later!");
+            logger.error("Error getting Tickets for username = " + username + "!", e);
         }
         return response;
     }
 
     @Override
     public void processTickets() {
-        LocalDateTime oldDate = LocalDateTime.now().minusMinutes(5);
-        ticketRepository.processTickets(oldDate);
-    }
-
-    @Override
-    public BigDecimal getWagerAmoutForUser(int userId) {
-        return BigDecimal.valueOf(ticketRepository.getWagerAmountForUser(userId));
-    }
-
-    @Override
-    public BigDecimal getTotalWinAmountForUser(int userId) {
-        return BigDecimal.valueOf(ticketRepository.getTotalWinAmountForUser(userId));
+        try {
+            LocalDateTime oldDate = LocalDateTime.now().minusMinutes(5);
+            ticketRepository.processTickets(oldDate);
+            logger.info("Successfully processed Tickets!");
+        } catch (Exception e) {
+            logger.error("Error while processing Tickets, try again later!", e);
+        }
     }
 
     @Transactional
@@ -97,10 +116,12 @@ public class TicketServiceImpl implements TicketService {
                     betService.saveBetsForTicket(betList, ticket);
                 } else {
                     response.addErrorMessage("Insufficient funds!");
+                    logger.error("Insufficient funds to create new Ticket!");
                 }
             }
         } catch (Exception e) {
-            response.addErrorMessage(e.getMessage());
+            response.addErrorMessage("Unable to create new Ticket, try again later!");
+            logger.error("Error while creating new Ticket!", e);
         }
         return response;
     }
@@ -112,25 +133,33 @@ public class TicketServiceImpl implements TicketService {
             try {
                 payoutUser(ticket);
             } catch (Exception e) {
-                //TODO add logging
+                logger.error("Error while paying out Users!", e);
             }
         }
     }
 
     @Transactional
     private void payoutUser(Ticket ticket) {
-        ticket.setState(Constants.TICKET_PAYOUT);
-        ticketRepository.save(ticket);
-        Payment payment = new Payment();
-        payment.setUser(ticket.getUser());
-        payment.setPaymentType(Constants.PAYMENT_PAYOUT);
-        payment.setAmount(ticket.getTotalWin());
-        paymentService.addPayment(payment);
+        try {
+            ticket.setState(Constants.TICKET_PAYOUT);
+            ticketRepository.save(ticket);
+            Payment payment = new Payment();
+            payment.setUser(ticket.getUser());
+            payment.setPaymentType(Constants.PAYMENT_PAYOUT);
+            payment.setAmount(ticket.getTotalWin());
+            paymentService.addPayment(payment);
+        } catch (Exception e) {
+            logger.error("Error while paying out Ticket = " + ticket + "!", e);
+        }
     }
 
     private void setNewTicketFields(Ticket ticket) {
-        ticket.setDate(LocalDateTime.now());
-        ticket.setState(Constants.TICKET_UNPROCESSED);
+        if(ticket==null){
+            logger.error("Error setting new ticket values for Ticket = " + ticket + "!");
+        }else{
+            ticket.setDate(LocalDateTime.now());
+            ticket.setState(Constants.TICKET_UNPROCESSED);
+        }
     }
 
     @Autowired

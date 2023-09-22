@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.dtos.Payment.PaymentDTO;
 import rs.ac.bg.fon.entity.League;
 import rs.ac.bg.fon.entity.Payment;
@@ -12,13 +13,11 @@ import rs.ac.bg.fon.repository.PaymentRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PaymentServiceImpl implements PaymentService {
     private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
@@ -26,6 +25,7 @@ public class PaymentServiceImpl implements PaymentService {
     UserService userService;
     TicketService ticketService;
 
+    @Transactional
     @Override
     public boolean canUserPay(Integer userId, BigDecimal amount) {
         try {
@@ -39,6 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
+    @Transactional
     @Override
     public BigDecimal getUserPayments(Integer userId) {
         try {
@@ -53,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
             return BigDecimal.ZERO;
         }
     }
-
+    @Transactional
     @Override
     public void addPayment(Payment payment) {
         try {
@@ -72,6 +73,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
+    @Transactional
     @Override
     public void addPayment(Integer userId, BigDecimal amount, String type) {
         try {

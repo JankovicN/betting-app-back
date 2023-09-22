@@ -15,14 +15,13 @@ import rs.ac.bg.fon.repository.RoleRepository;
 import rs.ac.bg.fon.repository.UserRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
 
@@ -68,6 +67,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.getRoles().add(role);
     }
 
+    @Transactional
     @Override
     public User getUser(String username) {
         log.info("Fetcing  user {}", username);

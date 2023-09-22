@@ -16,10 +16,6 @@ public interface TicketService {
 
     void processTickets();
 
-    BigDecimal getWagerAmoutForUser(int userId);
-
-    BigDecimal getTotalWinAmountForUser(int userId);
-
     ApiResponse<?> addNewTicketApiResponse(TicketDTO ticketDTO);
 
     void payoutUsers();
