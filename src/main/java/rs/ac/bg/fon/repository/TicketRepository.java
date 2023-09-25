@@ -44,4 +44,8 @@ public interface TicketRepository  extends JpaRepository<Ticket, Integer> {
 
     List<Ticket> findByState(String state);
 
+    @Modifying
+    @Query("SELECT * FROM Ticket WHERE date > :date")
+    List<Ticket> getTicketsAfterDateTime(LocalDateTime cancelDateTime);
+
 }

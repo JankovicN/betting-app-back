@@ -19,4 +19,12 @@ public interface TicketService {
     ApiResponse<?> addNewTicketApiResponse(TicketDTO ticketDTO);
 
     void payoutUsers();
+
+    List<Ticket> getCancelableTickets();
+
+    ApiResponse<?> getCancelableTicketsApiResponse();
+
+    Ticket cancelTicket(Integer ticketID);
+
+    ApiResponse<?> cancelTicketApiResponse(Integer ticketID);
 }

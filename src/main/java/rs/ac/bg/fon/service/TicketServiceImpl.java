@@ -13,8 +13,10 @@ import rs.ac.bg.fon.mappers.TicketMapper;
 import rs.ac.bg.fon.repository.TicketRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -138,6 +140,87 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    @Override
+    public List<Ticket> getCancelableTickets() {
+        try {
+            LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
+            List<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime);
+            logger.info("Successfully got cancelable Tickets!");
+            return ticketList;
+        } catch (Exception e) {
+            logger.error("Error while trying to get cancelable Tickets, try again later!", e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public ApiResponse<?> getCancelableTicketsApiResponse() {
+        ApiResponse<List<Ticket>> response = new ApiResponse<>();
+        try {
+            response.setData(getCancelableTickets());
+            logger.info("Successfully created response of cancelable Tickets!");
+        } catch (Exception e) {
+            response.addErrorMessage("Error getting Tickets to cancel, try again later!");
+            logger.info("Error creating response of cancelable Tickets!");
+        }
+        return response;
+    }
+
+    @Override
+    public Ticket cancelTicket(Integer ticketID) {
+        try {
+            Ticket canceledTicket = ticketRepository.findById(ticketID)
+                    .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+
+            LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
+            if (canceledTicket.getDate().isBefore(cancelDateTime)) {
+                logger.error("Time for canceling ticket has passed!");
+                canceledTicket.setDate(null);
+                return canceledTicket;
+            } else if (canceledTicket.getState() != Constants.TICKET_UNPROCESSED) {
+                logger.error("Ticket state is invalid, it should be \"" + Constants.TICKET_UNPROCESSED + "\", but it is \"" + canceledTicket.getState() + "\"!");
+                canceledTicket.setState(Constants.INVALID_DATA);
+                return canceledTicket;
+            } else {
+                canceledTicket.setState(Constants.TICKET_CANCELED);
+                ticketRepository.save(canceledTicket);
+                logger.info("Successfully canceled Ticket!");
+                return canceledTicket;
+            }
+        } catch (EntityNotFoundException e) {
+            logger.error("Error while trying to delete Ticket, try again later!", e);
+            return null;
+        } catch (Exception e) {
+            logger.error("Error while trying to cancel Ticket, try again later!", e);
+            return null;
+        }
+    }
+
+    @Override
+    public ApiResponse<?> cancelTicketApiResponse(Integer ticketID) {
+        ApiResponse<Ticket> response = new ApiResponse<>();
+        try {
+            Ticket canceledTicket = cancelTicket(ticketID);
+            if (canceledTicket == null) {
+                response.addErrorMessage("Error canceling Ticket, try again later!");
+                logger.info("Error creating response for canceling Ticket!");
+            } else if(canceledTicket.getDate()==null){
+                response.addErrorMessage("Time for canceling ticket has passed, ticket can be canceled 5 minutes after being played!");
+                logger.info("Time for canceling ticket has passed!");
+            } else if(canceledTicket.getState().equals(Constants.INVALID_DATA)){
+                response.addErrorMessage("Cannot cancel Ticket, please try again!");
+                logger.info("Invalid Ticket state, unable to cancel ticket!");
+            } else{
+                response.setData(canceledTicket);
+                logger.info("Successfully created response of cancelable Tickets!");
+            }
+        } catch (Exception e) {
+            response.addErrorMessage("Error canceling Ticket, try again later!");
+            logger.info("Error creating response for canceling Ticket!", e);
+        }
+        return response;
+    }
+
     @Transactional
     private void payoutUser(Ticket ticket) {
         try {
@@ -154,9 +237,9 @@ public class TicketServiceImpl implements TicketService {
     }
 
     private void setNewTicketFields(Ticket ticket) {
-        if(ticket==null){
+        if (ticket == null) {
             logger.error("Error setting new ticket values for Ticket = " + ticket + "!");
-        }else{
+        } else {
             ticket.setDate(LocalDateTime.now());
             ticket.setState(Constants.TICKET_UNPROCESSED);
         }

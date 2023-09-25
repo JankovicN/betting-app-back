@@ -43,6 +43,17 @@ public class TicketController {
         return ApiResponseUtil.handleApiResponse(ticketService.addNewTicketApiResponse(ticket));
     }
 
-    // TODO delete ticket
-    // TODO return tickets that can be deleted
+    @DeleteMapping(path = "/delete/{ticketID}")
+    public ResponseEntity<?> addNewTicket(@PathVariable Integer ticketID) {
+
+        if (ticketID == null) {
+            return ApiResponseUtil.errorApiResponse("Ticket data is missing!\nContact support for more information!");
+        }
+        return ApiResponseUtil.handleApiResponse(ticketService.cancelTicketApiResponse(ticketID));
+    }
+
+    @GetMapping(path = "/get/cancelable")
+    public ResponseEntity<?> getCancelableTickets() {
+        return ApiResponseUtil.handleApiResponse(ticketService.getCancelableTicketsApiResponse());
+    }
 }

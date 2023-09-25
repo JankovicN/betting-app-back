@@ -3,6 +3,8 @@ package rs.ac.bg.fon.constants;
 public class Constants {
     public static final String RESOURCE_FOLDER = "src/main/resources/";
 
+    public static final String INVALID_DATA="INVALID";
+
     // Football API specific constants
     public static final String SEASON = "2023";
     public static final Integer BET_365_ID = 8;
@@ -21,6 +23,7 @@ public class Constants {
     public static final String TICKET_LOSS = "LOSS";
     public static final String TICKET_WIN = "WIN";
     public static final String TICKET_PAYOUT = "PAYOUT";
+    public static final String TICKET_CANCELED = "CANCELED";
 
     // Fixture state constants
     public static final String FIXTURE_NOT_STARTED = "NS";
