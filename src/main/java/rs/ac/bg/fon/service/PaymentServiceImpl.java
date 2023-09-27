@@ -23,7 +23,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     private PaymentRepository paymentRepository;
     UserService userService;
-    TicketService ticketService;
 
     @Transactional
     @Override

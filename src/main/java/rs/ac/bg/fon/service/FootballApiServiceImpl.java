@@ -53,7 +53,7 @@ public class FootballApiServiceImpl implements FootballApiService {
     @Transactional
     @Override
     public ApiResponse<?> getBetGroupsFromAPI() {
-        ApiResponse apiResponse = new ApiResponse<>();
+        ApiResponse<?> apiResponse = new ApiResponse<>();
         try {
             if (betGroupService.exists()) {
                 try {
@@ -102,12 +102,12 @@ public class FootballApiServiceImpl implements FootballApiService {
 
     @Override
     public ApiResponse<?> getOddsFromAPI() {
-        ApiResponse apiResponse = new ApiResponse<>();
+        ApiResponse<?> apiResponse = new ApiResponse<>();
         try {
             LocalDateTime[] dateRange = getDateRange(currentDateAddOffset(0), currentDateAddOffset(5));
             for (LocalDateTime localDateTime : dateRange) {
                 List<League> leagueList = leagueService.getAllLeagues();
-                if(leagueList == null){
+                if (leagueList == null) {
                     logger.warn("List of Leagues is empty!");
                     continue;
                 }
@@ -115,29 +115,29 @@ public class FootballApiServiceImpl implements FootballApiService {
                     try {
                         String responseBody = oddsApiCall(league.getId(), dateFormatter.format(localDateTime));
                         if (responseBody == null || responseBody.isEmpty()) {
-                            logger.error("Invalid response from external API!\nFootballAPI Odds call returned empty response!");
+                            logger.error("Invalid response from external API!\nFootballAPI Odds call returned empty response!\n" + responseBody);
                             apiResponse.addErrorMessage("Invalid response from external API!");
                             continue;
                         }
 
                         JsonArray jsonArr = getResponseArrayFromJson(responseBody);
                         if (jsonArr == null) {
-                            logger.info("No Odds were added!\nFootballAPI Odds call response field is empty!");
-                            apiResponse.addInfoMessage("No Odds were added!");
+                            logger.warn("No Odds were added!\nFootballAPI Odds call response field is empty!\n" + jsonArr);
+                            apiResponse.addInfoMessage("No Odds were added, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
                             continue;
                         }
 
                         for (JsonElement jsonElement : jsonArr) {
                             addOddFromApiResponse(jsonElement);
                         }
-                        apiResponse.addInfoMessage("Successfully added new Odds, for Date =" + dateFormatter.format(localDateTime) + "and League = " + league + "!");
-                        logger.info("Successful FootballAPI Odds call for getting Odds, for Date =" + dateFormatter.format(localDateTime) + "and League = " + league + "!");
+                        apiResponse.addInfoMessage("Successfully added new Odds, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
+                        logger.info("Successful FootballAPI Odds call for getting Odds, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
                     } catch (IOException e) {
-                        apiResponse.addErrorMessage("Error getting Odds from Football API , for Date =" + dateFormatter.format(localDateTime) + "and League = " + league + "!");
-                        logger.error("IOException: FootballAPI Odds Error transforming response to Odd, for Date =" + dateFormatter.format(localDateTime) + "and League = " + league + "!");
+                        apiResponse.addErrorMessage("Error getting Odds from Football API , for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
+                        logger.error("IOException: FootballAPI Odds Error transforming response to Odd, for Date = " + dateFormatter.format(localDateTime) + "and League = " + league + "!");
                     } catch (Exception e) {
-                        apiResponse.addErrorMessage("Error getting Odds from Football API, for Date =" + dateFormatter.format(localDateTime) + "and League = " + league + "!");
-                        logger.error("FootballAPI Odds Error when getting Odds, for Date =" + dateFormatter.format(localDateTime) + "and League = " + league + "!", e);
+                        apiResponse.addErrorMessage("Error getting Odds from Football API, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
+                        logger.error("FootballAPI Odds Error when getting Odds, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!", e);
                     }
                 }
             }
@@ -150,12 +150,12 @@ public class FootballApiServiceImpl implements FootballApiService {
 
     @Override
     public ApiResponse<?> getFixturesFromAPI() {
-        ApiResponse apiResponse = new ApiResponse<>();
+        ApiResponse<?> apiResponse = new ApiResponse<>();
         try {
             String dateFromString = currentDateAddOffsetInFormat(-1);
             String dateToString = currentDateAddOffsetInFormat(5);
             List<League> leagueList = leagueService.getAllLeagues();
-            if(leagueList == null){
+            if (leagueList == null) {
                 logger.warn("List of Leagues is empty!");
                 apiResponse.addInfoMessage("No Leagues found!\nContact support for more information!");
                 return apiResponse;
@@ -164,15 +164,15 @@ public class FootballApiServiceImpl implements FootballApiService {
                 try {
                     String responseBody = fixturesApiCall(league.getId(), dateFromString, dateToString);
                     if (responseBody == null || responseBody.isEmpty()) {
-                        logger.error("Invalid response from external API!\nFootballAPI Fixtures call returned empty response!");
+                        logger.error("Invalid response from external API!\nFootballAPI Fixtures call returned empty response!\n" + responseBody);
                         apiResponse.addErrorMessage("Invalid response from external API!");
                         continue;
                     }
 
                     JsonArray jsonArr = getResponseArrayFromJson(responseBody);
                     if (jsonArr == null) {
-                        logger.info("No Fixtures were added!\nFootballAPI Fixtures call response field is empty!");
-                        apiResponse.addInfoMessage("No Fixtures were added!");
+                        logger.info("No Fixtures were added!\nFootballAPI Fixtures call response field is empty!\n" + jsonArr);
+                        apiResponse.addInfoMessage("No Fixtures were added for league " + league + "!");
                         continue;
                     }
 
@@ -198,7 +198,7 @@ public class FootballApiServiceImpl implements FootballApiService {
     }
 
     @Transactional
-    private void addFixtureFromApiResponse(JsonElement jsonElement, League league, ApiResponse apiResponse) {
+    private void addFixtureFromApiResponse(JsonElement jsonElement, League league, ApiResponse<?> apiResponse) {
 
         // Checking if JSON field are present and if it's a JSON Object
         if (!JsonValidation.validateJsonElementFieldIsObject(jsonElement, "teams")) {
@@ -252,6 +252,7 @@ public class FootballApiServiceImpl implements FootballApiService {
         // Checking if JSON field are present and of correct type
         if (!JsonValidation.validateJsonElementFieldIsObject(jsonElement, "fixture")
                 || !JsonValidation.validateJsonElementFieldIsNumber(jsonElement.getAsJsonObject().get("fixture"), "id")) {
+            logger.warn("addOddFromApiResponse: Missing fixture or id field in JSON!\n" + jsonElement);
             return;
         }
         // Get fixture by ID that we read from JSON
@@ -259,18 +260,20 @@ public class FootballApiServiceImpl implements FootballApiService {
         // Validate that fixture is fetched correctly and that it hasn't started yet
         if (fixture == null
                 || !fixture.getState().equals(Constants.FIXTURE_NOT_STARTED)) {
+            logger.warn("addOddFromApiResponse: Invalid Fixture!\n" + fixture);
             return;
         }
 
         JsonArray betsArray = getBetsArrayFromBookmakerJsonElement(jsonElement);
         if (betsArray == null) {
+            logger.warn("addOddFromApiResponse: Bet Array is null!\n");
             return;
         }
         for (JsonElement betGroupEl : betsArray) {
 
             // Checking if JSON field are present and of correct type
             if (!JsonValidation.validateJsonElementFieldIsNumber(betGroupEl, "id")
-                    || !JsonValidation.validateJsonElementFieldIsArray(betGroupEl, "value")) {
+                    || !JsonValidation.validateJsonElementFieldIsArray(betGroupEl, "values")) {
                 return;
             }
 
@@ -293,25 +296,25 @@ public class FootballApiServiceImpl implements FootballApiService {
             // Then add those odds to list
             // Log if error has occurred while creating odd
             List<Odd> oddList = new ArrayList<>();
-            JsonArray oddsArr = betGroupEl.getAsJsonObject().get("value").getAsJsonArray();
+            JsonArray oddsArr = betGroupEl.getAsJsonObject().get("values").getAsJsonArray();
             for (JsonElement oddsEl : oddsArr) {
                 Odd odd = crateOddFromJsonElement(oddsEl);
                 if (odd == null) {
-                    logger.warn("Error while trying to crate Odd from Json \n" + oddsEl);
+                    logger.warn("addOddFromApiResponse: Error while trying to crate Odd from Json \n" + oddsEl);
                     return;
                 }
                 odd.setFixture(fixture);
                 odd.setBetGroup(betGroup);
                 oddList.add(odd);
-                logger.info("Adding odd to list " + odd.getName() + " for fixture " + fixture.getHome().getName() + " - " + fixture.getAway().getName());
+                logger.info("addOddFromApiResponse: Adding odd to list " + odd.getName() + " for fixture " + fixture.getHome().getName() + " - " + fixture.getAway().getName());
             }
 
             // Save all odds that we created
             // Log if error has occurred
             if (oddService.saveOddList(oddList) == null) {
-                logger.warn("Error while trying to save Odd List!");
+                logger.warn("addOddFromApiResponse: Error while trying to save Odd List!");
             } else {
-                logger.info("Saving odd list for Bet Group " + betGroup.getName());
+                logger.info("addOddFromApiResponse: Saving odd list for Bet Group " + betGroup.getName());
             }
 
         }
@@ -427,6 +430,7 @@ public class FootballApiServiceImpl implements FootballApiService {
     private JsonArray getResponseArrayFromJson(String responseBody) {
         JsonElement responseEl = gsonBuilder.fromJson(responseBody, JsonElement.class);
         if (!JsonValidation.validateJsonElementFieldIsArray(responseEl, "response")) {
+            logger.info("Error getting response body\n" + responseBody);
             return null;
         }
         return responseEl.getAsJsonObject().getAsJsonArray("response");
@@ -473,12 +477,13 @@ public class FootballApiServiceImpl implements FootballApiService {
     }
 
     private Odd crateOddFromJsonElement(JsonElement jsonElement) {
-        if (!JsonValidation.validateJsonElementFieldIsNumber(jsonElement, "odd")
+        if (!JsonValidation.validateJsonElementFieldIsString(jsonElement, "odd")
                 || !JsonValidation.validateJsonElementFieldIsString(jsonElement, "value")) {
             return null;
         }
 
-        BigDecimal oddValue = jsonElement.getAsJsonObject().get("odd").getAsBigDecimal();
+        String oddValueString = jsonElement.getAsJsonObject().get("odd").getAsString();
+        BigDecimal oddValue = BigDecimal.valueOf(Double.parseDouble(oddValueString));
         String oddName = jsonElement.getAsJsonObject().get("value").getAsString();
 
         Odd odd = new Odd();

@@ -2,6 +2,8 @@ package rs.ac.bg.fon.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,6 +18,8 @@ import rs.ac.bg.fon.repository.UserRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -48,23 +53,59 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User saveUser(User user) {
-        log.info("Saving user {}  to database", user.getName());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        try {
+            if (user == null
+                    || user.getUsername() == null
+                    || user.getUsername().isBlank()
+                    || user.getPassword() == null
+                    || user.getPassword().isBlank()
+                    || user.getBirthday() == null
+                    || user.getName() == null
+                    || user.getName().isBlank()) {
+                logger.error("Error while trying save User, invalid data provided!");
+            } else if (user.getBirthday().isBefore(LocalDate.now().minusYears(18))) {
+                logger.error("Error while trying save User, User must be older than 18!");
+                user.setBirthday(null);
+            } else {
+                log.info("Saving user {}  to database", user.getName());
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                return userRepository.save(user);
+            }
+        } catch (Exception e) {
+            logger.error("Error while trying save User!", e);
+        }
+        return null;
     }
 
     @Override
     public Role saveRole(Role role) {
-        log.info("Saving role {} to database", role.getName());
-        return roleRepository.save(role);
+        try {
+            log.info("Saving role {} to database", role.getName());
+            if(roleRepository.existsByName(role.getName())){
+                logger.error("Error while trying save Role!");
+
+
+
+                return null;
+            }
+            return roleRepository.save(role);
+        } catch (Exception e) {
+            logger.error("Error while trying save Role!", e);
+        }
+        return null;
     }
 
     @Override
     public void addRoleToUser(String username, String roleName) {
-        log.info("Adding role {} to user {}", roleName, username);
-        User user = userRepository.findByUsername(username);
-        Role role = roleRepository.findByName(roleName);
-        user.getRoles().add(role);
+        try {
+
+            log.info("Adding role {} to user {}", roleName, username);
+            User user = userRepository.findByUsername(username);
+            Role role = roleRepository.findByName(roleName);
+            user.getRoles().add(role);
+        } catch (Exception e) {
+            logger.error("Error while trying add Role " + roleName + " to User " + username + "!", e);
+        }
     }
 
     @Transactional
@@ -88,6 +129,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User registerUser(User user) {
+
+        if (user == null
+                || user.getUsername() == null
+                || user.getUsername().isBlank()
+                || user.getPassword() == null
+                || user.getPassword().isBlank()
+                || user.getBirthday() == null
+                || user.getName() == null
+                || user.getName().isBlank()) {
+            logger.error("Error while trying save User, invalid data provided!");
+        } else if (user.getBirthday().isBefore(LocalDate.now().minusYears(18))) {
+            logger.error("User must be older than 18!");
+            user.setBirthday(null);
+        }
         if (!userRepository.existsByEmail(user.getEmail())) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             System.out.println(user.getPassword());
@@ -167,8 +222,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ApiResponse<?> saveRoleApiResponse(Role role) {
         ApiResponse<Role> response = new ApiResponse<>();
         try {
-            response.setData(saveRole(role));
-            response.addInfoMessage("Successfully added new role " + role.getName() + "!");
+            Role savedRole = saveRole(role);
+            if(savedRole!=null){
+                response.setData(saveRole(savedRole));
+                response.addInfoMessage("Successfully added new role " + role.getName() + "!");
+                logger.error("Creating successfully Api response for saving new role!");
+            }   else{
+                response.addErrorMessage("Unable to add new role " + role.getName() + " at this time, try again later!");
+                logger.error("Error while trying save Role!");
+            }
         } catch (Exception e) {
             response.addErrorMessage("Unable to add new role " + role.getName() + " at this time, try again later!");
         }
