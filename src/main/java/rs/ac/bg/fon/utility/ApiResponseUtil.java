@@ -1,7 +1,6 @@
 package rs.ac.bg.fon.utility;
 
 import org.springframework.http.ResponseEntity;
-import rs.ac.bg.fon.entity.User;
 
 import java.net.URI;
 import java.util.List;

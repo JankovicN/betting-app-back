@@ -4,7 +4,6 @@ import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.utility.ApiResponse;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 

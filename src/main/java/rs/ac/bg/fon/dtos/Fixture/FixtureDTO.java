@@ -9,7 +9,6 @@ import rs.ac.bg.fon.dtos.Team.TeamDTO;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -19,7 +18,7 @@ public class FixtureDTO implements Serializable {
 
     private Integer id;
 
-    private Date date;
+    private String date;
 
     private TeamDTO home;
 

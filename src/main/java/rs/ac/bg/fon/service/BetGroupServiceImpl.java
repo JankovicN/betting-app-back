@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
 import rs.ac.bg.fon.entity.BetGroup;
-import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.mappers.BetGroupMapper;
 import rs.ac.bg.fon.repository.BetGroupRepository;
 import rs.ac.bg.fon.utility.ApiResponse;

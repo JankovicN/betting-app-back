@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
-import rs.ac.bg.fon.entity.League;
 import rs.ac.bg.fon.entity.Team;
 import rs.ac.bg.fon.mappers.TeamMapper;
 import rs.ac.bg.fon.repository.TeamRepository;

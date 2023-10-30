@@ -13,7 +13,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import rs.ac.bg.fon.entity.Role;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.service.UserService;
-import rs.ac.bg.fon.utility.ApiResponse;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,7 +31,7 @@ import static rs.ac.bg.fon.constants.SecretKeys.getAlgorithm;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;

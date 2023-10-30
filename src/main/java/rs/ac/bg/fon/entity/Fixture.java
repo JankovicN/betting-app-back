@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import rs.ac.bg.fon.constants.Constants;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -24,7 +24,7 @@ public class Fixture {
     @Column(name = "fixture_id")
     private Integer id;
     @Column(name = "date")
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "home_id")

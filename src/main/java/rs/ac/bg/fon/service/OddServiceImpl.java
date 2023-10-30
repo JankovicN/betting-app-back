@@ -7,12 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
-import rs.ac.bg.fon.entity.League;
 import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.mappers.OddMapper;
 import rs.ac.bg.fon.repository.OddRepository;
-import rs.ac.bg.fon.utility.ApiResponse;
-import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;

@@ -5,6 +5,10 @@ public class Constants {
 
     public static final String INVALID_DATA="INVALID";
 
+    // String constants
+    public static final String DATE_TIME_FORMAT="yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_FORMAT="yyyy-MM-dd";
+
     // Football API specific constants
     public static final String SEASON = "2023";
     public static final Integer BET_365_ID = 8;

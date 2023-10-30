@@ -2,10 +2,8 @@ package rs.ac.bg.fon.mappers;
 
 import org.springframework.stereotype.Component;
 import rs.ac.bg.fon.dtos.Bet.BetDTO;
-import rs.ac.bg.fon.dtos.Team.TeamDTO;
 import rs.ac.bg.fon.entity.Bet;
 import rs.ac.bg.fon.entity.Odd;
-import rs.ac.bg.fon.entity.Team;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -7,14 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.dtos.Payment.PaymentDTO;
-import rs.ac.bg.fon.entity.League;
 import rs.ac.bg.fon.entity.Payment;
+import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.repository.PaymentRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +21,6 @@ public class PaymentServiceImpl implements PaymentService {
     private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private PaymentRepository paymentRepository;
-    UserService userService;
 
     @Transactional
     @Override
@@ -31,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (amount.compareTo(BigDecimal.ZERO) >= 0) {
                 return true;
             }
-            return getUserPayments(userId).compareTo(amount) >= 0;
+            return getUserPayments(userId).add(amount).compareTo(BigDecimal.ZERO) >= 0;
         } catch (Exception e) {
             logger.error("Error while trying check if user can pay!", e);
             return false;
@@ -81,9 +79,11 @@ public class PaymentServiceImpl implements PaymentService {
             } else if (!canUserPay(userId, amount)) {
                 logger.error("Insufficient funds!");
             } else {
+                User user = new User();
+                user.setId(userId);
                 Payment payment = new Payment();
                 payment.setAmount(amount);
-                payment.setUser(userService.getUser(userId));
+                payment.setUser(user);
                 payment.setPaymentType(type);
                 paymentRepository.saveAndFlush(payment);
             }

@@ -10,15 +10,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import rs.ac.bg.fon.dtos.User.UserDTO;
 import rs.ac.bg.fon.entity.Role;
-import rs.ac.bg.fon.entity.Ticket;
 import rs.ac.bg.fon.entity.User;
+import rs.ac.bg.fon.mappers.UserMapper;
 import rs.ac.bg.fon.repository.RoleRepository;
 import rs.ac.bg.fon.repository.UserRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 
-import org.springframework.transaction.annotation.Transactional;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +34,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    final PaymentService paymentService;
+
+    private final UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -81,11 +86,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Role saveRole(Role role) {
         try {
             log.info("Saving role {} to database", role.getName());
-            if(roleRepository.existsByName(role.getName())){
+            if (roleRepository.existsByName(role.getName())) {
                 logger.error("Error while trying save Role!");
-
-
-
                 return null;
             }
             return roleRepository.save(role);
@@ -123,7 +125,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public List<User> getUsers() {
-        log.info("Fetcing all users");
+        log.info("Fetching all users");
         return userRepository.findAll();
     }
 
@@ -137,7 +139,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 || user.getPassword().isBlank()
                 || user.getBirthday() == null
                 || user.getName() == null
-                || user.getName().isBlank()) {
+                || user.getName().isBlank()
+                || user.getSurname() == null
+                || user.getSurname().isBlank()) {
             logger.error("Error while trying save User, invalid data provided!");
         } else if (user.getBirthday().isBefore(LocalDate.now().minusYears(18))) {
             logger.error("User must be older than 18!");
@@ -186,10 +190,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public ApiResponse<?> getUsersApiResponse() {
-        ApiResponse<List<User>> response = new ApiResponse<>();
+        ApiResponse<List<UserDTO>> response = new ApiResponse<>();
         try {
-            response.setData(getUsers());
+            List<User> users = getUsers();
+            log.info("All users: " + users.toString());
+            List<UserDTO> userDTOS = userMapper.userToUserDTO(users);
+            for (UserDTO dto : userDTOS) {
+                BigDecimal balance = paymentService.getUserPayments(dto.getId());
+                dto.setBalance(balance);
+            }
+            response.setData(userDTOS);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
+            log.error("Error fetching users: " + e);
             response.addErrorMessage("Unable to get users at this time, try again later!");
         }
         return response;
@@ -197,10 +210,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public ApiResponse<?> getUserApiResponse(String username) {
-        ApiResponse<User> response = new ApiResponse<>();
+        ApiResponse<UserDTO> response = new ApiResponse<>();
         try {
-            response.setData(getUser(username));
+            UserDTO userDTO = userMapper.userToUserDTO(getUser(username));
+            BigDecimal balance = paymentService.getUserPayments(userDTO.getId());
+            userDTO.setBalance(balance);
+            response.setData(userDTO);
         } catch (Exception e) {
+            log.error("Error fetching user: " + e);
             response.addErrorMessage("Unable to get user at this time, try again later!");
         }
         return response;
@@ -223,11 +240,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         ApiResponse<Role> response = new ApiResponse<>();
         try {
             Role savedRole = saveRole(role);
-            if(savedRole!=null){
+            if (savedRole != null) {
                 response.setData(saveRole(savedRole));
                 response.addInfoMessage("Successfully added new role " + role.getName() + "!");
                 logger.error("Creating successfully Api response for saving new role!");
-            }   else{
+            } else {
                 response.addErrorMessage("Unable to add new role " + role.getName() + " at this time, try again later!");
                 logger.error("Error while trying save Role!");
             }
@@ -255,6 +272,4 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         return response;
     }
-
-
 }

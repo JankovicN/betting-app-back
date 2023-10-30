@@ -5,12 +5,13 @@ import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
 import rs.ac.bg.fon.entity.Fixture;
+import rs.ac.bg.fon.utility.Utility;
 
 import java.util.List;
 
 @Component
-public class
-FixtureMapper {
+public class FixtureMapper {
+
 
     public FixtureDTO fixtureToFixtureDTO(Fixture fixture) throws Exception {
         if (fixture.getId() == null || fixture.getId() < 0 || fixture.getDate() == null || fixture.getState() == null || fixture.getState().isBlank()) {
@@ -19,7 +20,7 @@ FixtureMapper {
 
         FixtureDTO fixtureDTO = new FixtureDTO();
         fixtureDTO.setId(fixture.getId());
-        fixtureDTO.setDate(fixture.getDate());
+        fixtureDTO.setDate(Utility.formatDateTime(fixture.getDate()));
         fixtureDTO.setState(fixture.getState());
         return fixtureDTO;
     }

@@ -3,7 +3,6 @@ package rs.ac.bg.fon.utility;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rs.ac.bg.fon.service.FootballApiServiceImpl;
 
 public class JsonValidation {
 

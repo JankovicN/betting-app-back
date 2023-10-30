@@ -1,6 +1,5 @@
 package rs.ac.bg.fon.entity;
 
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

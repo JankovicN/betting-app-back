@@ -4,15 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
-import rs.ac.bg.fon.entity.Ticket;
-import rs.ac.bg.fon.service.BetService;
 import rs.ac.bg.fon.service.TicketService;
-import rs.ac.bg.fon.service.UserService;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
-
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor

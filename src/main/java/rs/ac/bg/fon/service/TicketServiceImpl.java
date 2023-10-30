@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
+import rs.ac.bg.fon.dtos.Ticket.TicketBasicDTO;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
-import rs.ac.bg.fon.entity.*;
+import rs.ac.bg.fon.entity.Bet;
+import rs.ac.bg.fon.entity.Payment;
+import rs.ac.bg.fon.entity.Ticket;
+import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.mappers.BetMapper;
 import rs.ac.bg.fon.mappers.TicketMapper;
 import rs.ac.bg.fon.repository.TicketRepository;
@@ -74,9 +78,14 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public ApiResponse<?> getUserTickets(String username) {
-        ApiResponse<List<Ticket>> response = new ApiResponse<>();
+        ApiResponse<List<TicketBasicDTO>> response = new ApiResponse<>();
         try {
-            response.setData(ticketRepository.findByUserUsername(username));
+            List<TicketBasicDTO> ticketBasicDTOS = new ArrayList<>();
+            for (Ticket t : ticketRepository.findByUserUsername(username)) {
+                TicketBasicDTO ticketBasicDTO = ticketMapper.ticketToTicketBasicDTO(t);
+                ticketBasicDTOS.add(ticketBasicDTO);
+            }
+            response.setData(ticketBasicDTOS);
             logger.info("Successfully got Tickets for user = " + username + "!");
         } catch (Exception e) {
             response.addErrorMessage("Error getting Tickets, try again later!");
@@ -204,13 +213,13 @@ public class TicketServiceImpl implements TicketService {
             if (canceledTicket == null) {
                 response.addErrorMessage("Error canceling Ticket, try again later!");
                 logger.info("Error creating response for canceling Ticket!");
-            } else if(canceledTicket.getDate()==null){
+            } else if (canceledTicket.getDate() == null) {
                 response.addErrorMessage("Time for canceling ticket has passed, ticket can be canceled 5 minutes after being played!");
                 logger.info("Time for canceling ticket has passed!");
-            } else if(canceledTicket.getState().equals(Constants.INVALID_DATA)){
+            } else if (canceledTicket.getState().equals(Constants.INVALID_DATA)) {
                 response.addErrorMessage("Cannot cancel Ticket, please try again!");
                 logger.info("Invalid Ticket state, unable to cancel ticket!");
-            } else{
+            } else {
                 response.setData(canceledTicket);
                 logger.info("Successfully created response of cancelable Tickets!");
             }

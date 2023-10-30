@@ -78,6 +78,7 @@ public class FixtureServiceImpl implements FixtureService {
                     Optional<Team> away = teamService.findById(f.getAway().getId());
                     f.setHome(home.get());
                     f.setAway(away.get());
+
                 }
             }
             return fixtures;

@@ -11,6 +11,7 @@ import rs.ac.bg.fon.constants.SecretKeys;
 import rs.ac.bg.fon.entity.*;
 import rs.ac.bg.fon.utility.ApiResponse;
 import rs.ac.bg.fon.utility.JsonValidation;
+import rs.ac.bg.fon.utility.Utility;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,12 +19,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -36,9 +34,6 @@ public class FootballApiServiceImpl implements FootballApiService {
     private final BetGroupService betGroupService;
     private final TeamService teamService;
     private final OddService oddService;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
 
     private LocalDateTime[] getDateRange(LocalDateTime start, LocalDateTime end) {
@@ -113,7 +108,7 @@ public class FootballApiServiceImpl implements FootballApiService {
                 }
                 for (League league : leagueList) {
                     try {
-                        String responseBody = oddsApiCall(league.getId(), dateFormatter.format(localDateTime));
+                        String responseBody = oddsApiCall(league.getId(), Utility.formatDate(localDateTime));
                         if (responseBody == null || responseBody.isEmpty()) {
                             logger.error("Invalid response from external API!\nFootballAPI Odds call returned empty response!\n" + responseBody);
                             apiResponse.addErrorMessage("Invalid response from external API!");
@@ -123,21 +118,21 @@ public class FootballApiServiceImpl implements FootballApiService {
                         JsonArray jsonArr = getResponseArrayFromJson(responseBody);
                         if (jsonArr == null) {
                             logger.warn("No Odds were added!\nFootballAPI Odds call response field is empty!\n" + jsonArr);
-                            apiResponse.addInfoMessage("No Odds were added, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
+                            apiResponse.addInfoMessage("No Odds were added, for Date = " + Utility.formatDate(localDateTime) + " and League = " + league + "!");
                             continue;
                         }
 
                         for (JsonElement jsonElement : jsonArr) {
                             addOddFromApiResponse(jsonElement);
                         }
-                        apiResponse.addInfoMessage("Successfully added new Odds, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
-                        logger.info("Successful FootballAPI Odds call for getting Odds, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
+                        apiResponse.addInfoMessage("Successfully added new Odds, for Date = " + Utility.formatDate(localDateTime) + " and League = " + league + "!");
+                        logger.info("Successful FootballAPI Odds call for getting Odds, for Date = " + Utility.formatDate(localDateTime) + " and League = " + league + "!");
                     } catch (IOException e) {
-                        apiResponse.addErrorMessage("Error getting Odds from Football API , for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
-                        logger.error("IOException: FootballAPI Odds Error transforming response to Odd, for Date = " + dateFormatter.format(localDateTime) + "and League = " + league + "!");
+                        apiResponse.addErrorMessage("Error getting Odds from Football API , for Date = " + Utility.formatDate(localDateTime) + " and League = " + league + "!");
+                        logger.error("IOException: FootballAPI Odds Error transforming response to Odd, for Date = " + Utility.formatDate(localDateTime) + "and League = " + league + "!");
                     } catch (Exception e) {
-                        apiResponse.addErrorMessage("Error getting Odds from Football API, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!");
-                        logger.error("FootballAPI Odds Error when getting Odds, for Date = " + dateFormatter.format(localDateTime) + " and League = " + league + "!", e);
+                        apiResponse.addErrorMessage("Error getting Odds from Football API, for Date = " + Utility.formatDate(localDateTime) + " and League = " + league + "!");
+                        logger.error("FootballAPI Odds Error when getting Odds, for Date = " + Utility.formatDate(localDateTime) + " and League = " + league + "!", e);
                     }
                 }
             }
@@ -345,7 +340,7 @@ public class FootballApiServiceImpl implements FootballApiService {
             String status = fixtureElement.getAsJsonObject().get("status").getAsJsonObject().get("short").getAsString();
             String date = fixtureElement.getAsJsonObject().get("date").getAsString();
             date = date.substring(0, date.indexOf("+")).replace("T", " ");
-            Date formattedDate = dateTimeFormatter.parse(date);
+            LocalDateTime formattedDate = Utility.parseDateTime(date);
 
             // Creating fixture and returning it
             Fixture fixture = new Fixture();
@@ -493,7 +488,7 @@ public class FootballApiServiceImpl implements FootballApiService {
     }
 
     private String currentDateAddOffsetInFormat(long days) {
-        return dateFormatter.format(LocalDateTime.now().plusDays(days));
+        return Utility.formatDate(LocalDateTime.now().plusDays(days));
     }
 
     private LocalDateTime currentDateAddOffset(long days) {

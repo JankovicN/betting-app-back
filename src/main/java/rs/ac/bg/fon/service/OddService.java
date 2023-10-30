@@ -3,7 +3,6 @@ package rs.ac.bg.fon.service;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
 import rs.ac.bg.fon.entity.Odd;
-import rs.ac.bg.fon.utility.ApiResponse;
 
 import java.util.List;
 

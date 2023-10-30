@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.entity.Bet;
-import rs.ac.bg.fon.entity.BetGroup;
 import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.entity.Ticket;
 import rs.ac.bg.fon.repository.BetRepository;
@@ -58,6 +57,7 @@ public class BetServiceImpl implements BetService {
                 bet.setOdd(odd);
                 bet.setState(Constants.BET_NOT_FINISHED);
                 bet.setTicket(ticket);
+                betRepository.save(bet);
             }
         }catch(Exception e){
             if(!e.getMessage().contains("Unable to save all Bets for Ticket")){
