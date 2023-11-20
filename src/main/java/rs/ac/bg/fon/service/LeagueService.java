@@ -14,4 +14,6 @@ public interface LeagueService {
      boolean exists();
     ApiResponse<?> getAllLeaguesWithFixturesApiResponse();
     ApiResponse<?> getAllLeaguesApiResponse();
+
+    ApiResponse<?> getNotStartedByLeagueApiCall(Integer league);
 }

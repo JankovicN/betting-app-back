@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,13 +14,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rs.ac.bg.fon.dtos.Page.PageDTO;
 import rs.ac.bg.fon.dtos.User.UserDTO;
+import rs.ac.bg.fon.dtos.User.UserRegistrationDTO;
 import rs.ac.bg.fon.entity.Role;
 import rs.ac.bg.fon.entity.User;
+import rs.ac.bg.fon.mappers.PageMapper;
 import rs.ac.bg.fon.mappers.UserMapper;
 import rs.ac.bg.fon.repository.RoleRepository;
 import rs.ac.bg.fon.repository.UserRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
+import rs.ac.bg.fon.utility.Utility;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,10 +41,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-
-    final PaymentService paymentService;
-
-    private final UserMapper userMapper;
+    private final PaymentService paymentService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -113,7 +117,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     @Override
     public User getUser(String username) {
-        log.info("Fetcing  user {}", username);
+        log.info("Fetching  user {}", username);
         return userRepository.findByUsername(username);
     }
 
@@ -127,6 +131,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public List<User> getUsers() {
         log.info("Fetching all users");
         return userRepository.findAll();
+    }
+
+    private Page<User> getUsers(Pageable pageable) {
+        log.info("Fetching all users pageable");
+        return userRepository.findAll(pageable);
     }
 
     @Override
@@ -143,17 +152,29 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 || user.getSurname() == null
                 || user.getSurname().isBlank()) {
             logger.error("Error while trying save User, invalid data provided!");
-        } else if (user.getBirthday().isBefore(LocalDate.now().minusYears(18))) {
+            user.setId(-1);
+            return user;
+        } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
             logger.error("User must be older than 18!");
             user.setBirthday(null);
-        }
-        if (!userRepository.existsByEmail(user.getEmail())) {
+            return user;
+        } else if (!Utility.isValidEmail(user.getEmail())) {
+            logger.error("User email is invalid, email = " + user.getEmail() + "!");
+            user.setEmail(null);
+            return user;
+        } else if (userRepository.existsByUsername(user.getUsername())) {
+            logger.error("There is already a user with that username!");
+            user.setUsername(null);
+            return user;
+        } else if (!userRepository.existsByEmail(user.getEmail())) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            System.out.println(user.getPassword());
-            userRepository.save(user);
+            User newUser = userRepository.save(user);
             addRoleToUser(user.getUsername(), "ROLE_CLIENT");
+            return newUser;
+        } else {
+            logger.error("User already registered!");
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -177,11 +198,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public ApiResponse<?> registerUserApiResponse(User user) {
+    public ApiResponse<?> registerUserApiResponse(UserRegistrationDTO userDTO) {
         ApiResponse<User> response = new ApiResponse<>();
         try {
-            response.setData(registerUser(user));
-            response.addInfoMessage("Successfully registered!\nWelcome " + user.getUsername() + "!");
+            User user = UserMapper.userDtoToUser(userDTO);
+            User registeredUser = registerUser(user);
+            if (registeredUser == null) {
+                response.addErrorMessage("There is already a user registered with that email!");
+            } else if (registeredUser.getUsername() == null) {
+                response.addErrorMessage("There is already a user registered with that username!");
+            } else if (registeredUser.getBirthday() == null) {
+                response.addErrorMessage("User age must be greater than 18 to register!");
+            } else if (registeredUser.getEmail() == null) {
+                response.addErrorMessage("Invalid email format!");
+            } else if (registeredUser.getId() == -1) {
+                response.addErrorMessage("Invalid data for user!");
+            } else {
+                response.setData(registeredUser);
+                response.addInfoMessage("Successfully registered!\nWelcome " + user.getUsername() + "!");
+            }
         } catch (Exception e) {
             response.addErrorMessage("Unable to register user at this time, try again later!");
         }
@@ -189,17 +224,25 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public ApiResponse<?> getUsersApiResponse() {
-        ApiResponse<List<UserDTO>> response = new ApiResponse<>();
+    public ApiResponse<?> getUsersApiResponse(Pageable pageable) {
+        ApiResponse<PageDTO<UserDTO>> response = new ApiResponse<>();
         try {
-            List<User> users = getUsers();
-            log.info("All users: " + users.toString());
-            List<UserDTO> userDTOS = userMapper.userToUserDTO(users);
-            for (UserDTO dto : userDTOS) {
-                BigDecimal balance = paymentService.getUserPayments(dto.getId());
-                dto.setBalance(balance);
-            }
-            response.setData(userDTOS);
+            Page<User> users = getUsers(pageable);
+            log.info("All users: " + users.getContent());
+            List<UserDTO> userDtosList = users.map(user -> {
+                try {
+                    return UserMapper.userToUserDTO(user);
+                } catch (Exception e) {
+                    throw null;
+                }
+            }).filter(user -> user != null)
+                    .map(userDTO -> {
+                        userDTO.setBalance(paymentService.getUserPayments(userDTO.getId()));
+                        return userDTO;
+                    }).stream().toList();
+            Page<UserDTO> userPages = new PageImpl<>(userDtosList, pageable, userDtosList.size());
+            PageDTO<UserDTO> pageDTO = PageMapper.pageToPageDTO(userPages);
+            response.setData(pageDTO);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             log.error("Error fetching users: " + e);
@@ -212,10 +255,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ApiResponse<?> getUserApiResponse(String username) {
         ApiResponse<UserDTO> response = new ApiResponse<>();
         try {
-            UserDTO userDTO = userMapper.userToUserDTO(getUser(username));
-            BigDecimal balance = paymentService.getUserPayments(userDTO.getId());
-            userDTO.setBalance(balance);
-            response.setData(userDTO);
+            User user = getUser(username);
+            if (user == null) {
+                response.addErrorMessage("User doesn't exist!");
+            } else {
+                UserDTO userDTO = UserMapper.userToUserDTO(user);
+                BigDecimal balance = paymentService.getUserPayments(userDTO.getId());
+                userDTO.setBalance(balance);
+                response.setData(userDTO);
+            }
         } catch (Exception e) {
             log.error("Error fetching user: " + e);
             response.addErrorMessage("Unable to get user at this time, try again later!");
@@ -257,18 +305,38 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User updateUser(User updatedUser) {
         User user = userRepository.findByUsername(updatedUser.getUsername());
+        if (updatedUser.getPassword() == null || updatedUser.getPassword().isBlank()) {
+            updatedUser.setPassword(user.getPassword());
+        }
+        if (updatedUser.getRoles() == null || updatedUser.getRoles().isEmpty()) {
+            updatedUser.setRoles(user.getRoles());
+        }
         updatedUser.setId(user.getId());
         return userRepository.save(updatedUser);
     }
 
     @Override
-    public ApiResponse<?> updateUserApiResponse(User user) {
-        ApiResponse<User> response = new ApiResponse<>();
+    public ApiResponse<?> updateUserApiResponse(UserDTO user) {
+        ApiResponse<UserDTO> response = new ApiResponse<>();
         try {
-            response.setData(updateUser(user));
-            response.addInfoMessage("Successfully updated user " + user.getUsername() + "!");
+            User userToUpdate = UserMapper.userDtoToUser(user);
+            userToUpdate = updateUser(userToUpdate);
+            response.setData(UserMapper.userToUserDTO(userToUpdate));
+            response.addInfoMessage("Successfully updated user " + userToUpdate.getUsername() + "!");
         } catch (Exception e) {
             response.addErrorMessage("Unable to update user " + user.getUsername() + " at this time, try again later!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> getTestConformation() {
+        ApiResponse<User> response = new ApiResponse<>();
+        try {
+            response.addInfoMessage("Success!");
+        } catch (Exception e) {
+            response.addErrorMessage("Test Failed" +
+                    "!");
         }
         return response;
     }

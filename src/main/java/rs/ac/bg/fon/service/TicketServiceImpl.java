@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.service;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Ticket.TicketBasicDTO;
+import rs.ac.bg.fon.dtos.Ticket.TicketCancelDTO;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
 import rs.ac.bg.fon.entity.Bet;
 import rs.ac.bg.fon.entity.Payment;
@@ -24,17 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class TicketServiceImpl implements TicketService {
     private static final Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
-
-    private TicketRepository ticketRepository;
-    private TicketMapper ticketMapper;
-    private BetMapper betMapper;
-
-    private PaymentService paymentService;
-    private UserService userService;
-    private BetService betService;
+    private final TicketRepository ticketRepository;
+    private final PaymentService paymentService;
+    private final UserService userService;
+    private final BetService betService;
 
 
     @Override
@@ -81,8 +80,8 @@ public class TicketServiceImpl implements TicketService {
         ApiResponse<List<TicketBasicDTO>> response = new ApiResponse<>();
         try {
             List<TicketBasicDTO> ticketBasicDTOS = new ArrayList<>();
-            for (Ticket t : ticketRepository.findByUserUsername(username)) {
-                TicketBasicDTO ticketBasicDTO = ticketMapper.ticketToTicketBasicDTO(t);
+            for (Ticket t : ticketRepository.findByUserUsernameOrderByDateDesc(username)) {
+                TicketBasicDTO ticketBasicDTO = TicketMapper.ticketToTicketBasicDTO(t);
                 ticketBasicDTOS.add(ticketBasicDTO);
             }
             response.setData(ticketBasicDTOS);
@@ -112,11 +111,12 @@ public class TicketServiceImpl implements TicketService {
         ApiResponse<?> response = new ApiResponse<>();
         try {
             if (ticketDTO.getUsername() == null || ticketDTO.getUsername().isBlank()) {
+                logger.error("Username is missing! \n" + ticketDTO);
                 response.addErrorMessage("Username is missing!");
             } else {
                 User user = userService.getUser(ticketDTO.getUsername());
-                List<Bet> betList = betMapper.betDTOListToBetList(ticketDTO.getBets());
-                Ticket ticket = ticketMapper.ticketDTOToTicket(ticketDTO);
+                List<Bet> betList = BetMapper.betDTOListToBetList(ticketDTO.getBets());
+                Ticket ticket = TicketMapper.ticketDTOToTicket(ticketDTO);
 
                 if (paymentService.canUserPay(user.getId(), ticketDTO.getWager())) {
                     setNewTicketFields(ticket);
@@ -125,6 +125,7 @@ public class TicketServiceImpl implements TicketService {
                     paymentService.addPayment(user.getId(), ticket.getWager().negate(), Constants.PAYMENT_WAGER);
                     ticketRepository.save(ticket);
                     betService.saveBetsForTicket(betList, ticket);
+                    response.addInfoMessage("Successfully played Ticket!");
                 } else {
                     response.addErrorMessage("Insufficient funds!");
                     logger.error("Insufficient funds to create new Ticket!");
@@ -163,10 +164,55 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public ApiResponse<?> getCancelableTicketsApiResponse() {
-        ApiResponse<List<Ticket>> response = new ApiResponse<>();
+    public List<Ticket> getCancelableTickets(String username) {
         try {
-            response.setData(getCancelableTickets());
+            LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
+            List<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime, username);
+            logger.info("Successfully got cancelable Tickets!");
+            return ticketList;
+        } catch (Exception e) {
+            logger.error("Error while trying to get cancelable Tickets, try again later!", e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public ApiResponse<?> getCancelableTicketsApiResponse() {
+        ApiResponse<List<TicketCancelDTO>> response = new ApiResponse<>();
+        try {
+            List<Ticket> tickets = getCancelableTickets();
+            List<TicketCancelDTO> ticketBasicDTOS = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                try {
+                    ticketBasicDTOS.add(TicketMapper.ticketToTicketCancelDTO(ticket, ticket.getUser()));
+                } catch (Exception e) {
+                    logger.info("Error transforming ticket to ticketDTO!\n{}\n{}", ticket, e);
+                }
+            }
+            response.setData(ticketBasicDTOS);
+            logger.info("Successfully created response of cancelable Tickets!");
+        } catch (Exception e) {
+            response.addErrorMessage("Error getting Tickets to cancel, try again later!");
+            logger.info("Error creating response of cancelable Tickets!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> getCancelableTicketsApiResponse(String username) {
+        ApiResponse<List<TicketCancelDTO>> response = new ApiResponse<>();
+        try {
+            List<Ticket> tickets = getCancelableTickets(username);
+            User user = userService.getUser(username);
+            List<TicketCancelDTO> ticketCancelDTOS = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                try {
+                    ticketCancelDTOS.add(TicketMapper.ticketToTicketCancelDTO(ticket, user));
+                } catch (Exception e) {
+                    logger.info("Error transforming ticket to TicketCancelDTO!\n{}\n{}", ticket, e);
+                }
+            }
+            response.setData(ticketCancelDTOS);
             logger.info("Successfully created response of cancelable Tickets!");
         } catch (Exception e) {
             response.addErrorMessage("Error getting Tickets to cancel, try again later!");
@@ -252,16 +298,6 @@ public class TicketServiceImpl implements TicketService {
             ticket.setDate(LocalDateTime.now());
             ticket.setState(Constants.TICKET_UNPROCESSED);
         }
-    }
-
-    @Autowired
-    public TicketServiceImpl(TicketRepository ticketRepository, TicketMapper ticketMapper, BetMapper betMapper, PaymentService paymentService, UserService userService, BetService betService) {
-        this.ticketRepository = ticketRepository;
-        this.ticketMapper = ticketMapper;
-        this.betMapper = betMapper;
-        this.paymentService = paymentService;
-        this.userService = userService;
-        this.betService = betService;
     }
 
 }

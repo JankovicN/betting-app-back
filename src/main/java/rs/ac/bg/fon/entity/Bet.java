@@ -22,7 +22,7 @@ public class Bet {
     @Column(name = "state")
     private String state = Constants.BET_NOT_FINISHED;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "odds_id", nullable = false)
     private Odd odd;
 

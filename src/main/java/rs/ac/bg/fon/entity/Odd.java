@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,10 +38,9 @@ public class Odd {
     private BetGroup betGroup;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
+    @OneToMany(fetch = FetchType.LAZY,
             mappedBy = "odd")
-    private Bet bet;
+    private List<Bet> bet;
 
     @Override
     public String toString() {

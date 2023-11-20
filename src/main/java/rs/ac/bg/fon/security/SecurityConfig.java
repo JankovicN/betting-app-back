@@ -35,15 +35,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
+        customAuthenticationFilter.setFilterProcessesUrl("/login");
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
         http.cors();
-        http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**","/api/user/register/**").permitAll();
-        http.authorizeRequests().antMatchers(GET,"/api/user/**", "api/fixtures/**").hasAnyAuthority("ROLE_CLIENT");
+        http.authorizeRequests().antMatchers("/login/**", "/token/refresh/**","/user/register/**").permitAll();
+        //http.authorizeRequests().antMatchers(GET,"/api/user/**", "api/fixtures/**").hasAnyAuthority("ROLE_CLIENT");
         http.authorizeRequests().antMatchers(PATCH, "/api/bet/update/**", "/api/ticket/update/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(DELETE, "/api/user/delete/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(POST,"/api/user/save/**", "/role/addToUser").hasAnyAuthority("ROLE_ADMIN");
+        //http.authorizeRequests().antMatchers(POST,"/api/user/save/**", "/role/addToUser").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(POST,"/ticket").permitAll();
         http.authorizeRequests().antMatchers(GET,"/api/get/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);

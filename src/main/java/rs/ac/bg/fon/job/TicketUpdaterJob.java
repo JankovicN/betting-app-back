@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import rs.ac.bg.fon.service.BetService;
 import rs.ac.bg.fon.service.TicketService;
 
 @RequiredArgsConstructor
+@Component
 public class TicketUpdaterJob {
 
     private final BetService betService;
@@ -41,8 +43,8 @@ public class TicketUpdaterJob {
         }
     }
 
-    @Scheduled(initialDelay = 1000, fixedRate = 1000)
-    public void proccessTickets(){
+    @Scheduled(initialDelay = 1000, fixedRate = 1000 * 60)
+    public void processTickets(){
         try {
             ticketService.processTickets();
         }catch (Exception e){

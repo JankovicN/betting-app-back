@@ -7,12 +7,17 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import rs.ac.bg.fon.dtos.User.UserDTO;
+import rs.ac.bg.fon.dtos.User.UserRegistrationDTO;
 import rs.ac.bg.fon.entity.Role;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.service.UserService;
+import rs.ac.bg.fon.utility.ApiResponse;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,13 +36,13 @@ import static rs.ac.bg.fon.constants.SecretKeys.getAlgorithm;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("user")
 public class UserController {
 
     private final UserService userService;
 
-    @DeleteMapping("/delete/{username}")
-    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUser(@RequestParam String username) {
         if (username == null || username.isBlank()) {
             return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
@@ -45,15 +50,15 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
+    public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO user) {
         if (user == null) {
             return ApiResponseUtil.errorApiResponse("Invalid user data!\nContact support for more information!");
         }
         return ApiResponseUtil.handleApiResponse(userService.registerUserApiResponse(user));
     }
 
-    @GetMapping("/get/{username}")
-    public ResponseEntity<?> getUser(@PathVariable String username) {
+    @GetMapping("/get")
+    public ResponseEntity<?> getUser(@RequestParam String username) {
         if (username == null || username.isBlank()) {
             return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
@@ -61,21 +66,15 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getUsers() {
-        return ApiResponseUtil.handleApiResponse(userService.getUsersApiResponse());
+    public ResponseEntity<?> getUsers(Pageable pageable) {
+        ApiResponse<?> response =userService.getUsersApiResponse(pageable);
+        return ApiResponseUtil.handleApiResponse(response);
     }
 
 
-    @PostMapping("/save")
-    public ResponseEntity<?> saveUser(@RequestBody User user) {
-        if (user == null) {
-            return ApiResponseUtil.errorApiResponse("Invalid user data!\nContact support for more information!");
-        }
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ApiResponseUtil.handleApiResponse(userService.getUsersApiResponse(), uri);
-    }
+
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody User user) {
+    public ResponseEntity<?> updateUser(@RequestBody UserDTO user) {
         if (user == null) {
             return ApiResponseUtil.errorApiResponse("Invalid user data!\nContact support for more information!");
         }

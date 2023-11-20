@@ -15,8 +15,13 @@ public interface FixtureService {
 
     List<Fixture> getNotStartedByLeague(Integer league);
 
+    List<FixtureDTO> getFixtureDtoByLeague(Integer leagueID);
+
     List<FixtureDTO> createFixtureDTOList(List<Fixture> fixtures);
 
-    ApiResponse<?> getNotStartedByLeagueApiCall(Integer league);
+    ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueID);
 
+    ApiResponse<?> getNotStartedByLeaguesApiCall(List<Integer> leagues);
+
+    boolean existFixtureByLeagueId(Integer leagueId);
 }

@@ -16,11 +16,12 @@ import rs.ac.bg.fon.utility.ApiResponseUtil;
 import java.math.BigDecimal;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
-    private PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     @Override
@@ -102,16 +103,10 @@ public class PaymentServiceImpl implements PaymentService {
         ApiResponse<?> response = new ApiResponse<>();
         if (canUserPay(payment.getUserId(), payment.getAmount())) {
             addPayment(payment.getUserId(), payment.getAmount(), type);
-            response.addInfoMessage("Successful payment!");
+            response.addInfoMessage("Successful transaction!");
         } else {
             response.addErrorMessage("Insufficient funds!");
         }
         return response;
-    }
-
-
-    @Autowired
-    public void setPaymentRepository(PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
     }
 }

@@ -3,7 +3,6 @@ package rs.ac.bg.fon.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
@@ -26,13 +25,9 @@ import java.util.Optional;
 @Transactional
 public class FixtureServiceImpl implements FixtureService {
     private static final Logger logger = LoggerFactory.getLogger(FixtureServiceImpl.class);
-
-    FixtureRepository fixtureRepository;
-
-    FixtureMapper fixtureMapper;
-
-    BetGroupService betGroupService;
-    TeamService teamService;
+    private final FixtureRepository fixtureRepository;
+    private final BetGroupService betGroupService;
+    private final TeamService teamService;
 
 
     @Override
@@ -68,7 +63,7 @@ public class FixtureServiceImpl implements FixtureService {
     public List<Fixture> getNotStartedByLeague(Integer leagueID) {
 
         try {
-            List<Fixture> fixtures = fixtureRepository.findByStateAndLeagueId(Constants.FIXTURE_NOT_STARTED, leagueID);
+            List<Fixture> fixtures = fixtureRepository.findAllByStateAndLeagueIdOrderByDateAsc(Constants.FIXTURE_NOT_STARTED, leagueID);
             if (fixtures == null || fixtures.isEmpty()) {
                 logger.warn("No Fixtures were found for LEAGUE ID = " + leagueID + " and STATE = " + Constants.FIXTURE_NOT_STARTED);
             } else {
@@ -84,6 +79,18 @@ public class FixtureServiceImpl implements FixtureService {
             return fixtures;
         } catch (Exception e) {
             logger.error("Error while trying to find Fixtures with LEAGUE ID = " + leagueID + " and STATE = " + Constants.FIXTURE_NOT_STARTED + "!\n" + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<FixtureDTO> getFixtureDtoByLeague(Integer leagueID) {
+
+        try {
+            List<Fixture> fixtureList = getNotStartedByLeague(leagueID);
+            return createFixtureDTOList(fixtureList);
+        } catch (Exception e) {
+            logger.error("Error while trying to find Fixture with LEAGUE ID = " + leagueID + " and STATE = " + Constants.FIXTURE_NOT_STARTED + "!\n" + e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -108,7 +115,7 @@ public class FixtureServiceImpl implements FixtureService {
                 try {
                     TeamDTO homeDTO = teamService.createTeamDTO(home.get());
                     TeamDTO awayDTO = teamService.createTeamDTO(away.get());
-                    FixtureDTO fixtureDTO = fixtureMapper.fixtureToFixtureDTO(fixture, homeDTO, awayDTO, betGroupDTOList);
+                    FixtureDTO fixtureDTO = FixtureMapper.fixtureToFixtureDTO(fixture, homeDTO, awayDTO, betGroupDTOList);
                     fixtureDTOS.add(fixtureDTO);
                 } catch (Exception e) {
                     logger.error("Error while trying to create FixtureDTO for Fixture " + fixture + "!\n" + e.getMessage());
@@ -122,28 +129,24 @@ public class FixtureServiceImpl implements FixtureService {
     }
 
     @Override
-    public ApiResponse<?> getNotStartedByLeagueApiCall(Integer league) {
-        return ApiResponseUtil.transformListToApiResponse(getNotStartedByLeague(league), "fixtures");
+    public ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueID) {
+        return ApiResponseUtil.transformListToApiResponse(createFixtureDTOList(getNotStartedByLeague(leagueID)), "fixtures");
     }
 
-    @Autowired
-    public void setBetGroupService(BetGroupService betGroupService) {
-        this.betGroupService = betGroupService;
+    @Override
+    public ApiResponse<?> getNotStartedByLeaguesApiCall(List<Integer> leagues) {
+        List<Fixture> fixtureList = new ArrayList<>();
+        for (Integer id : leagues) {
+            List<Fixture> fixturesById = getNotStartedByLeague(id);
+            fixtureList.addAll(fixturesById);
+        }
+        return ApiResponseUtil.transformListToApiResponse(createFixtureDTOList(fixtureList), "fixtures");
     }
 
-    @Autowired
-    public void setTeamService(TeamService teamService) {
-        this.teamService = teamService;
+    @Override
+    public boolean existFixtureByLeagueId(Integer leagueId) {
+        return !getNotStartedByLeague(leagueId).isEmpty();
     }
 
-    @Autowired
-    public void setFixtureMapper(FixtureMapper fixtureMapper) {
-        this.fixtureMapper = fixtureMapper;
-    }
-
-    @Autowired
-    public void setFixtureRepository(FixtureRepository fixtureRepository) {
-        this.fixtureRepository = fixtureRepository;
-    }
 
 }

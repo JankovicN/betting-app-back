@@ -1,5 +1,8 @@
 package rs.ac.bg.fon.service;
 
+import org.springframework.data.domain.Pageable;
+import rs.ac.bg.fon.dtos.User.UserDTO;
+import rs.ac.bg.fon.dtos.User.UserRegistrationDTO;
 import rs.ac.bg.fon.entity.Role;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.utility.ApiResponse;
@@ -27,9 +30,9 @@ public interface UserService {
 
     ApiResponse<?> deleteUserApiResponse(String username);
 
-    ApiResponse<?> registerUserApiResponse(User user);
+    ApiResponse<?> registerUserApiResponse(UserRegistrationDTO user);
 
-    ApiResponse<?> getUsersApiResponse();
+    ApiResponse<?> getUsersApiResponse(Pageable pageable);
 
     ApiResponse<?> getUserApiResponse(String username);
 
@@ -37,5 +40,6 @@ public interface UserService {
 
     ApiResponse<?> saveRoleApiResponse(Role role);
 
-    ApiResponse<?> updateUserApiResponse(User user);
+    ApiResponse<?> updateUserApiResponse(UserDTO user);
+    ApiResponse<?> getTestConformation();
 }

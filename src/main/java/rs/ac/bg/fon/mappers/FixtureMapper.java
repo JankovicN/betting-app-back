@@ -13,7 +13,7 @@ import java.util.List;
 public class FixtureMapper {
 
 
-    public FixtureDTO fixtureToFixtureDTO(Fixture fixture) throws Exception {
+    public static FixtureDTO fixtureToFixtureDTO(Fixture fixture) throws Exception {
         if (fixture.getId() == null || fixture.getId() < 0 || fixture.getDate() == null || fixture.getState() == null || fixture.getState().isBlank()) {
             throw new Exception("Fixture object has invalid fields [id = " + fixture.getId() + ", state = " + fixture.getState() + ", date = " + fixture.getDate() + "]");
         }
@@ -26,7 +26,7 @@ public class FixtureMapper {
     }
 
 
-    public FixtureDTO fixtureToFixtureDTO(Fixture fixture, TeamDTO home, TeamDTO away, List<BetGroupDTO> betGroupDTO) throws Exception {
+    public static FixtureDTO fixtureToFixtureDTO(Fixture fixture, TeamDTO home, TeamDTO away, List<BetGroupDTO> betGroupDTO) throws Exception {
         if (fixture.getHomeGoals() < 0 || fixture.getAwayGoals() < 0) {
             throw new Exception("Fixture object has invalid fields [homeGoals = " + fixture.getHomeGoals() + ", awayGoals = " + fixture.getAwayGoals() + "]");
         } else if (home == null || away == null) {

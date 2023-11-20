@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class OddMapper {
 
-    public OddDTO oddToOddDTO(Odd odd) throws Exception {
+    public static OddDTO oddToOddDTO(Odd odd) throws Exception {
         if (odd.getId() == null || odd.getId() < 0 || odd.getName() == null || odd.getName().isBlank() || odd.getOdd() == null || odd.getOdd().compareTo(BigDecimal.ONE) < 0) {
             throw new Exception("Odd object has invalid fields [id = " + odd.getId() + ", name = " + odd.getName() + ", odd = " + odd.getOdd() + "]");
         }
@@ -23,7 +23,7 @@ public class OddMapper {
         return oddDTO;
     }
 
-    public List<OddDTO> oddListToOddDTOList(List<Odd> oddList) throws Exception {
+    public static List<OddDTO> oddListToOddDTOList(List<Odd> oddList) throws Exception {
         if (oddList == null || oddList.isEmpty()) {
             throw new Exception("List of Odds is Empty!");
         }

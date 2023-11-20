@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @ConfigurationProperties(prefix = "application")
@@ -54,8 +56,21 @@ public class Utility {
     public static LocalDateTime parseDateTime(String date){
         return LocalDateTime.parse(date, dateTimeFormatter);
     }
+    public static LocalDate parseDate(String date){
+        return LocalDate.parse(date, dateFormatter);
+    }
 
     public static Algorithm getAlgorithm(){
         return Algorithm.HMAC256("bdabsidubasuidasuidfiasubfius".getBytes());
+    }
+
+    private static final String EMAIL_REGEX =
+            "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
+    private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
+
+    public static boolean isValidEmail(String email) {
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 }

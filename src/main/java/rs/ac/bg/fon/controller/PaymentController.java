@@ -11,19 +11,19 @@ import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("api/payment")
+@RequestMapping("payment")
 public class PaymentController {
 
     private final PaymentService paymentService;
 
 
-    @GetMapping("/balance/{userId}")
-    public ResponseEntity<?> getBalanceForUser(@PathVariable Integer userId) {
+    @GetMapping("/balance")
+    public ResponseEntity<?> getBalanceForUser(@RequestParam Integer userID) {
 
-        if (userId == null) {
+        if (userID == null) {
             return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
-        return ApiResponseUtil.handleApiResponse(paymentService.getUserPaymentsApiResponse(userId));
+        return ApiResponseUtil.handleApiResponse(paymentService.getUserPaymentsApiResponse(userID));
     }
 
     @PostMapping("/deposit")

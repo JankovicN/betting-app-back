@@ -20,8 +20,10 @@ public interface TicketService {
     void payoutUsers();
 
     List<Ticket> getCancelableTickets();
+    List<Ticket> getCancelableTickets(String username);
 
     ApiResponse<?> getCancelableTicketsApiResponse();
+    ApiResponse<?> getCancelableTicketsApiResponse(String username);
 
     Ticket cancelTicket(Integer ticketID);
 

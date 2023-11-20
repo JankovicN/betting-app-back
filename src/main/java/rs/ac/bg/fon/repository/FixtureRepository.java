@@ -11,5 +11,5 @@ public interface FixtureRepository  extends JpaRepository<Fixture, Integer> {
 
     List<Fixture> findByState (String state);
 
-    List<Fixture> findByStateAndLeagueId(String ns, int league);
+    List<Fixture> findAllByStateAndLeagueIdOrderByDateAsc(String ns, int league);
 }

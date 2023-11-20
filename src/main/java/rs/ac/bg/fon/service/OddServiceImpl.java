@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
+import rs.ac.bg.fon.entity.BetGroup;
+import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.mappers.OddMapper;
 import rs.ac.bg.fon.repository.OddRepository;
@@ -14,6 +16,7 @@ import rs.ac.bg.fon.repository.OddRepository;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,9 +24,7 @@ import java.util.List;
 public class OddServiceImpl implements OddService {
     private static final Logger logger = LoggerFactory.getLogger(OddServiceImpl.class);
 
-    private OddRepository oddRepository;
-    private OddMapper oddMapper;
-
+    private final OddRepository oddRepository;
     @Override
     public Odd save(Odd odd) {
         try {
@@ -32,6 +33,24 @@ public class OddServiceImpl implements OddService {
             return savedOdd;
         } catch (Exception e) {
             logger.error("Error while trying to save Odd " + odd + "!\n" + e.getMessage());
+            return null;
+        }
+    }
+    @Transactional
+    @Override
+    public Odd getOddById(Integer oddId) {
+        try {
+            Optional<Odd> odd = oddRepository.findById(oddId);
+            if(odd.isPresent()){
+                logger.info("Successfully found Odd with id: "+oddId+", odd:  \n" + odd.get() + "!");
+                Odd fetchedOdd  = odd.get();
+                fetchedOdd.getFixture();
+                BetGroup betGroup = fetchedOdd.getBetGroup();
+                return fetchedOdd;
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("Error while trying to find Odd with id =  " + oddId + "!\n" + e.getMessage());
             return null;
         }
     }
@@ -48,19 +67,19 @@ public class OddServiceImpl implements OddService {
         }
     }
 
-
     @Override
     public List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId) {
         try {
             List<Odd> oddList = oddRepository.findByFixtureStateAndFixtureIdAndBetGroupId(Constants.FIXTURE_NOT_STARTED, fixtureId, betGroupId);
-            logger.info("Successfully found list of Odds!");
-            return oddList;
+            logger.info("Successfully found list of Odds for fixtureId = "+fixtureId+" and betGroupId = "+betGroupId+"!\n" +
+                    "Odd List: "+oddList);
+
+            return oddList==null ? new ArrayList<>() : oddList;
         } catch (Exception e) {
-            logger.error("Error while trying to save list of Odds!!\n" + e.getMessage());
+            logger.error("Error while trying to find list of Odds!!\n" + e.getMessage());
             return new ArrayList<>();
         }
     }
-
 
     @Override
     public List<OddDTO> createOddDTOList(Integer fixtureId, Integer betGroupId) {
@@ -70,7 +89,7 @@ public class OddServiceImpl implements OddService {
             List<Odd> oddList = getOddsForFixtureAndBetGroup(fixtureId, betGroupId);
             for (Odd odd : oddList) {
                 try {
-                    OddDTO oddDTO = oddMapper.oddToOddDTO(odd);
+                    OddDTO oddDTO = OddMapper.oddToOddDTO(odd);
                     oddDTOList.add(oddDTO);
                 } catch (Exception e) {
                     logger.error("Error while trying to map Odd to OddDTO!\n" + e.getMessage());
@@ -93,16 +112,4 @@ public class OddServiceImpl implements OddService {
             return false;
         }
     }
-
-
-    @Autowired
-    public void setOddMapper(OddMapper oddMapper) {
-        this.oddMapper = oddMapper;
-    }
-
-    @Autowired
-    public void setOddRepository(OddRepository oddRepository) {
-        this.oddRepository = oddRepository;
-    }
-
 }

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Component
 public class  BetGroupMapper {
-    public BetGroupDTO betGroupToBetGroupDTO(BetGroup betGroup) throws Exception {
+    public static BetGroupDTO betGroupToBetGroupDTO(BetGroup betGroup) throws Exception {
         if(betGroup.getId()==null || betGroup.getId()<0 || betGroup.getName()==null || betGroup.getName().isBlank()){
             throw new Exception("BetGroup object has invalid fields [id = "+betGroup.getId()+", name = "+betGroup.getName()+"]");
         }
@@ -18,7 +18,7 @@ public class  BetGroupMapper {
         betGroupDTO.setName(betGroup.getName());
         return betGroupDTO;
     }
-    public BetGroupDTO betGroupToBetGroupDTO(BetGroup betGroup, List<OddDTO> oddDTOList) throws Exception {
+    public static BetGroupDTO betGroupToBetGroupDTO(BetGroup betGroup, List<OddDTO> oddDTOList) throws Exception {
         if(oddDTOList==null || oddDTOList.isEmpty() ){
             throw new Exception("List of odds is null!");
         }

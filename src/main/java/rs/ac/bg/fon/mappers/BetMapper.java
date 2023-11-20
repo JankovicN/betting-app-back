@@ -2,8 +2,12 @@ package rs.ac.bg.fon.mappers;
 
 import org.springframework.stereotype.Component;
 import rs.ac.bg.fon.dtos.Bet.BetDTO;
+import rs.ac.bg.fon.dtos.Bet.BetInfoDTO;
 import rs.ac.bg.fon.entity.Bet;
+import rs.ac.bg.fon.entity.BetGroup;
+import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Odd;
+import rs.ac.bg.fon.utility.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +15,8 @@ import java.util.List;
 @Component
 public class BetMapper {
 
-    public Bet betDTOToBet(BetDTO betDTO) throws Exception {
-        if(betDTO==null){
+    public static Bet betDTOToBet(BetDTO betDTO) throws Exception {
+        if (betDTO == null) {
             throw new Exception("Invalid bet!");
         }
         if (betDTO.getOddId() == null) {
@@ -25,8 +29,8 @@ public class BetMapper {
         return bet;
     }
 
-    public List<Bet> betDTOListToBetList(List<BetDTO> betDtoList) throws Exception {
-        if(betDtoList==null || betDtoList.isEmpty()){
+    public static List<Bet> betDTOListToBetList(List<BetDTO> betDtoList) throws Exception {
+        if (betDtoList == null || betDtoList.isEmpty()) {
             throw new Exception("There are no bets in this ticket!");
         }
         List<Bet> betList = new ArrayList<>();
@@ -38,5 +42,28 @@ public class BetMapper {
             throw new Exception("One of the bet objects is invalid [ " + e.getMessage() + " ]");
         }
         return betList;
+    }
+
+
+    public static BetInfoDTO betToBetInfoDTO(Bet bet, BetGroup betGroup, Odd odd, Fixture fixture) throws Exception {
+        if (bet.getId() == null || bet.getState() == null || bet.getState().isBlank()
+                || betGroup.getName() == null || betGroup.getName().isBlank()
+                || odd.getOdd() == null || odd.getName() == null || odd.getName().isBlank()
+                || fixture.getDate() == null || fixture.getHomeGoals() < 0 || fixture.getAwayGoals() < 0
+                || fixture.getHome() == null || fixture.getHome().getName() == null || fixture.getHome().getName().isBlank()
+                || fixture.getAway() == null || fixture.getAway().getName() == null || fixture.getAway().getName().isBlank()) {
+            throw new Exception("Bet DTO object has invalid fields [bet = " + bet + ", betGroup = " + betGroup + ", odd = " + odd + ", fixture = " + fixture + " ]");
+        }
+        BetInfoDTO betDTO = new BetInfoDTO();
+        betDTO.setId(bet.getId());
+        betDTO.setState(bet.getState());
+        betDTO.setOdd(odd.getOdd());
+        betDTO.setName(odd.getName());
+        betDTO.setBetGroupName(betGroup.getName());
+        betDTO.setFixtureDate(Utility.formatDateTime(fixture.getDate()));
+        betDTO.setHome(fixture.getHome().getName());
+        betDTO.setAway(fixture.getAway().getName());
+        betDTO.setResult(fixture.getHomeGoals()+":"+fixture.getAwayGoals());
+        return betDTO;
     }
 }

@@ -24,21 +24,8 @@ import java.util.List;
 @Transactional
 public class LeagueServiceImpl implements LeagueService {
     private static final Logger logger = LoggerFactory.getLogger(LeagueServiceImpl.class);
-    LeagueRepository leagueRepository;
-
-    private LeagueMapper leagueMapper;
-
-    private FixtureService fixtureService;
-
-    @Autowired
-    public void setFixtureService(FixtureService fixtureService) {
-        this.fixtureService = fixtureService;
-    }
-
-    @Autowired
-    public void setLeagueRepository(LeagueRepository leagueRepository) {
-        this.leagueRepository = leagueRepository;
-    }
+    private final LeagueRepository leagueRepository;
+    private final  FixtureService fixtureService;
 
     @Override
     public League save(League league) {
@@ -76,7 +63,6 @@ public class LeagueServiceImpl implements LeagueService {
         }
     }
 
-
     @Override
     public boolean exists() {
         return leagueRepository.count() > 0;
@@ -101,7 +87,7 @@ public class LeagueServiceImpl implements LeagueService {
                     continue;
                 }
                 try {
-                    LeagueDTO leagueDTO = leagueMapper.leagueToLeagueDTO(league, fixtureDTOS);
+                    LeagueDTO leagueDTO = LeagueMapper.leagueToLeagueDTO(league, fixtureDTOS);
                     leagueDTOS.add(leagueDTO);
                 } catch (Exception e) {
                     logger.error("Error creating LeagueDTO for League " + league + "!", e);
@@ -116,18 +102,35 @@ public class LeagueServiceImpl implements LeagueService {
         List<LeagueBasicDTO> leagueDTOS = new ArrayList<>();
         List<League> allLeagues = getAllLeagues();
         if (allLeagues != null) {
-            try{
-                leagueDTOS = leagueMapper.leagueListToLeagueBasicDTOList(allLeagues);
-            }catch (Exception e){
-                logger.error("Unable to create League DTO List!\n"+e.getMessage());
+            try {
+                for (League league : allLeagues) {
+                    if(fixtureService.existFixtureByLeagueId(league.getId())){
+                        leagueDTOS.add(LeagueMapper.leagueToLeagueBasicDTO(league));
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Unable to create League DTO List!\n" + e.getMessage());
             }
         }
         return ApiResponseUtil.transformListToApiResponse(leagueDTOS, "leagues");
     }
 
-
-    @Autowired
-    public void setLeagueMapper(LeagueMapper leagueMapper) {
-        this.leagueMapper = leagueMapper;
+    @Override
+    public ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueId) {
+        League league = leagueRepository.findById(leagueId).get();
+        LeagueDTO leagueDTO = new LeagueDTO();
+        if (league != null) {
+            try {
+                List<FixtureDTO> fixtures = fixtureService.getFixtureDtoByLeague(leagueId);
+                if (fixtures != null && !fixtures.isEmpty()) {
+                    logger.info("Fixtures for league " + leagueId + "\n" + fixtures + "\nIs empty = " + fixtures.isEmpty());
+                    leagueDTO = LeagueMapper.leagueToLeagueDTO(league, fixtures);
+                    return ApiResponseUtil.transformObjectToApiResponse(leagueDTO, "leagues");
+                }
+            } catch (Exception e) {
+                logger.error("Unable to create League DTO List!\n" + e.getMessage());
+            }
+        }
+        return ApiResponseUtil.transformObjectToApiResponse(leagueDTO, "leagues");
     }
 }

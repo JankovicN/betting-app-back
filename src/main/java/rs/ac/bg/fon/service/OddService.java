@@ -10,14 +10,10 @@ import java.util.List;
 public interface OddService {
 
     Odd save(Odd odd);
+    Odd getOddById(Integer oddId);
     List<Odd> saveOddList(List<Odd> odds);
-
-
     List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId);
-
     List<OddDTO> createOddDTOList(Integer fixtureId, Integer betGroupId);
-
-
     boolean existsWithFixtureIdAndBetGroupId(Integer betGroupId, Integer id);
 
 }

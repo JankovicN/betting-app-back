@@ -17,14 +17,14 @@ import rs.ac.bg.fon.utility.ApiResponseUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BetGroupServiceImpl implements BetGroupService {
     private static final Logger logger = LoggerFactory.getLogger(BetGroupServiceImpl.class);
-    private BetGroupRepository betGroupRepository;
-    private OddService oddService;
-    private BetGroupMapper betGroupMapper;
+    private final BetGroupRepository betGroupRepository;
+    private final OddService oddService;
 
 
     @Override
@@ -67,7 +67,7 @@ public class BetGroupServiceImpl implements BetGroupService {
             for (BetGroup betGroup : betGroupList) {
                 List<OddDTO> oddList = oddService.createOddDTOList(fixtureId, betGroup.getId());
                 try {
-                    BetGroupDTO betGroupDTO = betGroupMapper.betGroupToBetGroupDTO(betGroup, oddList);
+                    BetGroupDTO betGroupDTO = BetGroupMapper.betGroupToBetGroupDTO(betGroup, oddList);
                     betGroupDTOList.add(betGroupDTO);
                 } catch (Exception e) {
                     logger.error("Error adding Bet Group with ID = " + betGroup.getId() + " to list!\n" + e.getMessage());
@@ -87,7 +87,7 @@ public class BetGroupServiceImpl implements BetGroupService {
             BetGroup betGroup = getBetGroupWithId(1);
             List<OddDTO> oddList = oddService.createOddDTOList(fixtureID, betGroupID);
             try {
-                BetGroupDTO betGroupDTO = betGroupMapper.betGroupToBetGroupDTO(betGroup, oddList);
+                BetGroupDTO betGroupDTO = BetGroupMapper.betGroupToBetGroupDTO(betGroup, oddList);
                 betGroupDTOList.add(betGroupDTO);
             } catch (Exception e) {
                 logger.error("Error adding Bet Group with ID = " + betGroup.getId() + " to list!\n" + e.getMessage());
@@ -115,17 +115,20 @@ public class BetGroupServiceImpl implements BetGroupService {
     @Override
     public List<BetGroupDTO> getBetGroupsByFixture(Integer fixtureID) {
         try {
-            List<BetGroup> betGroupList = betGroupRepository.findByOddsFixtureId(fixtureID);
+            List<BetGroup> betGroupList = betGroupRepository.findByOddsFixtureIdOrderByIdAsc(fixtureID);
+            betGroupList = betGroupList.stream()
+                    .distinct()
+                    .collect(Collectors.toList());
             List<BetGroupDTO> betGroupDTOList = new ArrayList<>();
             for (BetGroup betGroup : betGroupList) {
-                List<OddDTO> oddDTOList = oddService.createOddDTOList(fixtureID,betGroup.getId());
-                if(oddDTOList.isEmpty()){
+                List<OddDTO> oddDTOList = oddService.createOddDTOList(fixtureID, betGroup.getId());
+                if (oddDTOList.isEmpty()) {
                     continue;
                 }
-                try{
-                    BetGroupDTO betGroupDTO = betGroupMapper.betGroupToBetGroupDTO(betGroup,oddDTOList);
+                try {
+                    BetGroupDTO betGroupDTO = BetGroupMapper.betGroupToBetGroupDTO(betGroup, oddDTOList);
                     betGroupDTOList.add(betGroupDTO);
-                }catch (Exception e){
+                } catch (Exception e) {
                     logger.error("Error while trying to create Bet Group " + betGroup + "!\n" + e.getMessage());
                 }
             }
@@ -190,22 +193,6 @@ public class BetGroupServiceImpl implements BetGroupService {
             logger.error("Error while checking if Bet Group with ID = " + betGroupId + ", exists!\n" + e.getMessage());
             return false;
         }
-    }
-
-
-    @Autowired
-    public void setOddService(OddService oddService) {
-        this.oddService = oddService;
-    }
-
-    @Autowired
-    public void setBetGroupMapper(BetGroupMapper betGroupMapper) {
-        this.betGroupMapper = betGroupMapper;
-    }
-
-    @Autowired
-    public void setBetGroupRepository(BetGroupRepository betGroupRepository) {
-        this.betGroupRepository = betGroupRepository;
     }
 
 }

@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface BetGroupRepository  extends JpaRepository<BetGroup, Integer> {
 
-    List<BetGroup> findByOddsFixtureId(int fixture);
+    List<BetGroup> findByOddsFixtureIdOrderByIdAsc(int fixture);
 }

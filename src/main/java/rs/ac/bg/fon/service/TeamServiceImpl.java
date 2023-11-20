@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.service;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,11 @@ import rs.ac.bg.fon.repository.TeamRepository;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class TeamServiceImpl implements TeamService {
     private static final Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
-    TeamRepository teamRepository;
-    TeamMapper teamMapper;
+    private final TeamRepository teamRepository;
 
     @Transactional
     @Override
@@ -40,7 +41,7 @@ public class TeamServiceImpl implements TeamService {
             if (team == null || team.getName() == null) {
                 return null;
             }
-            TeamDTO teamDTO = teamMapper.teamToTeamDTO(team);
+            TeamDTO teamDTO = TeamMapper.teamToTeamDTO(team);
             logger.info("Successfully created TeamDTO from Team " + team + "!");
             return teamDTO;
         } catch (Exception e) {
@@ -62,16 +63,5 @@ public class TeamServiceImpl implements TeamService {
             logger.error("Error while trying to find Team with ID = " + id + "!\n" + e.getMessage());
             return null;
         }
-    }
-
-    @Autowired
-    public void setTeamMapper(TeamMapper teamMapper) {
-        this.teamMapper = teamMapper;
-    }
-
-    @Autowired
-    public void setTeamRepository(TeamRepository teamRepository) {
-
-        this.teamRepository = teamRepository;
     }
 }

@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.security.configuration;
 
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +19,26 @@ import rs.ac.bg.fon.service.UserService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+@NoArgsConstructor
 @Component
 public class CommandLineRunnerStartUp implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(CommandLineRunnerStartUp.class);
-    private UserService userService;
-    private RoleRepository roleRepository;
-    private UserRepository userRepository;
-    private LeagueService leagueService;
-    private BetGroupService betGroupService;
-    private InitialAdminConfig initialAdminConfig;
+    @Autowired
+    UserService userService;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    LeagueService leagueService;
+    @Autowired
+    BetGroupService betGroupService;
+    @Autowired
+    InitialAdminConfig initialAdminConfig;
+    @Autowired
 
-    private AllLeagues allLeagues;
-    private AllBetGroups allBetGroups;
+    public AllLeagues allLeagues;
+    @Autowired
+    public AllBetGroups allBetGroups;
 
-    public CommandLineRunnerStartUp() {
-    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -57,43 +63,4 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
         userService.addRoleToUser("janko", "ROLE_ADMIN");
     }
 
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
-    @Autowired
-    public void setRoleRepository(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setLeagueService(LeagueService leagueService) {
-        this.leagueService = leagueService;
-    }
-
-    @Autowired
-    public void setAllLeagues(AllLeagues allLeagues) {
-        this.allLeagues = allLeagues;
-    }
-
-    @Autowired
-    public void setInitialAdminConfig(InitialAdminConfig initialAdminConfig) {
-        this.initialAdminConfig = initialAdminConfig;
-    }
-
-    @Autowired
-    public void setAllBetGroups(AllBetGroups allBetGroups) {
-        this.allBetGroups = allBetGroups;
-    }
-
-    @Autowired
-    public void setBetGroupService(BetGroupService betGroupService) {
-        this.betGroupService = betGroupService;
-    }
 }

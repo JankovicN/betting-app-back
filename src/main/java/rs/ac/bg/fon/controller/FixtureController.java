@@ -3,25 +3,33 @@ package rs.ac.bg.fon.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import rs.ac.bg.fon.service.FixtureService;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("api/fixture")
+@RequestMapping("fixture")
 public class FixtureController {
 
 
     private final FixtureService fixtureService;
 
-    @GetMapping("/ns/{league}")
-    public ResponseEntity<?> getFixturesForLeague(@PathVariable Integer league) {
-        if(league == null){
+    @GetMapping("/ns")
+    public ResponseEntity<?> getFixturesForLeague(@RequestParam Integer leagueID) {
+        if(leagueID == null){
             return ApiResponseUtil.errorApiResponse("League data is missing!\nContact support for more information!");
         }
-        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeagueApiCall(league));
+        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeagueApiCall(leagueID));
+    }
+
+    @GetMapping("/ns/leagues")
+    public ResponseEntity<?> getFixturesForLeagues(@RequestBody List<Integer> leagues) {
+        if(leagues == null || leagues.isEmpty()){
+            return ApiResponseUtil.errorApiResponse("League data is missing!\nContact support for more information!");
+        }
+        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeaguesApiCall(leagues));
     }
 }

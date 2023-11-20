@@ -3,32 +3,29 @@ package rs.ac.bg.fon.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import rs.ac.bg.fon.service.BetGroupService;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("api/betgroup")
+@RequestMapping("betGroup")
 public class BetGroupController {
 
     private final BetGroupService betGroupService;
 
-    @GetMapping("/get/{fixture}")
-    public ResponseEntity<?> getBetGroups(@PathVariable Integer fixtureId) {
-        if (fixtureId == null) {
+    @GetMapping("/get")
+    public ResponseEntity<?> getBetGroups(@RequestParam Integer fixtureID) {
+        if (fixtureID == null) {
             return ApiResponseUtil.errorApiResponse("Fixture data is missing!\nContact support for more information!");
         }
-        return ApiResponseUtil.handleApiResponse(betGroupService.getBetGroupsByFixtureApiResponse(fixtureId));
+        return ApiResponseUtil.handleApiResponse(betGroupService.getBetGroupsByFixtureApiResponse(fixtureID));
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteBetGroup(@PathVariable Integer betGroupId){
-        if (betGroupId == null) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteBetGroup(@RequestParam Integer betGroupID){
+        if (betGroupID == null) {
             return ApiResponseUtil.errorApiResponse("Bet group data is missing!\nContact support for more information!");
         }
-        return ApiResponseUtil.handleApiResponse(betGroupService.deleteBetGroupApiResponse(betGroupId));
+        return ApiResponseUtil.handleApiResponse(betGroupService.deleteBetGroupApiResponse(betGroupID));
     }
 }
