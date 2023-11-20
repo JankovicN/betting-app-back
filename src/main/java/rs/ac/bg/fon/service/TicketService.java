@@ -13,7 +13,9 @@ public interface TicketService {
 
     ApiResponse<?> updateAllTickets();
 
-    ApiResponse<?> getUserTickets(String username);
+    ApiResponse<?> getUserTickets(String username, Pageable pageable);
+
+    ApiResponse<?> getAllTickets(Pageable pageable);
 
     void processTickets();
 

@@ -32,17 +32,11 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
             "  WHERE t.state='" + Constants.WAITING_FOR_RESULTS + "' OR t.state='" + Constants.TICKET_PROCESSED + "' ", nativeQuery = true)
     void updateAllTickets();
 
-    List<Ticket> findByUserUsernameOrderByDateDesc(String username);
+    Page<Ticket> findByUserUsernameOrderByDateDesc(String username, Pageable pageable);
 
     @Modifying
     @Query("UPDATE Ticket  SET state = '" + Constants.TICKET_PROCESSED + "' WHERE date < :date AND state = '" + Constants.TICKET_UNPROCESSED + "'")
     void processTickets(@Param("date") LocalDateTime oldDate);
-
-    @Query("SELECT SUM(wager) FROM Ticket WHERE user.id = :userId ")
-    Double getWagerAmountForUser(@Param("userId") int userId);
-
-    @Query("SELECT SUM(totalWin) FROM Ticket WHERE user.id = :userId AND state = '" + Constants.TICKET_WIN + "'")
-    Double getTotalWinAmountForUser(@Param("userId") int userId);
 
     List<Ticket> findByState(String state);
 

@@ -81,19 +81,50 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public ApiResponse<?> getUserTickets(String username) {
-        ApiResponse<List<TicketBasicDTO>> response = new ApiResponse<>();
+    public ApiResponse<?> getUserTickets(String username, Pageable pageable) {
+        ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
         try {
-            List<TicketBasicDTO> ticketBasicDTOS = new ArrayList<>();
-            for (Ticket t : ticketRepository.findByUserUsernameOrderByDateDesc(username)) {
-                TicketBasicDTO ticketBasicDTO = TicketMapper.ticketToTicketBasicDTO(t);
-                ticketBasicDTOS.add(ticketBasicDTO);
-            }
-            response.setData(ticketBasicDTOS);
-            logger.info("Successfully got Tickets for user = " + username + "!");
+            Page<Ticket> ticketPage = ticketRepository.findByUserUsernameOrderByDateDesc(username, pageable);
+            PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
+            response.setData(ticketDtoPage);
         } catch (Exception e) {
             response.addErrorMessage("Error getting Tickets, try again later!");
             logger.error("Error getting Tickets for username = " + username + "!", e);
+        }
+        return response;
+    }
+
+    private PageDTO<TicketBasicDTO> createPageDtoForTickets(Page<Ticket> tickets, Pageable pageable) throws Exception {
+        // Creating a List of TicketBasicDTO,
+        // 1. Map the ticket to the DTO
+        // 2. Filter if there are any null values ( meaning mapping wasn't successful )
+        // 3. Create a list of DTO objects
+        List<TicketBasicDTO> basicTicketDtoList = tickets.map(ticket -> {
+            try {
+                return TicketMapper.ticketToTicketBasicDTO(ticket);
+            } catch (Exception e) {
+                logger.error("Error while mapping cancel ticket to DTO");
+                return null;
+            }
+        }).filter(ticketDTO -> ticketDTO != null).stream().toList();
+
+        // Create a Page instance of TicketBasicDTO List
+        Page<TicketBasicDTO> basicTicketPage = new PageImpl<>(basicTicketDtoList, pageable, basicTicketDtoList.size());
+
+        // Map the Page instance to PageDTO adn return that value
+        return PageMapper.pageToPageDTO(basicTicketPage);
+    }
+
+    @Override
+    public ApiResponse<?> getAllTickets(Pageable pageable) {
+        ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
+        try {
+            Page<Ticket> ticketPage = ticketRepository.findAll(pageable);
+            PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
+            response.setData(ticketDtoPage);
+        } catch (Exception e) {
+            response.addErrorMessage("Error getting Tickets, try again later!");
+            logger.error("Error getting all Tickets!", e);
         }
         return response;
     }
