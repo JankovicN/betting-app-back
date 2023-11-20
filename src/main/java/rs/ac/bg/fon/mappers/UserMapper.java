@@ -19,7 +19,7 @@ public class UserMapper {
                 || userDTO.getSurname() == null || userDTO.getSurname().isBlank()
                 || userDTO.getName() == null || userDTO.getName().isBlank()
                 || userDTO.getEmail() == null || userDTO.getEmail().isBlank()) {
-            throw new Exception("User object has invalid fields [ email = " + userDTO.getEmail()+ ", birthday = " + userDTO.getBirthday()
+            throw new Exception("User object has invalid fields [ email = " + userDTO.getEmail() + ", birthday = " + userDTO.getBirthday()
                     + ", username = " + userDTO.getUsername() + ", password = " + userDTO.getPassword()
                     + ", name = " + userDTO.getName() + ", surname = " + userDTO.getSurname() + " ]");
         }
@@ -41,7 +41,7 @@ public class UserMapper {
                 || user.getSurname() == null || user.getSurname().isBlank()
                 || user.getName() == null || user.getName().isBlank()
                 || user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new Exception("User object has invalid fields [id = " + user.getId()+ ", email = " + user.getEmail()
+            throw new Exception("User object has invalid fields [id = " + user.getId() + ", email = " + user.getEmail()
                     + ", username = " + user.getUsername() + ", birthday = " + user.getBirthday()
                     + ", name = " + user.getName() + ", surname = " + user.getSurname() + "]");
         }
@@ -56,9 +56,9 @@ public class UserMapper {
         return userDTO;
     }
 
-    public static List<UserDTO> userToUserDTO(List<User> users) throws Exception{
+    public static List<UserDTO> userToUserDTO(List<User> users) throws Exception {
         List<UserDTO> userDTOS = new ArrayList<>();
-        for (User user: users) {
+        for (User user : users) {
             userDTOS.add(userToUserDTO(user));
         }
         return userDTOS;
@@ -71,7 +71,7 @@ public class UserMapper {
                 || userDTO.getSurname() == null || userDTO.getSurname().isBlank()
                 || userDTO.getName() == null || userDTO.getName().isBlank()
                 || userDTO.getEmail() == null || userDTO.getEmail().isBlank()) {
-            throw new Exception("User object has invalid fields [id = " + userDTO.getId()+ ", email = " + userDTO.getEmail()
+            throw new Exception("User object has invalid fields [id = " + userDTO.getId() + ", email = " + userDTO.getEmail()
                     + ", username = " + userDTO.getUsername() + ", birthday = " + userDTO.getBirthday()
                     + ", name = " + userDTO.getName() + ", surname = " + userDTO.getSurname() + "]");
         }

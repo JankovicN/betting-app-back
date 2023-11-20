@@ -32,7 +32,7 @@ public class PaymentController {
         if (payment == null) {
             return ApiResponseUtil.errorApiResponse("Payment data is missing!\nContact support for more information!");
         }
-        if (payment.getUserId() == null ) {
+        if (payment.getUserId() == null) {
             return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
         if (payment.getAmount() == null) {

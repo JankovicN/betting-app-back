@@ -1,31 +1,37 @@
 [
-	{
-		"id": 2,
-		"name": "UEFA Champions League",
-		"fixtures": []
-	},{
-		"id": 39,
-		"name": "Premier League",
-		"fixtures": []
-	},{
-		"id": 61,
-		"name": "Ligue 1",
-		"fixtures": []
-	},{
-		"id": 78,
-		"name": "Bundesliga",
-		"fixtures": []
-	},{
-		"id": 135,
-		"name": "Serie A",
-		"fixtures": []
-	},{
-		"id": 140,
-		"name": "La Liga",
-		"fixtures": []
-	},{
-		"id": 286,
-		"name": "Super Liga",
-		"fixtures": []
-	}
+  {
+    "id": 2,
+    "name": "UEFA Champions League",
+    "fixtures": []
+  },
+  {
+    "id": 39,
+    "name": "Premier League",
+    "fixtures": []
+  },
+  {
+    "id": 61,
+    "name": "Ligue 1",
+    "fixtures": []
+  },
+  {
+    "id": 78,
+    "name": "Bundesliga",
+    "fixtures": []
+  },
+  {
+    "id": 135,
+    "name": "Serie A",
+    "fixtures": []
+  },
+  {
+    "id": 140,
+    "name": "La Liga",
+    "fixtures": []
+  },
+  {
+    "id": 286,
+    "name": "Super Liga",
+    "fixtures": []
+  }
 ]

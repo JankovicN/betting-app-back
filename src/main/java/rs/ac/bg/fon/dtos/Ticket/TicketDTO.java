@@ -2,7 +2,6 @@ package rs.ac.bg.fon.dtos.Ticket;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.ac.bg.fon.dtos.Bet.BetDTO;
 
@@ -14,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class TicketDTO  implements Serializable {
+public class TicketDTO implements Serializable {
 
     private BigDecimal wager;
     private Double totalOdd;
@@ -23,7 +22,7 @@ public class TicketDTO  implements Serializable {
     private List<BetDTO> bets;
 
     public TicketDTO() {
-        bets=new ArrayList<>();
+        bets = new ArrayList<>();
     }
 
     @Override

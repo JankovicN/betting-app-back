@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class BetGroupDTO  implements Serializable {
+public class BetGroupDTO implements Serializable {
 
     private Integer id;
 
@@ -20,7 +20,7 @@ public class BetGroupDTO  implements Serializable {
 
     private List<OddDTO> odds;
 
-    public BetGroupDTO(){
-        odds=new ArrayList<>();
+    public BetGroupDTO() {
+        odds = new ArrayList<>();
     }
 }

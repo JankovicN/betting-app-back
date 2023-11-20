@@ -63,7 +63,7 @@ public class BetMapper {
         betDTO.setFixtureDate(Utility.formatDateTime(fixture.getDate()));
         betDTO.setHome(fixture.getHome().getName());
         betDTO.setAway(fixture.getAway().getName());
-        betDTO.setResult(fixture.getHomeGoals()+":"+fixture.getAwayGoals());
+        betDTO.setResult(fixture.getHomeGoals() + ":" + fixture.getAwayGoals());
         return betDTO;
     }
 }

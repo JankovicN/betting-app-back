@@ -3,7 +3,6 @@ package rs.ac.bg.fon.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
 import rs.ac.bg.fon.dtos.League.LeagueBasicDTO;
@@ -25,7 +24,7 @@ import java.util.List;
 public class LeagueServiceImpl implements LeagueService {
     private static final Logger logger = LoggerFactory.getLogger(LeagueServiceImpl.class);
     private final LeagueRepository leagueRepository;
-    private final  FixtureService fixtureService;
+    private final FixtureService fixtureService;
 
     @Override
     public League save(League league) {
@@ -104,7 +103,7 @@ public class LeagueServiceImpl implements LeagueService {
         if (allLeagues != null) {
             try {
                 for (League league : allLeagues) {
-                    if(fixtureService.existFixtureByLeagueId(league.getId())){
+                    if (fixtureService.existFixtureByLeagueId(league.getId())) {
                         leagueDTOS.add(LeagueMapper.leagueToLeagueBasicDTO(league));
                     }
                 }

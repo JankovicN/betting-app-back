@@ -21,14 +21,16 @@ public class ApiResponseUtil {
             return ResponseEntity.badRequest().body(apiResponse);
         }
     }
+
     public static ResponseEntity<?> errorApiResponse(String errorMessage) {
-        ApiResponse response= new ApiResponse<>();
+        ApiResponse response = new ApiResponse<>();
         response.addErrorMessage(errorMessage);
         return ResponseEntity.badRequest().body(response);
     }
+
     public static ApiResponse<?> transformListToApiResponse(List<?> listOfObjects, String objectName) {
         ApiResponse response = new ApiResponse();
-        if (listOfObjects==null || listOfObjects.isEmpty()) {
+        if (listOfObjects == null || listOfObjects.isEmpty()) {
             response.addInfoMessage("There are no " + objectName + " to show!");
             response.setData(listOfObjects);
         } else {

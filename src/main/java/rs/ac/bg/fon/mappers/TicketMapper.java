@@ -11,7 +11,6 @@ import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.utility.Utility;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -66,7 +65,7 @@ public class TicketMapper {
     }
 
     public static TicketCancelDTO ticketToTicketCancelDTO(Ticket ticket) throws Exception {
-        if(ticket == null){
+        if (ticket == null) {
             throw new Exception("Ticket is null!");
         }
         if (ticket.getId() == null
@@ -82,10 +81,10 @@ public class TicketMapper {
     }
 
     public static TicketCancelDTO ticketToTicketCancelDTO(Ticket ticket, User user) throws Exception {
-        if(user == null){
+        if (user == null) {
             throw new Exception("User is null!");
         }
-        if (user.getId() == null  || user.getUsername() == null  || user.getUsername().isBlank()) {
+        if (user.getId() == null || user.getUsername() == null || user.getUsername().isBlank()) {
             throw new Exception("User object has invalid fields [ id = " + user.getId() + ", username = " + user.getUsername() + "]");
         }
 

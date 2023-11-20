@@ -3,7 +3,10 @@ package rs.ac.bg.fon.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import rs.ac.bg.fon.service.BetGroupService;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
@@ -21,8 +24,9 @@ public class BetGroupController {
         }
         return ApiResponseUtil.handleApiResponse(betGroupService.getBetGroupsByFixtureApiResponse(fixtureID));
     }
+
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteBetGroup(@RequestParam Integer betGroupID){
+    public ResponseEntity<?> deleteBetGroup(@RequestParam Integer betGroupID) {
         if (betGroupID == null) {
             return ApiResponseUtil.errorApiResponse("Bet group data is missing!\nContact support for more information!");
         }

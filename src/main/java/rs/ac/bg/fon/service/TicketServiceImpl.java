@@ -26,7 +26,6 @@ import rs.ac.bg.fon.utility.ApiResponse;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

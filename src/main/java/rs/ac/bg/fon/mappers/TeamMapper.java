@@ -5,10 +5,10 @@ import rs.ac.bg.fon.dtos.Team.TeamDTO;
 import rs.ac.bg.fon.entity.Team;
 
 @Component
-public class TeamMapper{
+public class TeamMapper {
     public static TeamDTO teamToTeamDTO(Team team) throws Exception {
-        if(team.getId()==null || team.getId()<0 || team.getName()==null || team.getName().isBlank()){
-            throw new Exception("Team object has invalid fields [id = "+team.getId()+", name = "+team.getName()+"]");
+        if (team.getId() == null || team.getId() < 0 || team.getName() == null || team.getName().isBlank()) {
+            throw new Exception("Team object has invalid fields [id = " + team.getId() + ", name = " + team.getName() + "]");
         }
         TeamDTO teamDTO = new TeamDTO();
         teamDTO.setId(team.getId());

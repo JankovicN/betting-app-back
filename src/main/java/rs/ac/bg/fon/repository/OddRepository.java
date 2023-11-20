@@ -7,7 +7,7 @@ import rs.ac.bg.fon.entity.Odd;
 import java.util.List;
 
 @Repository
-public interface OddRepository  extends JpaRepository<Odd, Integer> {
+public interface OddRepository extends JpaRepository<Odd, Integer> {
 
     List<Odd> findByFixtureStateAndFixtureIdAndBetGroupId(String ns, Integer fixtureId, Integer betGroupId);
 

@@ -7,9 +7,9 @@ import rs.ac.bg.fon.entity.Fixture;
 import java.util.List;
 
 @Repository
-public interface FixtureRepository  extends JpaRepository<Fixture, Integer> {
+public interface FixtureRepository extends JpaRepository<Fixture, Integer> {
 
-    List<Fixture> findByState (String state);
+    List<Fixture> findByState(String state);
 
     List<Fixture> findAllByStateAndLeagueIdOrderByDateAsc(String ns, int league);
 }

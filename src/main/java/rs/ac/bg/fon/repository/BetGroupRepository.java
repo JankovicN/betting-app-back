@@ -7,7 +7,7 @@ import rs.ac.bg.fon.entity.BetGroup;
 import java.util.List;
 
 @Repository
-public interface BetGroupRepository  extends JpaRepository<BetGroup, Integer> {
+public interface BetGroupRepository extends JpaRepository<BetGroup, Integer> {
 
     List<BetGroup> findByOddsFixtureIdOrderByIdAsc(int fixture);
 }

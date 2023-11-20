@@ -10,7 +10,6 @@ import rs.ac.bg.fon.constants.AllBetGroups;
 import rs.ac.bg.fon.constants.AllLeagues;
 import rs.ac.bg.fon.entity.Role;
 import rs.ac.bg.fon.entity.User;
-import rs.ac.bg.fon.repository.RoleRepository;
 import rs.ac.bg.fon.repository.UserRepository;
 import rs.ac.bg.fon.service.BetGroupService;
 import rs.ac.bg.fon.service.LeagueService;
@@ -24,6 +23,11 @@ import java.util.ArrayList;
 public class CommandLineRunnerStartUp implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(CommandLineRunnerStartUp.class);
     @Autowired
+
+    public AllLeagues allLeagues;
+    @Autowired
+    public AllBetGroups allBetGroups;
+    @Autowired
     UserService userService;
     @Autowired
     UserRepository userRepository;
@@ -33,12 +37,6 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
     BetGroupService betGroupService;
     @Autowired
     InitialAdminConfig initialAdminConfig;
-    @Autowired
-
-    public AllLeagues allLeagues;
-    @Autowired
-    public AllBetGroups allBetGroups;
-
 
     @Override
     public void run(String... args) throws Exception {

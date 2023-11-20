@@ -17,18 +17,22 @@ public class ApiResponse<T> {
     public ApiResponse(T data) {
         this.data = data;
     }
+
     public ApiResponse() {
         this.infoMessages = new ArrayList<>();
         this.errorMessages = new ArrayList<>();
     }
+
     public ApiResponse(List<String> infoMessages, List<String> errorMessages) {
         this.infoMessages = infoMessages;
         this.errorMessages = errorMessages;
     }
-    public void addInfoMessage(String infoMessage){
+
+    public void addInfoMessage(String infoMessage) {
         infoMessages.add(infoMessage);
     }
-    public void addErrorMessage(String errorMessage){
+
+    public void addErrorMessage(String errorMessage) {
         errorMessages.add(errorMessage);
     }
 }

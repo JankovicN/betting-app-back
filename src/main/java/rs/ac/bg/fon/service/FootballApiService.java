@@ -6,6 +6,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface FootballApiService {
     CompletableFuture<ApiResponse<?>> getBetGroupsFromAPI();
-    CompletableFuture<ApiResponse<?>>  getOddsFromAPI();
+
+    CompletableFuture<ApiResponse<?>> getOddsFromAPI();
+
     CompletableFuture<ApiResponse<?>> getFixturesFromAPI();
 }

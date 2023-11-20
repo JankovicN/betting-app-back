@@ -9,10 +9,15 @@ import java.util.List;
 public interface LeagueService {
 
     League save(League league);
+
     List<League> saveLeagues(List<League> leagues);
-     List<League> getAllLeagues();
-     boolean exists();
+
+    List<League> getAllLeagues();
+
+    boolean exists();
+
     ApiResponse<?> getAllLeaguesWithFixturesApiResponse();
+
     ApiResponse<?> getAllLeaguesApiResponse();
 
     ApiResponse<?> getNotStartedByLeagueApiCall(Integer league);

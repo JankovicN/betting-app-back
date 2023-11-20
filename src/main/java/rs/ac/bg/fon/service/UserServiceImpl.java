@@ -230,13 +230,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             Page<User> users = getUsers(pageable);
             log.info("All users: " + users.getContent());
             List<UserDTO> userDtosList = users.map(user -> {
-                try {
-                    return UserMapper.userToUserDTO(user);
-                } catch (Exception e) {
-                    logger.error("Error while mapping user to user DTO");
-                    throw null;
-                }
-            }).filter(user -> user != null)
+                        try {
+                            return UserMapper.userToUserDTO(user);
+                        } catch (Exception e) {
+                            logger.error("Error while mapping user to user DTO");
+                            throw null;
+                        }
+                    }).filter(user -> user != null)
                     .map(userDTO -> {
                         userDTO.setBalance(paymentService.getUserPayments(userDTO.getId()));
                         return userDTO;

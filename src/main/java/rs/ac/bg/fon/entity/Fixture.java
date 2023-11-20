@@ -47,7 +47,7 @@ public class Fixture {
     private League league;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "fixture",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fixture", fetch = FetchType.LAZY)
     private List<Odd> odds;
 
     @Transient

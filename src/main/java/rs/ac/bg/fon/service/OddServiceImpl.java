@@ -3,12 +3,10 @@ package rs.ac.bg.fon.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
 import rs.ac.bg.fon.entity.BetGroup;
-import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Odd;
 import rs.ac.bg.fon.mappers.OddMapper;
 import rs.ac.bg.fon.repository.OddRepository;
@@ -25,6 +23,7 @@ public class OddServiceImpl implements OddService {
     private static final Logger logger = LoggerFactory.getLogger(OddServiceImpl.class);
 
     private final OddRepository oddRepository;
+
     @Override
     public Odd save(Odd odd) {
         try {
@@ -36,14 +35,15 @@ public class OddServiceImpl implements OddService {
             return null;
         }
     }
+
     @Transactional
     @Override
     public Odd getOddById(Integer oddId) {
         try {
             Optional<Odd> odd = oddRepository.findById(oddId);
-            if(odd.isPresent()){
-                logger.info("Successfully found Odd with id: "+oddId+", odd:  \n" + odd.get() + "!");
-                Odd fetchedOdd  = odd.get();
+            if (odd.isPresent()) {
+                logger.info("Successfully found Odd with id: " + oddId + ", odd:  \n" + odd.get() + "!");
+                Odd fetchedOdd = odd.get();
                 fetchedOdd.getFixture();
                 BetGroup betGroup = fetchedOdd.getBetGroup();
                 return fetchedOdd;
@@ -71,10 +71,10 @@ public class OddServiceImpl implements OddService {
     public List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId) {
         try {
             List<Odd> oddList = oddRepository.findByFixtureStateAndFixtureIdAndBetGroupId(Constants.FIXTURE_NOT_STARTED, fixtureId, betGroupId);
-            logger.info("Successfully found list of Odds for fixtureId = "+fixtureId+" and betGroupId = "+betGroupId+"!\n" +
-                    "Odd List: "+oddList);
+            logger.info("Successfully found list of Odds for fixtureId = " + fixtureId + " and betGroupId = " + betGroupId + "!\n" +
+                    "Odd List: " + oddList);
 
-            return oddList==null ? new ArrayList<>() : oddList;
+            return oddList == null ? new ArrayList<>() : oddList;
         } catch (Exception e) {
             logger.error("Error while trying to find list of Odds!!\n" + e.getMessage());
             return new ArrayList<>();

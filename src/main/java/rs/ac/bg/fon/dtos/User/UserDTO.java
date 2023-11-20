@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO   implements Serializable {
+public class UserDTO implements Serializable {
 
     private Integer id;
     private String name;

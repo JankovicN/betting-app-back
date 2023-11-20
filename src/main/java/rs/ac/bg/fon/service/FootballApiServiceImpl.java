@@ -23,7 +23,6 @@ import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -124,7 +123,7 @@ public class FootballApiServiceImpl implements FootballApiService {
                         try {
                             Thread.sleep(1000); // 1000 milliseconds (1 second) delay
                         } catch (InterruptedException e) {
-                            logger.error("Error while thread was asleep: {}",e);
+                            logger.error("Error while thread was asleep: {}", e);
                         }
                         String responseBody = oddsApiCall(league.getId(), Utility.formatDate(localDateTime));
                         if (responseBody == null || responseBody.isEmpty()) {
@@ -179,7 +178,7 @@ public class FootballApiServiceImpl implements FootballApiService {
                     try {
                         Thread.sleep(1000); // 1000 milliseconds (1 second) delay
                     } catch (InterruptedException e) {
-                        logger.error("Error while thread was asleep: {}",e);
+                        logger.error("Error while thread was asleep: {}", e);
                     }
                     String responseBody = fixturesApiCall(league.getId(), dateFromString, dateToString);
                     if (responseBody == null || responseBody.isEmpty()) {
@@ -495,7 +494,7 @@ public class FootballApiServiceImpl implements FootballApiService {
     private void updateInfoMessages(ApiResponse<?> apiResponse, String containsString, String newMessage) {
         List<String> infoMessages = apiResponse.getInfoMessages();
         boolean noFixturesAdded = infoMessages.stream().allMatch(s -> s.contains(containsString));
-        if(noFixturesAdded){
+        if (noFixturesAdded) {
             List<String> newInfoMessages = new ArrayList<>();
             newInfoMessages.add(newMessage);
             apiResponse.setInfoMessages(newInfoMessages);

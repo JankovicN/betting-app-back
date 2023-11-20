@@ -3,7 +3,6 @@ package rs.ac.bg.fon.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.dtos.Payment.PaymentDTO;
@@ -52,6 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
             return BigDecimal.ZERO;
         }
     }
+
     @Transactional
     @Override
     public void addPayment(Payment payment) {
@@ -60,9 +60,9 @@ public class PaymentServiceImpl implements PaymentService {
                     || payment.getAmount() == null
                     || payment.getUser() == null) {
                 logger.error("Error while trying add Payment, invalid data provided!");
-            } else if(!canUserPay(payment.getUser().getId(), payment.getAmount())){
+            } else if (!canUserPay(payment.getUser().getId(), payment.getAmount())) {
                 logger.error("Insufficient funds!");
-            }else {
+            } else {
                 paymentRepository.saveAndFlush(payment);
             }
         } catch (Exception e) {

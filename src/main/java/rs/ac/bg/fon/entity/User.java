@@ -38,12 +38,13 @@ public class User {
 
     @ManyToMany(fetch = EAGER)
     private Collection<Role> roles = new ArrayList<>();
+
     @Override
     public String toString() {
         if (StringUtils.isBlank(name) || StringUtils.isBlank(surname)) {
             return super.toString();
         }
-        return StringUtils.capitalize(name)+" "+StringUtils.capitalize(surname);
+        return StringUtils.capitalize(name) + " " + StringUtils.capitalize(surname);
     }
 
 }

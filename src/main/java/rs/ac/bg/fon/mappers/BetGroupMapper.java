@@ -8,21 +8,22 @@ import rs.ac.bg.fon.entity.BetGroup;
 import java.util.List;
 
 @Component
-public class  BetGroupMapper {
+public class BetGroupMapper {
     public static BetGroupDTO betGroupToBetGroupDTO(BetGroup betGroup) throws Exception {
-        if(betGroup.getId()==null || betGroup.getId()<0 || betGroup.getName()==null || betGroup.getName().isBlank()){
-            throw new Exception("BetGroup object has invalid fields [id = "+betGroup.getId()+", name = "+betGroup.getName()+"]");
+        if (betGroup.getId() == null || betGroup.getId() < 0 || betGroup.getName() == null || betGroup.getName().isBlank()) {
+            throw new Exception("BetGroup object has invalid fields [id = " + betGroup.getId() + ", name = " + betGroup.getName() + "]");
         }
-        BetGroupDTO betGroupDTO =  new BetGroupDTO();
+        BetGroupDTO betGroupDTO = new BetGroupDTO();
         betGroupDTO.setId(betGroup.getId());
         betGroupDTO.setName(betGroup.getName());
         return betGroupDTO;
     }
+
     public static BetGroupDTO betGroupToBetGroupDTO(BetGroup betGroup, List<OddDTO> oddDTOList) throws Exception {
-        if(oddDTOList==null || oddDTOList.isEmpty() ){
+        if (oddDTOList == null || oddDTOList.isEmpty()) {
             throw new Exception("List of odds is null!");
         }
-        BetGroupDTO betGroupDTO =  betGroupToBetGroupDTO(betGroup);
+        BetGroupDTO betGroupDTO = betGroupToBetGroupDTO(betGroup);
         betGroupDTO.setOdds(oddDTOList);
         return betGroupDTO;
     }

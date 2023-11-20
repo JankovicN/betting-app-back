@@ -22,6 +22,9 @@ public class Utility {
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Constants.DATE_TIME_FORMAT);
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
+    private static final String EMAIL_REGEX =
+            "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+    private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
 
     static {
         propertiesFile = new Properties();
@@ -36,7 +39,7 @@ public class Utility {
     public static String getProperty(String name) {
         try {
 
-            System.out.println(name +"  "+ propertiesFile.getProperty(name));
+            System.out.println(name + "  " + propertiesFile.getProperty(name));
             return propertiesFile.getProperty(name);
         } catch (Throwable ex) {
             log.error("Error getting Property!");
@@ -44,30 +47,29 @@ public class Utility {
         }
     }
 
-    public static String formatDateTime(LocalDateTime localDateTime){
+    public static String formatDateTime(LocalDateTime localDateTime) {
         return localDateTime.format(dateTimeFormatter);
     }
-    public static String formatDate(LocalDate localDate){
+
+    public static String formatDate(LocalDate localDate) {
         return localDate.format(dateFormatter);
     }
-    public static String formatDate(LocalDateTime localDate){
+
+    public static String formatDate(LocalDateTime localDate) {
         return localDate.format(dateFormatter);
     }
-    public static LocalDateTime parseDateTime(String date){
+
+    public static LocalDateTime parseDateTime(String date) {
         return LocalDateTime.parse(date, dateTimeFormatter);
     }
-    public static LocalDate parseDate(String date){
+
+    public static LocalDate parseDate(String date) {
         return LocalDate.parse(date, dateFormatter);
     }
 
-    public static Algorithm getAlgorithm(){
+    public static Algorithm getAlgorithm() {
         return Algorithm.HMAC256("bdabsidubasuidasuidfiasubfius".getBytes());
     }
-
-    private static final String EMAIL_REGEX =
-            "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-
-    private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
 
     public static boolean isValidEmail(String email) {
         Matcher matcher = pattern.matcher(email);

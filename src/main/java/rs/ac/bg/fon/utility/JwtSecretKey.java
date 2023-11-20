@@ -10,11 +10,11 @@ public class JwtSecretKey {
     private final JwtUtility jwtUtility;
 
     @Autowired
-    public JwtSecretKey(JwtUtility jwtConfig){
+    public JwtSecretKey(JwtUtility jwtConfig) {
         this.jwtUtility = jwtConfig;
     }
 
-    public Algorithm getAlgorithm(){
+    public Algorithm getAlgorithm() {
         return Algorithm.HMAC256("bnckjbasduifbsiudbfiusabciuzsdbcfuifviucxzb".getBytes());
     }
 }

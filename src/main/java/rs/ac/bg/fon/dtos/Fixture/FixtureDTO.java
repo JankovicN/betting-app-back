@@ -16,23 +16,16 @@ import java.util.List;
 @AllArgsConstructor
 public class FixtureDTO implements Serializable {
 
+    List<BetGroupDTO> betGroupList;
     private Integer id;
-
     private String date;
-
     private TeamDTO home;
-
     private TeamDTO away;
-
     private int homeGoals;
-
     private int awayGoals;
-
     private String state = Constants.FIXTURE_NOT_STARTED;
 
-    List<BetGroupDTO> betGroupList;
-
     public FixtureDTO() {
-        betGroupList =new ArrayList<>();
+        betGroupList = new ArrayList<>();
     }
 }

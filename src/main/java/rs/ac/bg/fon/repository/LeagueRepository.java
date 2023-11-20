@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import rs.ac.bg.fon.entity.League;
 
 @Repository
-public interface LeagueRepository  extends JpaRepository<League, Integer> {
+public interface LeagueRepository extends JpaRepository<League, Integer> {
 }

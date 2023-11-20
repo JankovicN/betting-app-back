@@ -7,7 +7,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,7 +73,6 @@ public class UserController {
     }
 
 
-
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestBody UserDTO user) {
         if (user == null) {
@@ -85,7 +83,7 @@ public class UserController {
 
     @PostMapping("/role/save")
     public ResponseEntity<?> saveRole(@RequestBody Role role) {
-        if (role == null || role.getName()==null || role.getName().isBlank()) {
+        if (role == null || role.getName() == null || role.getName().isBlank()) {
             return ApiResponseUtil.errorApiResponse("Invalid role data!\nContact support for more information!");
         }
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
@@ -116,7 +114,7 @@ public class UserController {
                 User user = userService.getUser(username);
 
                 String access_token = JWT.create()
-                        .withSubject(user.getUsername()).withExpiresAt(new Date(System.currentTimeMillis() +  60 * 60 * 30))
+                        .withSubject(user.getUsername()).withExpiresAt(new Date(System.currentTimeMillis() + 60 * 60 * 30))
                         .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                         .sign(algorithm);
 

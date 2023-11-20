@@ -3,7 +3,6 @@ package rs.ac.bg.fon.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
@@ -13,7 +12,6 @@ import rs.ac.bg.fon.mappers.BetMapper;
 import rs.ac.bg.fon.repository.BetRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
