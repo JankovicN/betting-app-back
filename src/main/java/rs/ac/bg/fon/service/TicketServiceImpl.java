@@ -3,10 +3,13 @@ package rs.ac.bg.fon.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
+import rs.ac.bg.fon.dtos.Page.PageDTO;
 import rs.ac.bg.fon.dtos.Ticket.TicketBasicDTO;
 import rs.ac.bg.fon.dtos.Ticket.TicketCancelDTO;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
@@ -15,6 +18,7 @@ import rs.ac.bg.fon.entity.Payment;
 import rs.ac.bg.fon.entity.Ticket;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.mappers.BetMapper;
+import rs.ac.bg.fon.mappers.PageMapper;
 import rs.ac.bg.fon.mappers.TicketMapper;
 import rs.ac.bg.fon.repository.TicketRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
@@ -23,7 +27,9 @@ import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +42,7 @@ public class TicketServiceImpl implements TicketService {
     private final BetService betService;
 
 
-    @Override
-    public Ticket save(Ticket ticket) {
+    private Ticket save(Ticket ticket) {
         try {
             if (ticket == null
                     || ticket.getUser() == null
@@ -123,7 +128,7 @@ public class TicketServiceImpl implements TicketService {
                     ticket.setUser(user);
 
                     paymentService.addPayment(user.getId(), ticket.getWager().negate(), Constants.PAYMENT_WAGER);
-                    ticketRepository.save(ticket);
+                    this.save(ticket);
                     betService.saveBetsForTicket(betList, ticket);
                     response.addInfoMessage("Successfully played Ticket!");
                 } else {
@@ -150,46 +155,39 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
-    @Override
-    public List<Ticket> getCancelableTickets() {
+    private Page<Ticket> getCancelableTickets(Pageable pageable) {
         try {
             LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
-            List<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime);
+            Page<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime, pageable);
             logger.info("Successfully got cancelable Tickets!");
             return ticketList;
         } catch (Exception e) {
             logger.error("Error while trying to get cancelable Tickets, try again later!", e);
-            return new ArrayList<>();
+            return new PageImpl<>(Collections.emptyList(), Pageable.unpaged(), 0);
         }
     }
 
-    @Override
-    public List<Ticket> getCancelableTickets(String username) {
+    private Page<Ticket> getCancelableTickets(String username, Pageable pageable) {
         try {
             LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
-            List<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime, username);
+            Page<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime, username, pageable);
             logger.info("Successfully got cancelable Tickets!");
             return ticketList;
         } catch (Exception e) {
             logger.error("Error while trying to get cancelable Tickets, try again later!", e);
-            return new ArrayList<>();
+            return new PageImpl<>(Collections.emptyList(), Pageable.unpaged(), 0);
         }
     }
 
-    @Override
-    public ApiResponse<?> getCancelableTicketsApiResponse() {
-        ApiResponse<List<TicketCancelDTO>> response = new ApiResponse<>();
+    private ApiResponse<?> getCancelableTicketsApiResponse(Pageable pageable) {
+        ApiResponse<PageDTO<TicketCancelDTO>> response = new ApiResponse<>();
         try {
-            List<Ticket> tickets = getCancelableTickets();
-            List<TicketCancelDTO> ticketBasicDTOS = new ArrayList<>();
-            for (Ticket ticket : tickets) {
-                try {
-                    ticketBasicDTOS.add(TicketMapper.ticketToTicketCancelDTO(ticket, ticket.getUser()));
-                } catch (Exception e) {
-                    logger.info("Error transforming ticket to ticketDTO!\n{}\n{}", ticket, e);
-                }
-            }
-            response.setData(ticketBasicDTOS);
+            // Getting page of Tickets that can be canceled
+            Page<Ticket> tickets = getCancelableTickets(pageable);
+
+            PageDTO<TicketCancelDTO> cancelTicketPageDTO = createPageDtoForCancelTickets(tickets, pageable);
+
+            response.setData(cancelTicketPageDTO);
             logger.info("Successfully created response of cancelable Tickets!");
         } catch (Exception e) {
             response.addErrorMessage("Error getting Tickets to cancel, try again later!");
@@ -198,25 +196,51 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
-    @Override
-    public ApiResponse<?> getCancelableTicketsApiResponse(String username) {
-        ApiResponse<List<TicketCancelDTO>> response = new ApiResponse<>();
+    private ApiResponse<?> getCancelableTicketsApiResponse(String username, Pageable pageable) {
+        ApiResponse<PageDTO<TicketCancelDTO>> response = new ApiResponse<>();
         try {
-            List<Ticket> tickets = getCancelableTickets(username);
-            User user = userService.getUser(username);
-            List<TicketCancelDTO> ticketCancelDTOS = new ArrayList<>();
-            for (Ticket ticket : tickets) {
-                try {
-                    ticketCancelDTOS.add(TicketMapper.ticketToTicketCancelDTO(ticket, user));
-                } catch (Exception e) {
-                    logger.info("Error transforming ticket to TicketCancelDTO!\n{}\n{}", ticket, e);
-                }
-            }
-            response.setData(ticketCancelDTOS);
+            Page<Ticket> tickets = getCancelableTickets(username, pageable);
+
+            PageDTO<TicketCancelDTO> cancelTicketPageDTO = createPageDtoForCancelTickets(tickets, pageable);
+
+            response.setData(cancelTicketPageDTO);
             logger.info("Successfully created response of cancelable Tickets!");
         } catch (Exception e) {
             response.addErrorMessage("Error getting Tickets to cancel, try again later!");
             logger.info("Error creating response of cancelable Tickets!");
+        }
+        return response;
+    }
+
+    private PageDTO<TicketCancelDTO> createPageDtoForCancelTickets(Page<Ticket> tickets, Pageable pageable) throws Exception {
+        // Creating a List of TicketCancelDTOs,
+        // 1. Map the ticket to the DTO
+        // 2. Filter if there are any null values ( meaning mapping wasn't successful )
+        // 3. Create a list of DTO objects
+        List<TicketCancelDTO> cancelTicketDtoList = tickets.map(ticket -> {
+            try {
+                return TicketMapper.ticketToTicketCancelDTO(ticket, ticket.getUser());
+            } catch (Exception e) {
+                logger.error("Error while mapping cancel ticket to DTO");
+                return null;
+            }
+        }).filter(ticketDTO -> ticketDTO != null).stream().toList();
+
+        // Create a Page instance of CancelTicketDTOs List
+        Page<TicketCancelDTO> cancelTicketPage = new PageImpl<>(cancelTicketDtoList, pageable, cancelTicketDtoList.size());
+
+        // Map the Page instance to PageDTO adn return that value
+        return PageMapper.pageToPageDTO(cancelTicketPage);
+    }
+
+    @Override
+    public ApiResponse<?> handleCancelTicketsAPI(Optional<String> username, Pageable pageable) {
+        ApiResponse<?> response;
+        if (username.isPresent()) {
+            String usernameValue = username.get();
+            response = getCancelableTicketsApiResponse(usernameValue, pageable);
+        } else {
+            response = getCancelableTicketsApiResponse(pageable);
         }
         return response;
     }

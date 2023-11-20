@@ -233,6 +233,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 try {
                     return UserMapper.userToUserDTO(user);
                 } catch (Exception e) {
+                    logger.error("Error while mapping user to user DTO");
                     throw null;
                 }
             }).filter(user -> user != null)

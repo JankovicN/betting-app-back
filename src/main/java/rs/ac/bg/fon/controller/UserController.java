@@ -67,7 +67,7 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getUsers(Pageable pageable) {
-        ApiResponse<?> response =userService.getUsersApiResponse(pageable);
+        ApiResponse<?> response = userService.getUsersApiResponse(pageable);
         return ApiResponseUtil.handleApiResponse(response);
     }
 

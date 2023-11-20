@@ -1,5 +1,7 @@
 package rs.ac.bg.fon.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -46,10 +48,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     @Modifying
     @Query("SELECT t FROM Ticket t WHERE t.date > :date ORDER BY t.date DESC")
-    List<Ticket> getTicketsAfterDateTime(@Param("date") LocalDateTime cancelDateTime);
+    Page<Ticket> getTicketsAfterDateTime(@Param("date") LocalDateTime cancelDateTime, Pageable pageable);
 
     @Modifying
     @Query("SELECT t FROM Ticket t WHERE user.username = :username AND t.date > :date ORDER BY t.date DESC")
-    List<Ticket> getTicketsAfterDateTime(@Param("date") LocalDateTime cancelDateTime, @Param("username") String username);
+    Page<Ticket> getTicketsAfterDateTime(@Param("date") LocalDateTime cancelDateTime, @Param("username") String username, Pageable pageable);
 
 }
