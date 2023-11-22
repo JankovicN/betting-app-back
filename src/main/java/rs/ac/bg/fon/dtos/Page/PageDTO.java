@@ -14,6 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class PageDTO<T> implements Serializable {
     private List<T> content;
-    private int number; // page number
+    private int number;
     private int totalPages;
 }

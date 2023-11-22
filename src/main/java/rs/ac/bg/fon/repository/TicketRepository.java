@@ -16,6 +16,9 @@ import java.util.List;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
+
+    Page<Ticket> findAllByOrderByDateDesc(Pageable pageable);
+
     @Transactional
     @Modifying
     @Query(value = "UPDATE Ticket t\n" +
@@ -40,12 +43,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     List<Ticket> findByState(String state);
 
-    @Modifying
-    @Query("SELECT t FROM Ticket t WHERE t.date > :date ORDER BY t.date DESC")
-    Page<Ticket> getTicketsAfterDateTime(@Param("date") LocalDateTime cancelDateTime, Pageable pageable);
+    @Query("SELECT t FROM Ticket t WHERE t.date > :date AND t.state = :state ORDER BY t.date DESC")
+    Page<Ticket> getTicketsAfterDateTime(@Param("date") LocalDateTime cancelDateTime, @Param("state") String state, Pageable pageable);
 
-    @Modifying
-    @Query("SELECT t FROM Ticket t WHERE user.username = :username AND t.date > :date ORDER BY t.date DESC")
-    Page<Ticket> getTicketsAfterDateTime(@Param("date") LocalDateTime cancelDateTime, @Param("username") String username, Pageable pageable);
+    @Query("SELECT t FROM Ticket t WHERE user.username = :username AND t.date > :date AND t.state = :state ORDER BY t.date DESC")
+    Page<Ticket> getTicketsAfterDateTime(@Param("date") LocalDateTime cancelDateTime, @Param("username") String username, @Param("state") String state, Pageable pageable);
 
 }

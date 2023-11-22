@@ -59,31 +59,10 @@ public class BetGroupServiceImpl implements BetGroupService {
     }
 
     @Override
-    public List<BetGroupDTO> createBetGroupDTOList(Integer fixtureId) {
-        try {
-            List<BetGroupDTO> betGroupDTOList = new ArrayList<>();
-            List<BetGroup> betGroupList = getAllBetGroups();
-            for (BetGroup betGroup : betGroupList) {
-                List<OddDTO> oddList = oddService.createOddDTOList(fixtureId, betGroup.getId());
-                try {
-                    BetGroupDTO betGroupDTO = BetGroupMapper.betGroupToBetGroupDTO(betGroup, oddList);
-                    betGroupDTOList.add(betGroupDTO);
-                } catch (Exception e) {
-                    logger.error("Error adding Bet Group with ID = " + betGroup.getId() + " to list!\n" + e.getMessage());
-                }
-            }
-            return betGroupDTOList;
-        } catch (Exception e) {
-            logger.error("Error while trying to create Bet Group DTO list!\n" + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
     public List<BetGroupDTO> createBetGroupDTOList(Integer fixtureID, Integer betGroupID) {
         try {
             List<BetGroupDTO> betGroupDTOList = new ArrayList<>();
-            BetGroup betGroup = getBetGroupWithId(1);
+            BetGroup betGroup = getBetGroupWithId(betGroupID);
             List<OddDTO> oddList = oddService.createOddDTOList(fixtureID, betGroupID);
             try {
                 BetGroupDTO betGroupDTO = BetGroupMapper.betGroupToBetGroupDTO(betGroup, oddList);
@@ -115,15 +94,23 @@ public class BetGroupServiceImpl implements BetGroupService {
     public List<BetGroupDTO> getBetGroupsByFixture(Integer fixtureID) {
         try {
             List<BetGroup> betGroupList = betGroupRepository.findByOddsFixtureIdOrderByIdAsc(fixtureID);
+            if (betGroupList == null || betGroupList.isEmpty()) {
+                logger.error("No bet groups were found for Fixture with ID = " + fixtureID);
+                return new ArrayList<>();
+            }
             betGroupList = betGroupList.stream()
                     .distinct()
                     .collect(Collectors.toList());
+
             List<BetGroupDTO> betGroupDTOList = new ArrayList<>();
             for (BetGroup betGroup : betGroupList) {
+
                 List<OddDTO> oddDTOList = oddService.createOddDTOList(fixtureID, betGroup.getId());
                 if (oddDTOList.isEmpty()) {
+                    logger.error("List of odds for Bet Group with ID " + betGroup.getId() + " and Fixture with ID " + fixtureID + " is empty!");
                     continue;
                 }
+
                 try {
                     BetGroupDTO betGroupDTO = BetGroupMapper.betGroupToBetGroupDTO(betGroup, oddDTOList);
                     betGroupDTOList.add(betGroupDTO);
@@ -161,18 +148,6 @@ public class BetGroupServiceImpl implements BetGroupService {
             return savedBetGroups;
         } catch (Exception e) {
             logger.error("Error while trying to save Bet Group!\n" + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public List<BetGroup> getAllBetGroups() {
-        try {
-            List<BetGroup> savedBetGroups = betGroupRepository.findAll();
-            logger.info("Successfully found all Bet Groups!");
-            return savedBetGroups;
-        } catch (Exception e) {
-            logger.error("Error while trying to find all Bet Groups!\n" + e.getMessage());
             return new ArrayList<>();
         }
     }

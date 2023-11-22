@@ -43,27 +43,10 @@ public class FootballApiController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping(path = "/new")
+    @PostMapping(path = "/new/fixturesAndOdds")
     public CompletableFuture<ResponseEntity<?>> getFixturesAndOdds(Authentication auth) {
-        CompletableFuture<ApiResponse<?>> fixturesResult = footballApiService.getFixturesFromAPI();
-
-        // Use thenCompose to wait for the completion of the fixturesResult before starting the oddsResult
-        CompletableFuture<ApiResponse<?>> combinedResult =
-                fixturesResult.thenCompose(fixturesApiResponse -> {
-                    CompletableFuture<ApiResponse<?>> oddsResult = footballApiService.getOddsFromAPI();
-
-                    // Merge the data from both ApiResponse objects
-                    return oddsResult.thenApply(oddsApiResponse -> {
-                        System.out.println(oddsApiResponse.getInfoMessages());
-                        System.out.println(fixturesApiResponse.getInfoMessages());
-                        fixturesApiResponse.getInfoMessages().addAll(oddsApiResponse.getInfoMessages());
-                        fixturesApiResponse.getErrorMessages().addAll(oddsApiResponse.getErrorMessages());
-                        return fixturesApiResponse;
-                    });
-                });
-
-        // Return a new CompletableFuture with additional processing using ApiResponseUtil
-        return combinedResult.thenApply(apiResult -> ApiResponseUtil.handleApiResponse(apiResult));
+        CompletableFuture<ApiResponse<?>> result = footballApiService.getFixturesAndOddsFromAPI();
+        return result.thenApply(apiResult -> ApiResponseUtil.handleApiResponse(apiResult));
 
     }
 }

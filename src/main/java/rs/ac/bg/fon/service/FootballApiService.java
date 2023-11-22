@@ -10,4 +10,8 @@ public interface FootballApiService {
     CompletableFuture<ApiResponse<?>> getOddsFromAPI();
 
     CompletableFuture<ApiResponse<?>> getFixturesFromAPI();
+
+    CompletableFuture<ApiResponse<?>> getFixturesAndOddsFromAPI();
+
+
 }

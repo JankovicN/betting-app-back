@@ -16,23 +16,21 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("fixture")
 public class FixtureController {
-
-
-    private final FixtureService fixtureService;
-
-    @GetMapping("/ns")
-    public ResponseEntity<?> getFixturesForLeague(@RequestParam Integer leagueID) {
-        if (leagueID == null) {
-            return ApiResponseUtil.errorApiResponse("League data is missing!\nContact support for more information!");
-        }
-        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeagueApiCall(leagueID));
-    }
-
-    @GetMapping("/ns/leagues")
-    public ResponseEntity<?> getFixturesForLeagues(@RequestBody List<Integer> leagues) {
-        if (leagues == null || leagues.isEmpty()) {
-            return ApiResponseUtil.errorApiResponse("League data is missing!\nContact support for more information!");
-        }
-        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeaguesApiCall(leagues));
-    }
+//    private final FixtureService fixtureService;
+//
+//    @GetMapping("/ns")
+//    public ResponseEntity<?> getFixturesForLeague(@RequestParam Integer leagueID) {
+//        if (leagueID == null) {
+//            return ApiResponseUtil.errorApiResponse("League data is missing!\nContact support for more information!");
+//        }
+//        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeagueApiCall(leagueID));
+//    }
+//
+//    @GetMapping("/ns/leagues")
+//    public ResponseEntity<?> getFixturesForLeagues(@RequestBody List<Integer> leagues) {
+//        if (leagues == null || leagues.isEmpty()) {
+//            return ApiResponseUtil.errorApiResponse("League data is missing!\nContact support for more information!");
+//        }
+//        return ApiResponseUtil.handleApiResponse(fixtureService.getNotStartedByLeaguesApiCall(leagues));
+//    }
 }

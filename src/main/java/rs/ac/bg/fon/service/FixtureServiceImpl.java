@@ -128,20 +128,20 @@ public class FixtureServiceImpl implements FixtureService {
         }
     }
 
-    @Override
-    public ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueID) {
-        return ApiResponseUtil.transformListToApiResponse(createFixtureDTOList(getNotStartedByLeague(leagueID)), "fixtures");
-    }
-
-    @Override
-    public ApiResponse<?> getNotStartedByLeaguesApiCall(List<Integer> leagues) {
-        List<Fixture> fixtureList = new ArrayList<>();
-        for (Integer id : leagues) {
-            List<Fixture> fixturesById = getNotStartedByLeague(id);
-            fixtureList.addAll(fixturesById);
-        }
-        return ApiResponseUtil.transformListToApiResponse(createFixtureDTOList(fixtureList), "fixtures");
-    }
+//    @Override
+//    public ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueID) {
+//        return ApiResponseUtil.transformListToApiResponse(createFixtureDTOList(getNotStartedByLeague(leagueID)), "fixtures");
+//    }
+//
+//    @Override
+//    public ApiResponse<?> getNotStartedByLeaguesApiCall(List<Integer> leagues) {
+//        List<Fixture> fixtureList = new ArrayList<>();
+//        for (Integer id : leagues) {
+//            List<Fixture> fixturesById = getNotStartedByLeague(id);
+//            fixtureList.addAll(fixturesById);
+//        }
+//        return ApiResponseUtil.transformListToApiResponse(createFixtureDTOList(fixtureList), "fixtures");
+//    }
 
     @Override
     public boolean existFixtureByLeagueId(Integer leagueId) {

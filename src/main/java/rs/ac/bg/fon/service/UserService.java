@@ -7,7 +7,6 @@ import rs.ac.bg.fon.entity.Role;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.utility.ApiResponse;
 
-import java.util.List;
 
 public interface UserService {
     User saveUser(User user);
@@ -17,11 +16,6 @@ public interface UserService {
     void addRoleToUser(String username, String roleName);
 
     User getUser(String username);
-
-
-    User getUser(Integer userId);
-
-    List<User> getUsers();
 
     User registerUser(User user);
 
@@ -43,5 +37,5 @@ public interface UserService {
 
     ApiResponse<?> updateUserApiResponse(UserDTO user);
 
-    ApiResponse<?> getTestConformation();
+    ApiResponse<?> getFilteredUsersApiResponse(String filterUsername, Pageable pageable);
 }

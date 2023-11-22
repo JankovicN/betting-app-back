@@ -66,9 +66,15 @@ public class UserController {
         return ApiResponseUtil.handleApiResponse(userService.getUserApiResponse(username));
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/all")
     public ResponseEntity<?> getUsers(Pageable pageable) {
         ApiResponse<?> response = userService.getUsersApiResponse(pageable);
+        return ApiResponseUtil.handleApiResponse(response);
+    }
+
+    @GetMapping("/users/filter")
+    public ResponseEntity<?> getFilteredUsers(@RequestParam String filterUsername, Pageable pageable) {
+        ApiResponse<?> response = userService.getFilteredUsersApiResponse(filterUsername, pageable);
         return ApiResponseUtil.handleApiResponse(response);
     }
 

@@ -71,9 +71,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     || user.getBirthday() == null
                     || user.getName() == null
                     || user.getName().isBlank()) {
-                logger.error("Error while trying save User, invalid data provided!");
-            } else if (user.getBirthday().isBefore(LocalDate.now().minusYears(18))) {
-                logger.error("Error while trying save User, User must be older than 18!");
+                logger.error("Error while trying to save User, invalid data provided!");
+            } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
+                System.out.println(user.getBirthday());
+                logger.error("Error while trying to save User, User must be older than 18!");
                 user.setBirthday(null);
             } else {
                 log.info("Saving user {}  to database", user.getName());
@@ -91,7 +92,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         try {
             log.info("Saving role {} to database", role.getName());
             if (roleRepository.existsByName(role.getName())) {
-                logger.error("Error while trying save Role!");
+                logger.error("Role already exists in database!");
                 return null;
             }
             return roleRepository.save(role);
@@ -121,21 +122,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
-    @Override
-    public User getUser(Integer userId) {
-        log.info("Fetcing  user {}", userId);
-        return userRepository.findById(userId).get();
-    }
-
-    @Override
-    public List<User> getUsers() {
-        log.info("Fetching all users");
-        return userRepository.findAll();
-    }
-
     private Page<User> getUsers(Pageable pageable) {
         log.info("Fetching all users pageable");
         return userRepository.findAll(pageable);
+    }
+
+    private Page<User> getFilteredUsers(String filterUsername, Pageable pageable) {
+        log.info("Fetching users whose username contains \'" + filterUsername + "\' pageable");
+        return userRepository.findByUsernameContaining(filterUsername,pageable);
     }
 
     @Override
@@ -253,6 +247,34 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public ApiResponse<?> getFilteredUsersApiResponse(String filterUsername, Pageable pageable) {
+        ApiResponse<PageDTO<UserDTO>> response = new ApiResponse<>();
+        try {
+            Page<User> users = getFilteredUsers(filterUsername,pageable);
+            log.info("Filtered users: " + users.getContent());
+            List<UserDTO> userDtosList = users.map(user -> {
+                        try {
+                            return UserMapper.userToUserDTO(user);
+                        } catch (Exception e) {
+                            logger.error("Error while mapping user to user DTO");
+                            throw null;
+                        }
+                    }).filter(user -> user != null)
+                    .map(userDTO -> {
+                        userDTO.setBalance(paymentService.getUserPayments(userDTO.getId()));
+                        return userDTO;
+                    }).stream().toList();
+            Page<UserDTO> userPages = new PageImpl<>(userDtosList, pageable, userDtosList.size());
+            PageDTO<UserDTO> pageDTO = PageMapper.pageToPageDTO(userPages);
+            response.setData(pageDTO);
+        } catch (Exception e) {
+            log.error("Error fetching users: " + e);
+            response.addErrorMessage("Unable to get users at this time, try again later!");
+        }
+        return response;
+    }
+
+    @Override
     public ApiResponse<?> getUserApiResponse(String username) {
         ApiResponse<UserDTO> response = new ApiResponse<>();
         try {
@@ -326,18 +348,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             response.addInfoMessage("Successfully updated user " + userToUpdate.getUsername() + "!");
         } catch (Exception e) {
             response.addErrorMessage("Unable to update user " + user.getUsername() + " at this time, try again later!");
-        }
-        return response;
-    }
-
-    @Override
-    public ApiResponse<?> getTestConformation() {
-        ApiResponse<User> response = new ApiResponse<>();
-        try {
-            response.addInfoMessage("Success!");
-        } catch (Exception e) {
-            response.addErrorMessage("Test Failed" +
-                    "!");
         }
         return response;
     }

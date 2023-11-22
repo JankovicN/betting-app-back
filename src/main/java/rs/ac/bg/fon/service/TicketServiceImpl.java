@@ -69,6 +69,7 @@ public class TicketServiceImpl implements TicketService {
     public ApiResponse<?> updateAllTickets() {
         ApiResponse<List<Ticket>> response = new ApiResponse<>();
         try {
+            betService.updateAllBets();
             ticketRepository.updateAllTickets();
             response.addInfoMessage("Successfully updated Tickets!");
             logger.info("Successfully updated Tickets!");
@@ -108,7 +109,7 @@ public class TicketServiceImpl implements TicketService {
         }).filter(ticketDTO -> ticketDTO != null).stream().toList();
 
         // Create a Page instance of TicketBasicDTO List
-        Page<TicketBasicDTO> basicTicketPage = new PageImpl<>(basicTicketDtoList, pageable, basicTicketDtoList.size());
+        Page<TicketBasicDTO> basicTicketPage = new PageImpl<>(basicTicketDtoList, pageable, tickets.getTotalElements());
 
         // Map the Page instance to PageDTO adn return that value
         return PageMapper.pageToPageDTO(basicTicketPage);
@@ -118,8 +119,9 @@ public class TicketServiceImpl implements TicketService {
     public ApiResponse<?> getAllTickets(Pageable pageable) {
         ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
         try {
-            Page<Ticket> ticketPage = ticketRepository.findAll(pageable);
+            Page<Ticket> ticketPage = ticketRepository.findAllByOrderByDateDesc(pageable);
             PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
+            ticketDtoPage.setTotalPages(ticketPage.getTotalPages());
             response.setData(ticketDtoPage);
         } catch (Exception e) {
             response.addErrorMessage("Error getting Tickets, try again later!");
@@ -152,13 +154,19 @@ public class TicketServiceImpl implements TicketService {
                 User user = userService.getUser(ticketDTO.getUsername());
                 List<Bet> betList = BetMapper.betDTOListToBetList(ticketDTO.getBets());
                 Ticket ticket = TicketMapper.ticketDTOToTicket(ticketDTO);
+                ticket.setBets(betList);
 
-                if (paymentService.canUserPay(user.getId(), ticketDTO.getWager())) {
+                if (paymentService.canUserPay(user.getId(), ticketDTO.getWager().negate())) {
                     setNewTicketFields(ticket);
                     ticket.setUser(user);
 
+                    BigDecimal ticketOdds = BigDecimal.valueOf(ticket.getOdd());
+                    ticketOdds = ticketOdds.setScale(2, BigDecimal.ROUND_HALF_UP);
+                    ticket.setOdd(ticketOdds.doubleValue());
+
                     paymentService.addPayment(user.getId(), ticket.getWager().negate(), Constants.PAYMENT_WAGER);
-                    this.save(ticket);
+                    ticket = save(ticket);
+                    logger.info("Saved ticket " + ticket);
                     betService.saveBetsForTicket(betList, ticket);
                     response.addInfoMessage("Successfully played Ticket!");
                 } else {
@@ -188,7 +196,7 @@ public class TicketServiceImpl implements TicketService {
     private Page<Ticket> getCancelableTickets(Pageable pageable) {
         try {
             LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
-            Page<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime, pageable);
+            Page<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime, Constants.TICKET_UNPROCESSED, pageable);
             logger.info("Successfully got cancelable Tickets!");
             return ticketList;
         } catch (Exception e) {
@@ -200,7 +208,7 @@ public class TicketServiceImpl implements TicketService {
     private Page<Ticket> getCancelableTickets(String username, Pageable pageable) {
         try {
             LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
-            Page<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime, username, pageable);
+            Page<Ticket> ticketList = ticketRepository.getTicketsAfterDateTime(cancelDateTime, username, Constants.TICKET_UNPROCESSED, pageable);
             logger.info("Successfully got cancelable Tickets!");
             return ticketList;
         } catch (Exception e) {
@@ -286,10 +294,11 @@ public class TicketServiceImpl implements TicketService {
                 logger.error("Time for canceling ticket has passed!");
                 canceledTicket.setDate(null);
                 return canceledTicket;
-            } else if (canceledTicket.getState() != Constants.TICKET_UNPROCESSED) {
+            } else if (!canceledTicket.getState().equals(Constants.TICKET_UNPROCESSED)) {
                 logger.error("Ticket state is invalid, it should be \"" + Constants.TICKET_UNPROCESSED + "\", but it is \"" + canceledTicket.getState() + "\"!");
-                canceledTicket.setState(Constants.INVALID_DATA);
-                return canceledTicket;
+                Ticket invaliTicket = new Ticket();
+                invaliTicket.setState(Constants.INVALID_DATA);
+                return invaliTicket;
             } else {
                 canceledTicket.setState(Constants.TICKET_CANCELED);
                 ticketRepository.save(canceledTicket);
@@ -320,7 +329,7 @@ public class TicketServiceImpl implements TicketService {
                 response.addErrorMessage("Cannot cancel Ticket, please try again!");
                 logger.info("Invalid Ticket state, unable to cancel ticket!");
             } else {
-                response.setData(canceledTicket);
+                response.addInfoMessage("Successfully canceled Ticket!");
                 logger.info("Successfully created response of cancelable Tickets!");
             }
         } catch (Exception e) {

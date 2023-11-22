@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -10,15 +11,11 @@ import rs.ac.bg.fon.service.LeagueService;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("league")
 public class LeagueController {
 
-    private LeagueService leagueService;
-
-    @Autowired
-    public void setLeagueService(LeagueService leagueService) {
-        this.leagueService = leagueService;
-    }
+    private final LeagueService leagueService;
 
     @GetMapping("/get/fixtures")
     public ResponseEntity<?> getAllLeaguesWithFixtures() {

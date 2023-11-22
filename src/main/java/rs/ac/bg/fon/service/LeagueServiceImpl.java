@@ -71,16 +71,17 @@ public class LeagueServiceImpl implements LeagueService {
     public ApiResponse<?> getAllLeaguesWithFixturesApiResponse() {
         List<LeagueDTO> leagueDTOS = new ArrayList<>();
         List<League> allLeagues = getAllLeagues();
-        if (allLeagues != null) {
+        if (allLeagues != null && !allLeagues.isEmpty()) {
             for (League league : allLeagues) {
-
                 if (league == null) {
                     continue;
                 }
+
                 List<Fixture> fixturesList = fixtureService.getNotStartedByLeague(league.getId());
                 if (fixturesList == null || fixturesList.isEmpty()) {
                     continue;
                 }
+
                 List<FixtureDTO> fixtureDTOS = fixtureService.createFixtureDTOList(fixturesList);
                 if (fixtureDTOS == null || fixtureDTOS.isEmpty()) {
                     continue;
@@ -100,16 +101,17 @@ public class LeagueServiceImpl implements LeagueService {
     public ApiResponse<?> getAllLeaguesApiResponse() {
         List<LeagueBasicDTO> leagueDTOS = new ArrayList<>();
         List<League> allLeagues = getAllLeagues();
-        if (allLeagues != null) {
-            try {
-                for (League league : allLeagues) {
+        if (allLeagues != null && !allLeagues.isEmpty()) {
+            for (League league : allLeagues) {
+                try {
                     if (fixtureService.existFixtureByLeagueId(league.getId())) {
                         leagueDTOS.add(LeagueMapper.leagueToLeagueBasicDTO(league));
                     }
+                } catch (Exception e) {
+                    logger.error("Unable to create League DTO for League " + league + "!\n" + e.getMessage());
                 }
-            } catch (Exception e) {
-                logger.error("Unable to create League DTO List!\n" + e.getMessage());
             }
+
         }
         return ApiResponseUtil.transformListToApiResponse(leagueDTOS, "leagues");
     }
@@ -122,13 +124,19 @@ public class LeagueServiceImpl implements LeagueService {
             try {
                 List<FixtureDTO> fixtures = fixtureService.getFixtureDtoByLeague(leagueId);
                 if (fixtures != null && !fixtures.isEmpty()) {
-                    logger.info("Fixtures for league " + leagueId + "\n" + fixtures + "\nIs empty = " + fixtures.isEmpty());
                     leagueDTO = LeagueMapper.leagueToLeagueDTO(league, fixtures);
-                    return ApiResponseUtil.transformObjectToApiResponse(leagueDTO, "leagues");
                 }
             } catch (Exception e) {
+                ApiResponse<?> response = new ApiResponse<>();
+                response.addErrorMessage("Unable to get Fixtures for League " + league.getName());
                 logger.error("Unable to create League DTO List!\n" + e.getMessage());
+                return response;
             }
+        } else {
+            ApiResponse<?> response = new ApiResponse<>();
+            response.addErrorMessage("Unknown error try again later!");
+            logger.error("No League is found for ID = " + leagueId + "!");
+            return response;
         }
         return ApiResponseUtil.transformObjectToApiResponse(leagueDTO, "leagues");
     }

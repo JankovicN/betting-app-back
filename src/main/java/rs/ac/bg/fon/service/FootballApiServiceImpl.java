@@ -11,6 +11,7 @@ import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.constants.SecretKeys;
 import rs.ac.bg.fon.entity.*;
 import rs.ac.bg.fon.utility.ApiResponse;
+import rs.ac.bg.fon.utility.ApiResponseUtil;
 import rs.ac.bg.fon.utility.JsonValidation;
 import rs.ac.bg.fon.utility.Utility;
 
@@ -214,6 +215,29 @@ public class FootballApiServiceImpl implements FootballApiService {
         }
         updateInfoMessages(apiResponse, "No Fixtures were added", "No new Fixtures were added");
         return CompletableFuture.completedFuture(apiResponse);
+    }
+
+    @Override
+    public CompletableFuture<ApiResponse<?>> getFixturesAndOddsFromAPI() {
+        CompletableFuture<ApiResponse<?>> fixturesResult = getFixturesFromAPI();
+
+        // Use thenCompose to wait for the completion of the fixturesResult before starting the oddsResult
+        CompletableFuture<ApiResponse<?>> combinedResult =
+                fixturesResult.thenCompose(fixturesApiResponse -> {
+                    CompletableFuture<ApiResponse<?>> oddsResult = getOddsFromAPI();
+
+                    // Merge the data from both ApiResponse objects
+                    return oddsResult.thenApply(oddsApiResponse -> {
+                        System.out.println(oddsApiResponse.getInfoMessages());
+                        System.out.println(fixturesApiResponse.getInfoMessages());
+                        fixturesApiResponse.getInfoMessages().addAll(oddsApiResponse.getInfoMessages());
+                        fixturesApiResponse.getErrorMessages().addAll(oddsApiResponse.getErrorMessages());
+                        return fixturesApiResponse;
+                    });
+                });
+
+        // Return a new CompletableFuture with additional processing using ApiResponseUtil
+        return combinedResult;
     }
 
     @Transactional

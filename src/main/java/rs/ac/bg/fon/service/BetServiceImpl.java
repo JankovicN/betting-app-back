@@ -76,6 +76,7 @@ public class BetServiceImpl implements BetService {
             List<BetInfoDTO> betInfoDTOS = new ArrayList<>();
             for (Bet bet : betList) {
                 if (bet.getOdd() == null || bet.getOdd().getId() == null) {
+                    logger.error("Odd or its ID for bet = [" + bet + "] is null!\nOdd = " + bet.getOdd());
                     return new ArrayList<>();
                 }
                 Odd odd = bet.getOdd();

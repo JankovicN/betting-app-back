@@ -49,7 +49,7 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
             logger.info("Successfully saved all bet groups");
         }
 
-        if (userRepository.existsByEmail(initialAdminConfig.getEmail())) return;
+        if (userRepository.existsByEmail(initialAdminConfig.getEmail()) || userRepository.existsByUsername(initialAdminConfig.getUsername())) return;
 
         userService.saveRole(new Role(null, "ROLE_CLIENT"));
         userService.saveRole(new Role(null, "ROLE_ADMIN"));

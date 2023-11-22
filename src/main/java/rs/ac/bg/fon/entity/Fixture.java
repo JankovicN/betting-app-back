@@ -23,6 +23,7 @@ public class Fixture {
     @Id
     @Column(name = "fixture_id")
     private Integer id;
+
     @Column(name = "date")
     private LocalDateTime date;
 
