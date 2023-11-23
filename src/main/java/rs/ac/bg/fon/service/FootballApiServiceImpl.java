@@ -11,7 +11,6 @@ import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.constants.SecretKeys;
 import rs.ac.bg.fon.entity.*;
 import rs.ac.bg.fon.utility.ApiResponse;
-import rs.ac.bg.fon.utility.ApiResponseUtil;
 import rs.ac.bg.fon.utility.JsonValidation;
 import rs.ac.bg.fon.utility.Utility;
 
@@ -34,7 +33,7 @@ public class FootballApiServiceImpl implements FootballApiService {
     private static final Logger logger = LoggerFactory.getLogger(FootballApiServiceImpl.class);
     private final LeagueService leagueService;
     private final FixtureService fixtureService;
-    private final BetGroupService betGroupService;
+    private final OddGroupService oddGroupService;
     private final TeamService teamService;
     private final OddService oddService;
     private final Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
@@ -60,15 +59,15 @@ public class FootballApiServiceImpl implements FootballApiService {
     @Transactional
     @Override
     @Async
-    public CompletableFuture<ApiResponse<?>> getBetGroupsFromAPI() {
+    public CompletableFuture<ApiResponse<?>> getOddGroupsFromAPI() {
         ApiResponse<?> apiResponse = new ApiResponse<>();
         try {
-            if (betGroupService.exists()) {
+            if (oddGroupService.exists()) {
                 try {
-                    String responseBody = betGroupsApiResponse();
+                    String responseBody = oddGroupsApiResponse();
 
                     if (responseBody == null || responseBody.isEmpty()) {
-                        logger.error("Invalid response from external API!\nFootballAPI BetGroups call returned empty response!");
+                        logger.error("Invalid response from external API!\nFootballAPI OddGroups call returned empty response!");
                         apiResponse.addErrorMessage("Invalid response from external API!");
                         return CompletableFuture.completedFuture(apiResponse);
                     }
@@ -76,34 +75,34 @@ public class FootballApiServiceImpl implements FootballApiService {
                     JsonArray responseArray = getResponseArrayFromJson(responseBody);
 
                     if (responseArray == null) {
-                        logger.info("No Bet Groups were added!\nFootballAPI BetGroups call returned empty array!");
-                        apiResponse.addInfoMessage("No Bet Groups were added!");
+                        logger.info("No Odd Groups were added!\nFootballAPI OddGroups call returned empty array!");
+                        apiResponse.addInfoMessage("No Odd Groups were added!");
                         return CompletableFuture.completedFuture(apiResponse);
                     }
 
                     for (JsonElement jsonElement : responseArray) {
-                        BetGroup group = createBetGroupFromJsonElement(jsonElement);
-                        if (betGroupService.saveBetGroup(group) == null) {
-                            logger.warn("Error while saving Bet Group " + group + "!");
+                        OddGroup group = createOddGroupFromJsonElement(jsonElement);
+                        if (oddGroupService.saveOddGroup(group) == null) {
+                            logger.warn("Error while saving Odd Group " + group + "!");
                         } else {
-                            apiResponse.addInfoMessage("Successfully added new Bet Group " + group + "!");
+                            apiResponse.addInfoMessage("Successfully added new Odd Group " + group + "!");
                         }
                     }
-                    logger.info("Successful added Bet Groups!");
+                    logger.info("Successful added Odd Groups!");
                 } catch (IOException e) {
-                    apiResponse.addErrorMessage("Error getting Bet Groups from Football API!");
-                    logger.error("FootballAPI Bet Groups Error transforming response to Bet Group!", e);
+                    apiResponse.addErrorMessage("Error getting Odd Groups from Football API!");
+                    logger.error("FootballAPI Odd Groups Error transforming response to Odd Group!", e);
                 } catch (Exception e) {
-                    apiResponse.addErrorMessage("Error getting Bet Groups from Football API!");
-                    logger.error("FootballAPI BetGroups Error when getting Bet Groups!", e);
+                    apiResponse.addErrorMessage("Error getting Odd Groups from Football API!");
+                    logger.error("FootballAPI OddGroups Error when getting Odd Groups!", e);
                 }
             } else {
-                logger.info("Bet groups are already fetched!");
-                apiResponse.addInfoMessage("No new Bet Groups were added!");
+                logger.info("Odd Groups are already fetched!");
+                apiResponse.addInfoMessage("No new Odd Groups were added!");
             }
         } catch (Exception e) {
-            apiResponse.addErrorMessage("Error getting Bet Groups from Football API");
-            logger.error("FootballAPI Bet Group Error when getting Bet Groups", e);
+            apiResponse.addErrorMessage("Error getting Odd Groups from Football API");
+            logger.error("FootballAPI Odd Group Error when getting Odd Groups", e);
         }
         return CompletableFuture.completedFuture(apiResponse);
     }
@@ -309,24 +308,24 @@ public class FootballApiServiceImpl implements FootballApiService {
             logger.warn("addOddFromApiResponse: Bet Array is null!\n");
             return;
         }
-        for (JsonElement betGroupEl : betsArray) {
+        for (JsonElement oddGroupEl : betsArray) {
 
             // Checking if JSON field are present and of correct type
-            if (!JsonValidation.validateJsonElementFieldIsNumber(betGroupEl, "id") || !JsonValidation.validateJsonElementFieldIsArray(betGroupEl, "values")) {
+            if (!JsonValidation.validateJsonElementFieldIsNumber(oddGroupEl, "id") || !JsonValidation.validateJsonElementFieldIsArray(oddGroupEl, "values")) {
                 continue;
             }
 
-            // Getting bet group id from JSON
-            Integer betGroupId = betGroupEl.getAsJsonObject().get("id").getAsInt();
-            // If we don't have that bet group or if odds are already saved fo that fixture and bet group then return
-            if (!betGroupService.existsWithId(betGroupId) || oddService.existsWithFixtureIdAndBetGroupId(betGroupId, fixture.getId())) {
+            // Getting Odd Group id from JSON
+            Integer oddGroupId = oddGroupEl.getAsJsonObject().get("id").getAsInt();
+            // If we don't have that Odd Group or if odds are already saved fo that fixture and Odd Group then return
+            if (!oddGroupService.existsWithId(oddGroupId) || oddService.existsWithFixtureIdAndOddGroupId(oddGroupId, fixture.getId())) {
                 continue;
             }
 
-            // Get bet group with ID
-            // If betGroup is null it means that an error has occurred, that is why we return
-            BetGroup betGroup = betGroupService.getBetGroupWithId(betGroupId);
-            if (betGroup == null) {
+            // Get Odd Group with ID
+            // If oddGroup is null it means that an error has occurred, that is why we return
+            OddGroup oddGroup = oddGroupService.getOddGroupWithId(oddGroupId);
+            if (oddGroup == null) {
                 continue;
             }
 
@@ -334,7 +333,7 @@ public class FootballApiServiceImpl implements FootballApiService {
             // Then add those odds to list
             // Log if error has occurred while creating odd
             List<Odd> oddList = new ArrayList<>();
-            JsonArray oddsArr = betGroupEl.getAsJsonObject().get("values").getAsJsonArray();
+            JsonArray oddsArr = oddGroupEl.getAsJsonObject().get("values").getAsJsonArray();
             for (JsonElement oddsEl : oddsArr) {
                 Odd odd = crateOddFromJsonElement(oddsEl);
                 String oddName = odd.getName();
@@ -346,7 +345,7 @@ public class FootballApiServiceImpl implements FootballApiService {
                     continue;
                 }
                 odd.setFixture(fixture);
-                odd.setBetGroup(betGroup);
+                odd.setOddGroup(oddGroup);
                 oddList.add(odd);
                 logger.info("addOddFromApiResponse: Adding odd to list " + odd.getName() + " for fixture " + fixture.getHome().getName() + " - " + fixture.getAway().getName());
             }
@@ -356,7 +355,7 @@ public class FootballApiServiceImpl implements FootballApiService {
             if (oddService.saveOddList(oddList) == null) {
                 logger.warn("addOddFromApiResponse: Error while trying to save Odd List!");
             } else {
-                logger.info("addOddFromApiResponse: Saving odd list for Bet Group " + betGroup.getName());
+                logger.info("addOddFromApiResponse: Saving odd list for Odd Group " + oddGroup.getName());
             }
 
         }
@@ -419,11 +418,11 @@ public class FootballApiServiceImpl implements FootballApiService {
         return response.body();
     }
 
-    private String betGroupsApiResponse() throws IOException, InterruptedException {
-        logger.info("Creating Football API call for getting Bet Groups.");
+    private String oddGroupsApiResponse() throws IOException, InterruptedException {
+        logger.info("Creating Football API call for getting Odd Groups.");
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://api-football-v1.p.rapidapi.com/v3/odds/bets")).header("X-RapidAPI-Key", SecretKeys.getApi_key()).header("X-RapidAPI-Host", "api-football-v1.p.rapidapi.com").method("GET", HttpRequest.BodyPublishers.noBody()).build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        logger.info("Successful Football API call for getting Bet Groups");
+        logger.info("Successful Football API call for getting Odd Groups");
         return response.body();
     }
 
@@ -458,13 +457,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         return responseEl.getAsJsonObject().getAsJsonArray("response");
     }
 
-    private BetGroup createBetGroupFromJsonElement(JsonElement jsonElement) {
+    private OddGroup createOddGroupFromJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementFieldIsNumber(jsonElement, "id") || !JsonValidation.validateJsonElementFieldIsString(jsonElement, "name")) {
             return null;
         }
-        int betGroupID = jsonElement.getAsJsonObject().get("id").getAsInt();
-        String betGroupName = jsonElement.getAsJsonObject().get("name").getAsString();
-        return new BetGroup(betGroupID, betGroupName, new ArrayList<>());
+        int oddGroupID = jsonElement.getAsJsonObject().get("id").getAsInt();
+        String oddGroupName = jsonElement.getAsJsonObject().get("name").getAsString();
+        return new OddGroup(oddGroupID, oddGroupName, new ArrayList<>());
     }
 
     private int getTeamGoalsFromJsonElement(JsonElement jsonElement) {

@@ -52,7 +52,7 @@ public class Fixture {
     private List<Odd> odds;
 
     @Transient
-    private List<BetGroup> betGroupList;
+    private List<OddGroup> oddGroupList;
 
     @Override
     public String toString() {

@@ -7,29 +7,29 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import rs.ac.bg.fon.service.BetGroupService;
+import rs.ac.bg.fon.service.OddGroupService;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("betGroup")
-public class BetGroupController {
+@RequestMapping("oddGroup")
+public class OddGroupController {
 
-    private final BetGroupService betGroupService;
+    private final OddGroupService oddGroupService;
 
     @GetMapping("/get")
-    public ResponseEntity<?> getBetGroups(@RequestParam Integer fixtureID) {
+    public ResponseEntity<?> getOddGroups(@RequestParam Integer fixtureID) {
         if (fixtureID == null) {
             return ApiResponseUtil.errorApiResponse("Fixture data is missing!\nContact support for more information!");
         }
-        return ApiResponseUtil.handleApiResponse(betGroupService.getBetGroupsByFixtureApiResponse(fixtureID));
+        return ApiResponseUtil.handleApiResponse(oddGroupService.getOddGroupsByFixtureApiResponse(fixtureID));
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteBetGroup(@RequestParam Integer betGroupID) {
-        if (betGroupID == null) {
-            return ApiResponseUtil.errorApiResponse("Bet group data is missing!\nContact support for more information!");
+    public ResponseEntity<?> deleteOddGroup(@RequestParam Integer oddGroupID) {
+        if (oddGroupID == null) {
+            return ApiResponseUtil.errorApiResponse("Odd Group data is missing!\nContact support for more information!");
         }
-        return ApiResponseUtil.handleApiResponse(betGroupService.deleteBetGroupApiResponse(betGroupID));
+        return ApiResponseUtil.handleApiResponse(oddGroupService.deleteOddGroupApiResponse(oddGroupID));
     }
 }

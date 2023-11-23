@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import rs.ac.bg.fon.constants.Constants;
-import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
+import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
 
 import java.io.Serializable;
@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FixtureDTO implements Serializable {
 
-    List<BetGroupDTO> betGroupList;
+    List<OddGroupDTO> oddGroupList;
     private Integer id;
     private String date;
     private TeamDTO home;
@@ -26,6 +26,6 @@ public class FixtureDTO implements Serializable {
     private String state = Constants.FIXTURE_NOT_STARTED;
 
     public FixtureDTO() {
-        betGroupList = new ArrayList<>();
+        oddGroupList = new ArrayList<>();
     }
 }

@@ -15,10 +15,10 @@ public interface OddService {
 
     List<Odd> saveOddList(List<Odd> odds);
 
-    List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId);
+    List<Odd> getOddsForFixtureAndOddGroup(Integer fixtureId, Integer oddGroupId);
 
-    List<OddDTO> createOddDTOList(Integer fixtureId, Integer betGroupId);
+    List<OddDTO> createOddDTOList(Integer fixtureId, Integer oddGroupId);
 
-    boolean existsWithFixtureIdAndBetGroupId(Integer betGroupId, Integer id);
+    boolean existsWithFixtureIdAndOddGroupId(Integer oddGroupId, Integer id);
 
 }

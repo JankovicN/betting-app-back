@@ -21,9 +21,9 @@ public class FootballApiController {
     private final FootballApiService footballApiService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/get/betGroups")
-    public CompletableFuture<ResponseEntity<?>> getBetGroupsFromAPI(Authentication auth) {
-        CompletableFuture<ApiResponse<?>> result = footballApiService.getBetGroupsFromAPI();
+    @PostMapping("/get/oddGroups")
+    public CompletableFuture<ResponseEntity<?>> getOddGroupsFromAPI(Authentication auth) {
+        CompletableFuture<ApiResponse<?>> result = footballApiService.getOddGroupsFromAPI();
 
         return result.thenApply(apiResult -> ApiResponseUtil.handleApiResponse(apiResult));
     }

@@ -81,10 +81,10 @@ public class BetServiceImpl implements BetService {
                 }
                 Odd odd = bet.getOdd();
                 Fixture fixture = odd.getFixture();
-                BetGroup betGroup = odd.getBetGroup();
+                OddGroup oddGroup = odd.getOddGroup();
                 BetInfoDTO betInfoDTO = new BetInfoDTO();
                 try {
-                    betInfoDTO = BetMapper.betToBetInfoDTO(bet, betGroup, odd, fixture);
+                    betInfoDTO = BetMapper.betToBetInfoDTO(bet, oddGroup, odd, fixture);
                     betInfoDTOS.add(betInfoDTO);
                 } catch (Exception e) {
                     logger.error("Error creating betInfoDTO " + betInfoDTO + "!\n" + e);

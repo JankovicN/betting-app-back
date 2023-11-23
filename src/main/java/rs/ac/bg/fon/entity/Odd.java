@@ -34,8 +34,8 @@ public class Odd {
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bet_group_id")
-    private BetGroup betGroup;
+    @JoinColumn(name = "odd_group_id")
+    private OddGroup OddGroup;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,
