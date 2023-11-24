@@ -8,15 +8,6 @@ import rs.ac.bg.fon.constants.Constants;
 
 import javax.persistence.*;
 
-/**
- * Class representing a single Bet placed on a Ticket.
- *
- * Contains information about the state, value and type of Bet, as well as the Ticket which contains the Bet.
- * Class attributes: unique id, state, odd, ticket.
- *
- * @author Janko
- * @version 1.0
- */
 @AllArgsConstructor
 @Entity
 @Table(name = "bet")
@@ -70,7 +61,7 @@ public class Bet {
     /**
      * Sets Bet ID to value that is provided.
      *
-     * @param id new Integer value as ID.
+     * @param id new Integer value for Bet ID.
      * @throws NullPointerException if provided ID is null.
      */
     public void setId(Integer id) {

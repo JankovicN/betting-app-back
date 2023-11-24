@@ -76,11 +76,10 @@ public class OddGroup {
     /**
      * Sets Odd Group ID to value that is provided.
      *
-     * @param id new Integer value as ID.
+     * @param id new Integer value  for Odd Group ID.
      * @throws NullPointerException if provided ID is null.
      */
     public void setId(Integer id) {
-
         if (id == null)
             throw new NullPointerException("Id can not be null!");
 
@@ -113,7 +112,7 @@ public class OddGroup {
     /**
      * Sets list of Odds to value that is provided.
      *
-     * @param odds new List of odds for odds contained in Odd Group,
+     * @param odds new List of Odd objects for odds contained in Odd Group,
      *             if odds is null an empty Array List is assigned instead
      */
     public void setOdds(List<Odd> odds) {
@@ -127,7 +126,7 @@ public class OddGroup {
      * Returns the list of Odd objects that Odd Group contains.
      *
      * @return odds as a list of Odd objects associated with Odd Group,
-     *          if odds attribute is null then an empty Array List is returned
+     *          if odds attribute is null then an empty Array List is returned.
      */
     public List<Odd> getOdds() {
         if (odds == null) {
