@@ -1,4 +1,4 @@
-package rs.ac.bg.fon.dtos.BetGroup;
+package rs.ac.bg.fon.dtos.OddGroup;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class BetGroupDTO implements Serializable {
+public class OddGroupDTO implements Serializable {
 
     private Integer id;
 
@@ -20,7 +20,7 @@ public class BetGroupDTO implements Serializable {
 
     private List<OddDTO> odds;
 
-    public BetGroupDTO() {
+    public OddGroupDTO() {
         odds = new ArrayList<>();
     }
 }

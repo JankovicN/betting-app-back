@@ -43,7 +43,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 try {
                     String token = authorizationHeader.substring("Bearer ".length());
 
-                    // TODO -> UTILITY KLASA U KOJOJ IMAMO ALGORITAM
                     Algorithm algorithm = getAlgorithm();
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(token);

@@ -27,7 +27,7 @@ public class Ticket {
     private Integer id;
     @Column(name = "wager")
     private BigDecimal wager;
-    @Column(name = "odd")
+    @Column(name = "total_odd")
     private double odd;
     @Column(name = "total_win")
     private BigDecimal totalWin;

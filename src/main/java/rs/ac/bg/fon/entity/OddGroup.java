@@ -16,16 +16,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "bet_group")
-public class BetGroup {
+@Table(name = "odd_group")
+public class OddGroup {
     @Id
-    @Column(name = "bet_group_id")
+    @Column(name = "odd_group_id")
     private Integer id;
-    @Column(name = "bet_group_name")
+    @Column(name = "odd_group_name")
     private String name;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "betGroup", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "oddGroup", fetch = FetchType.LAZY)
     private List<Odd> odds;
 
     public List<Odd> getOdds() {

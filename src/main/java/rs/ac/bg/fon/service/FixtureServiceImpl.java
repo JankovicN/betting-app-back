@@ -5,15 +5,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
-import rs.ac.bg.fon.dtos.BetGroup.BetGroupDTO;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
+import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Team;
 import rs.ac.bg.fon.mappers.FixtureMapper;
 import rs.ac.bg.fon.repository.FixtureRepository;
-import rs.ac.bg.fon.utility.ApiResponse;
-import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -26,7 +24,7 @@ import java.util.Optional;
 public class FixtureServiceImpl implements FixtureService {
     private static final Logger logger = LoggerFactory.getLogger(FixtureServiceImpl.class);
     private final FixtureRepository fixtureRepository;
-    private final BetGroupService betGroupService;
+    private final OddGroupService oddGroupService;
     private final TeamService teamService;
 
 
@@ -100,22 +98,22 @@ public class FixtureServiceImpl implements FixtureService {
         try {
             List<FixtureDTO> fixtureDTOS = new ArrayList<>();
             for (Fixture fixture : fixtures) {
-                List<BetGroupDTO> betGroupDTOList = betGroupService.createBetGroupDTOList(fixture.getId(), 1);
+                List<OddGroupDTO> oddGroupDTOList = oddGroupService.createOddGroupDTOList(fixture.getId(), 1);
                 Optional<Team> home = teamService.findById(fixture.getHome().getId());
                 Optional<Team> away = teamService.findById(fixture.getAway().getId());
 
                 if (home == null || away == null
                         || !home.isPresent()
                         || !away.isPresent()
-                        || betGroupDTOList == null
-                        || betGroupDTOList.isEmpty()) {
+                        || oddGroupDTOList == null
+                        || oddGroupDTOList.isEmpty()) {
                     continue;
                 }
 
                 try {
                     TeamDTO homeDTO = teamService.createTeamDTO(home.get());
                     TeamDTO awayDTO = teamService.createTeamDTO(away.get());
-                    FixtureDTO fixtureDTO = FixtureMapper.fixtureToFixtureDTO(fixture, homeDTO, awayDTO, betGroupDTOList);
+                    FixtureDTO fixtureDTO = FixtureMapper.fixtureToFixtureDTO(fixture, homeDTO, awayDTO, oddGroupDTOList);
                     fixtureDTOS.add(fixtureDTO);
                 } catch (Exception e) {
                     logger.error("Error while trying to create FixtureDTO for Fixture " + fixture + "!\n" + e.getMessage());
@@ -145,7 +143,18 @@ public class FixtureServiceImpl implements FixtureService {
 
     @Override
     public boolean existFixtureByLeagueId(Integer leagueId) {
-        return !getNotStartedByLeague(leagueId).isEmpty();
+        List<Fixture> notStartedByLeague = getNotStartedByLeague(leagueId);
+        boolean existsByLeagueID = notStartedByLeague.isEmpty();
+        if(existsByLeagueID){
+            return false;
+        }
+        for ( Fixture f : notStartedByLeague) {
+            if(f!= null && !f.getOdds().isEmpty()){
+                existsByLeagueID = true;
+            }
+        }
+
+        return existsByLeagueID;
     }
 
 

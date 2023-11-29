@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import rs.ac.bg.fon.dtos.Bet.BetDTO;
 import rs.ac.bg.fon.dtos.Bet.BetInfoDTO;
 import rs.ac.bg.fon.entity.Bet;
-import rs.ac.bg.fon.entity.BetGroup;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Odd;
+import rs.ac.bg.fon.entity.OddGroup;
 import rs.ac.bg.fon.utility.Utility;
 
 import java.util.ArrayList;
@@ -45,21 +45,21 @@ public class BetMapper {
     }
 
 
-    public static BetInfoDTO betToBetInfoDTO(Bet bet, BetGroup betGroup, Odd odd, Fixture fixture) throws Exception {
+    public static BetInfoDTO betToBetInfoDTO(Bet bet, OddGroup oddGroup, Odd odd, Fixture fixture) throws Exception {
         if (bet.getId() == null || bet.getState() == null || bet.getState().isBlank()
-                || betGroup.getName() == null || betGroup.getName().isBlank()
+                || oddGroup.getName() == null || oddGroup.getName().isBlank()
                 || odd.getOdd() == null || odd.getName() == null || odd.getName().isBlank()
                 || fixture.getDate() == null || fixture.getHomeGoals() < 0 || fixture.getAwayGoals() < 0
                 || fixture.getHome() == null || fixture.getHome().getName() == null || fixture.getHome().getName().isBlank()
                 || fixture.getAway() == null || fixture.getAway().getName() == null || fixture.getAway().getName().isBlank()) {
-            throw new Exception("Bet DTO object has invalid fields [bet = " + bet + ", betGroup = " + betGroup + ", odd = " + odd + ", fixture = " + fixture + " ]");
+            throw new Exception("Bet DTO object has invalid fields [bet = " + bet + ", oddGroup = " + oddGroup + ", odd = " + odd + ", fixture = " + fixture + " ]");
         }
         BetInfoDTO betDTO = new BetInfoDTO();
         betDTO.setId(bet.getId());
         betDTO.setState(bet.getState());
         betDTO.setOdd(odd.getOdd());
         betDTO.setName(odd.getName());
-        betDTO.setBetGroupName(betGroup.getName());
+        betDTO.setOddGroupName(oddGroup.getName());
         betDTO.setFixtureDate(Utility.formatDateTime(fixture.getDate()));
         betDTO.setHome(fixture.getHome().getName());
         betDTO.setAway(fixture.getAway().getName());

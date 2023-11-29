@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
-import rs.ac.bg.fon.entity.BetGroup;
 import rs.ac.bg.fon.entity.Odd;
+import rs.ac.bg.fon.entity.OddGroup;
 import rs.ac.bg.fon.mappers.OddMapper;
 import rs.ac.bg.fon.repository.OddRepository;
 
@@ -45,7 +45,7 @@ public class OddServiceImpl implements OddService {
                 logger.info("Successfully found Odd with id: " + oddId + ", odd:  \n" + odd.get() + "!");
                 Odd fetchedOdd = odd.get();
                 fetchedOdd.getFixture();
-                BetGroup betGroup = fetchedOdd.getBetGroup();
+                OddGroup oddGroup = fetchedOdd.getOddGroup();
                 return fetchedOdd;
             }
             return null;
@@ -68,10 +68,10 @@ public class OddServiceImpl implements OddService {
     }
 
     @Override
-    public List<Odd> getOddsForFixtureAndBetGroup(Integer fixtureId, Integer betGroupId) {
+    public List<Odd> getOddsForFixtureAndOddGroup(Integer fixtureId, Integer oddGroupId) {
         try {
-            List<Odd> oddList = oddRepository.findByFixtureStateAndFixtureIdAndBetGroupId(Constants.FIXTURE_NOT_STARTED, fixtureId, betGroupId);
-            logger.info("Successfully found list of Odds for fixtureId = " + fixtureId + " and betGroupId = " + betGroupId + "!\n" +
+            List<Odd> oddList = oddRepository.findByFixtureStateAndFixtureIdAndOddGroupId(Constants.FIXTURE_NOT_STARTED, fixtureId, oddGroupId);
+            logger.info("Successfully found list of Odds for fixtureId = " + fixtureId + " and oddGroupId = " + oddGroupId + "!\n" +
                     "Odd List: " + oddList);
 
             return oddList == null ? new ArrayList<>() : oddList;
@@ -82,11 +82,11 @@ public class OddServiceImpl implements OddService {
     }
 
     @Override
-    public List<OddDTO> createOddDTOList(Integer fixtureId, Integer betGroupId) {
+    public List<OddDTO> createOddDTOList(Integer fixtureId, Integer oddGroupId) {
 
         List<OddDTO> oddDTOList = new ArrayList<>();
         try {
-            List<Odd> oddList = getOddsForFixtureAndBetGroup(fixtureId, betGroupId);
+            List<Odd> oddList = getOddsForFixtureAndOddGroup(fixtureId, oddGroupId);
             for (Odd odd : oddList) {
                 try {
                     OddDTO oddDTO = OddMapper.oddToOddDTO(odd);
@@ -103,12 +103,12 @@ public class OddServiceImpl implements OddService {
     }
 
     @Override
-    public boolean existsWithFixtureIdAndBetGroupId(Integer fixtureId, Integer betGroupId) {
+    public boolean existsWithFixtureIdAndOddGroupId(Integer fixtureId, Integer oddGroupId) {
 
         try {
-            return oddRepository.existsByFixtureIdAndBetGroupId(fixtureId, betGroupId);
+            return oddRepository.existsByFixtureIdAndOddGroupId(fixtureId, oddGroupId);
         } catch (Exception e) {
-            logger.error("Error unnecessary while trying to check if Odds exits for Fixture ID = " + fixtureId + " and Bet Group ID = " + betGroupId + "!\n" + e.getMessage());
+            logger.error("Error unnecessary while trying to check if Odds exits for Fixture ID = " + fixtureId + " and Odd Group ID = " + oddGroupId + "!\n" + e.getMessage());
             return false;
         }
     }

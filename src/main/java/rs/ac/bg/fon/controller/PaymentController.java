@@ -2,14 +2,13 @@ package rs.ac.bg.fon.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Payment.PaymentDTO;
 import rs.ac.bg.fon.service.PaymentService;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("payment")
 public class PaymentController {

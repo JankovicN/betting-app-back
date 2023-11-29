@@ -18,7 +18,7 @@ public class BetInfoDTO {
     private String state;
     private BigDecimal odd;
     private String name;
-    private String betGroupName;
+    private String oddGroupName;
     private String fixtureDate;
     private String home;
     private String away;
@@ -29,7 +29,7 @@ public class BetInfoDTO {
     public String toString() {
         return "BetInfoDTO object has invalid fields [id = " + id
                 + ", state = " + state + ", odd = " + odd
-                + ", name = " + name + ", betGroupName = " + betGroupName
+                + ", name = " + name + ", oddGroupName = " + oddGroupName
                 + ", fixtureDate = " + fixtureDate + ", home = " + home
                 + ", away = " + away + ", result = " + result + "]";
     }

@@ -6,13 +6,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import rs.ac.bg.fon.constants.AllBetGroups;
+import rs.ac.bg.fon.constants.AllOddGroups;
 import rs.ac.bg.fon.constants.AllLeagues;
 import rs.ac.bg.fon.entity.Role;
 import rs.ac.bg.fon.entity.User;
 import rs.ac.bg.fon.repository.UserRepository;
-import rs.ac.bg.fon.service.BetGroupService;
 import rs.ac.bg.fon.service.LeagueService;
+import rs.ac.bg.fon.service.OddGroupService;
 import rs.ac.bg.fon.service.UserService;
 
 import java.time.LocalDate;
@@ -26,7 +26,7 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
 
     public AllLeagues allLeagues;
     @Autowired
-    public AllBetGroups allBetGroups;
+    public AllOddGroups allOddGroups;
     @Autowired
     UserService userService;
     @Autowired
@@ -34,7 +34,7 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
     @Autowired
     LeagueService leagueService;
     @Autowired
-    BetGroupService betGroupService;
+    OddGroupService oddGroupService;
     @Autowired
     InitialAdminConfig initialAdminConfig;
 
@@ -44,9 +44,9 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
         if (!leagueService.exists()) {
             leagueService.saveLeagues(allLeagues.getAllLeagues());
         }
-        if (!betGroupService.exists()) {
-            betGroupService.saveBetGroups(allBetGroups.getAllBetGroupsList());
-            logger.info("Successfully saved all bet groups");
+        if (!oddGroupService.exists()) {
+            oddGroupService.saveOddGroups(allOddGroups.getAllOddGroupsList());
+            logger.info("Successfully saved all Odd Groups");
         }
 
         if (userRepository.existsByEmail(initialAdminConfig.getEmail()) || userRepository.existsByUsername(initialAdminConfig.getUsername())) return;
