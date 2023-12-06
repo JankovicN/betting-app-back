@@ -14,7 +14,7 @@ import java.util.Objects;
  * Class representing a Football League.
  *
  * Contains information about the name of the League and all fixtures that it has.
- * Class attributes: unique id, name, list of fixtures.
+ * Class attributes: id, name and fixtures.
  *
  * @author Janko
  * @version 1.0
@@ -112,7 +112,7 @@ public class League {
     }
 
     /**
-     * Returns the list of Fixture objects that this league contains.
+     * Returns fixtures that are contained in league.
      *
      * @return fixtures as a list of Fixture objects associated with league,
      *         if fixtures attribute is null, then an empty Array List is returned.

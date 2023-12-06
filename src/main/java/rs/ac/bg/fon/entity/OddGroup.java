@@ -13,7 +13,7 @@ import java.util.Objects;
  * Class representing odd groups, each group is associated with a list of odds.
  *
  * Contains information about the name of the group and all odds that are in the group.
- * Class attributes: unique id, name, list of odds.
+ * Class attributes: id, name and odds.
  *
  * @author Janko
  * @version 1.0
@@ -46,7 +46,7 @@ public class OddGroup {
 
 
     /**
-     * Returns a string representation of the odd group.
+     * Returns a string representation of odd group.
      *
      * @return A string representation of the object, either the 'name' attribute (e.g. Match Winner)
      *  or the result of super.toString() method
@@ -121,7 +121,7 @@ public class OddGroup {
     }
 
     /**
-     * Returns list of Odd objects that odd group contains.
+     * Returns odds that are contained in  odd group.
      *
      * @return odds as a list of Odd objects associated with odd group,
      *          if odds attribute is null then an empty Array List is returned.

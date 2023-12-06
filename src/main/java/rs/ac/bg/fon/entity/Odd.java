@@ -3,9 +3,6 @@ package rs.ac.bg.fon.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
@@ -18,7 +15,7 @@ import java.util.Objects;
  * Class representing odd.
  *
  * Contains information about the value and name of odd, fixture that contains the odd, odd group which contains odd and list of bets that are placed on the odd.
- * Class attributes: unique id, odd value, name, fixture, odd group and list of bets.
+ * Class attributes: id, oddValue, name, fixture, oddGroup and bets.
  *
  * @author Janko
  * @version 1.0
@@ -69,7 +66,7 @@ public class Odd {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,
             mappedBy = "odd")
-    private List<Bet> bet;
+    private List<Bet> bets;
 
     /**
      * Returns a string representation of the odd.
@@ -155,7 +152,7 @@ public class Odd {
     }
 
     /**
-     * Returns Fixture object that contains odd.
+     * Returns fixture that contains odd.
      *
      * @return fixture as an Object of class Fixture.
      */
@@ -176,7 +173,7 @@ public class Odd {
     }
 
     /**
-     * Returns OddGroup object that contains odd.
+     * Returns odd group that contains odd.
      *
      * @return oddGroup as an Object of class OddGroup.
      */
@@ -197,25 +194,25 @@ public class Odd {
     }
 
     /**
-     * Returns list of Bet objects that are associated with the odd.
+     * Returns bets that are played with this odd.
      *
-     * @return bet as a list of Bet objects associated with the odd,
-     *          if bet attribute is null, then an empty Array List is returned.
+     * @return bets as a list of Bet objects associated with the odd,
+     *          if bets attribute is null, then an empty Array List is returned.
      */
-    public List<Bet> getBet() {
-        if (bet == null) {
-            bet = new ArrayList<>();
+    public List<Bet> getBets() {
+        if (bets == null) {
+            bets = new ArrayList<>();
         }
-        return bet;
+        return bets;
     }
 
     /**
-     * Sets bet to value that is provided.
+     * Sets bets to value that is provided.
      *
-     * @param bet new List of Bet objects for bet associated with the odd,
-     *             if bet is null, an empty Array List is assigned instead
+     * @param bets new List of Bet objects for bets associated with the odd,
+     *             if bets is null, an empty Array List is assigned instead
      */
-    public void setBet(List<Bet> bet) {
-        this.bet = Objects.requireNonNullElseGet(bet, ArrayList::new);
+    public void setBets(List<Bet> bets) {
+        this.bets = Objects.requireNonNullElseGet(bets, ArrayList::new);
     }
 }

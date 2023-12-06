@@ -9,7 +9,7 @@ import javax.persistence.*;
  * Class representing a single bet placed on  ticket.
  *
  * Contains information about the state of the bet, the odd associated with the bet and the ticket it is placed on.
- * Class attributes: unique id, state, odd and ticket.
+ * Class attributes: id, state, odd and ticket.
  *
  * @author Janko
  * @version 1.0
@@ -100,7 +100,7 @@ public class Bet {
     }
 
     /**
-     * Returns Odd object which bet is placed on.
+     * Returns odd which bet is placed on.
      *
      * @return odd as an Object of class Odd.
      */

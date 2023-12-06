@@ -16,7 +16,7 @@ import java.util.Objects;
  *
  * Contains information about the following: start date and time, home team, away team, home team goals, away team goals,
  *      state of the fixture (Not Started, Half Time, Full Time etc.), League in which the fixture is being played, odds that are associated with the fixture.
- * Class attributes: unique id, home team, away team, home team goals, away team goals, state, league and list of odds.
+ * Class attributes: id, date, home, away, homeGoals, awayGoals, state, league and odds.
  *
  * @author Janko
  * @version 1.0
@@ -153,7 +153,7 @@ public class Fixture {
     }
 
     /**
-     * Returns Team object that is the home side of fixture.
+     * Returns team that is the home side of fixture.
      *
      * @return home as an Object of class Team.
      */
@@ -174,7 +174,7 @@ public class Fixture {
     }
 
     /**
-     * Returns Team object that is the away side of fixture.
+     * Returns team that is the away side of fixture.
      *
      * @return away as an Object of class Team.
      */
@@ -255,7 +255,7 @@ public class Fixture {
     }
 
     /**
-     * Returns League object which fixture is played in.
+     * Returns league which fixture is played in.
      *
      * @return league as an Object of class League.
      */
@@ -276,7 +276,7 @@ public class Fixture {
     }
 
     /**
-     * Returns list of Odd objects that are associated with the fixture.
+     * Returns odds that are associated with the fixture.
      *
      * @return odds as a list of Odd objects associated with the fixture,
      *          if odds attribute is null, then an empty Array List is returned.

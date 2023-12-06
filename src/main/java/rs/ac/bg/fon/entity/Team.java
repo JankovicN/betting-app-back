@@ -16,7 +16,7 @@ import java.util.Objects;
  * Class representing a football Team.
  *
  * Contains information about the name of the team and fixtures where team is home side and fixtures where team is  away side.
- * Class attributes: unique id, name, list of fixtures and list of fixtures.
+ * Class attributes: id, name, home and away.
  *
  * @author Janko
  * @version 1.0
@@ -115,7 +115,7 @@ public class Team {
     }
 
     /**
-     * Returns the list of Fixture objects in which team plays as home side.
+     * Returns fixtures in which team plays as home side.
      *
      * @return fixtures as a list of Fixture objects,
      *         if fixtures attribute is null, then an empty Array List is returned.
@@ -138,7 +138,7 @@ public class Team {
     }
 
     /**
-     * Returns the list of Fixture objects in which team plays as away side.
+     * Returns fixtures in which team plays as away side.
      *
      * @return fixtures as a list of Fixture objects,
      *         if fixtures attribute is null, then an empty Array List is returned.

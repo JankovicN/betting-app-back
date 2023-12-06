@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  *
  * Contains information about the payment amount, type of payment and the user that is bound to payment
  * .
- * Class attributes: unique id, amount, payment type and user.
+ * Class attributes: id, amount, paymentType and user.
  *
  * @author Janko
  * @version 1.0
@@ -100,7 +100,7 @@ public class Payment {
     /**
      * Returns the type of payment.
      *
-     * @return paymentType as an String value.
+     * @return paymentType as a String value.
      */
     public String getPaymentType() {
         return paymentType;
@@ -119,7 +119,7 @@ public class Payment {
     }
 
     /**
-     * Returns User object that payment is bound to.
+     * Returns user that payment is bound to.
      *
      * @return user as an Object of class User.
      */

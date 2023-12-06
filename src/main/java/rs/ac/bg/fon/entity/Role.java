@@ -15,7 +15,7 @@ import static javax.persistence.GenerationType.AUTO;
  * Class representing user Role.
  *
  * Contains information about the name of the role.
- * Class attributes: unique id and name.
+ * Class attributes: id and name.
  *
  * @author Janko
  * @version 1.0
