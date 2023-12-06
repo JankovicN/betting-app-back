@@ -48,16 +48,16 @@ public class TicketController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/get/all")
-    public ResponseEntity<?> getUserTickets(Pageable pageable) {
-        return ApiResponseUtil.handleApiResponse(ticketService.getAllTickets(pageable));
+    public ResponseEntity<?> getTickets(@RequestParam(required = false) Optional<String> date,Pageable pageable) {
+        return ApiResponseUtil.handleApiResponse(ticketService.handleGetAllTickets(date, pageable));
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getUserTickets(@RequestParam String username, Pageable pageable) {
+    public ResponseEntity<?> getUserTickets(@RequestParam String username, @RequestParam(required = false) Optional<String> date, Pageable pageable) {
         if (username == null || username.isBlank()) {
             return ApiResponseUtil.errorApiResponse("User data is missing!\nContact support for more information!");
         }
-        return ApiResponseUtil.handleApiResponse(ticketService.getUserTickets(username, pageable));
+        return ApiResponseUtil.handleApiResponse(ticketService.handleGetUserTickets(username,date, pageable));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

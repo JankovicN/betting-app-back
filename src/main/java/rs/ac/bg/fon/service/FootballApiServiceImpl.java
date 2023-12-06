@@ -256,7 +256,8 @@ public class FootballApiServiceImpl implements FootballApiService {
 
         // Checking if JSON fields are present and if they are JSON Objects
         JsonElement teams = jsonElement.getAsJsonObject().get("teams");
-        if (!JsonValidation.validateJsonElementFieldIsObject(teams, "home") || !JsonValidation.validateJsonElementFieldIsObject(teams, "away")) {
+        if (!JsonValidation.validateJsonElementFieldIsObject(teams, "home")
+                || !JsonValidation.validateJsonElementFieldIsObject(teams, "away")) {
             return;
         }
 
@@ -298,7 +299,8 @@ public class FootballApiServiceImpl implements FootballApiService {
     @Transactional
     private void addOddFromApiResponse(JsonElement jsonElement) {
         // Checking if JSON field are present and of correct type
-        if (!JsonValidation.validateJsonElementFieldIsObject(jsonElement, "fixture") || !JsonValidation.validateJsonElementFieldIsNumber(jsonElement.getAsJsonObject().get("fixture"), "id")) {
+        if (!JsonValidation.validateJsonElementFieldIsObject(jsonElement, "fixture")
+                || !JsonValidation.validateJsonElementFieldIsNumber(jsonElement.getAsJsonObject().get("fixture"), "id")) {
             logger.warn("addOddFromApiResponse: Missing fixture or id field in JSON!\n" + jsonElement);
             return;
         }
@@ -318,14 +320,16 @@ public class FootballApiServiceImpl implements FootballApiService {
         for (JsonElement oddGroupEl : betsArray) {
 
             // Checking if JSON field are present and of correct type
-            if (!JsonValidation.validateJsonElementFieldIsNumber(oddGroupEl, "id") || !JsonValidation.validateJsonElementFieldIsArray(oddGroupEl, "values")) {
+            if (!JsonValidation.validateJsonElementFieldIsNumber(oddGroupEl, "id")
+                    || !JsonValidation.validateJsonElementFieldIsArray(oddGroupEl, "values")) {
                 continue;
             }
 
             // Getting Odd Group id from JSON
             Integer oddGroupId = oddGroupEl.getAsJsonObject().get("id").getAsInt();
             // If we don't have that Odd Group or if odds are already saved fo that fixture and Odd Group then return
-            if (!oddGroupService.existsWithId(oddGroupId) || oddService.existsWithFixtureIdAndOddGroupId(fixture.getId(), oddGroupId)) {
+            if (!oddGroupService.existsWithId(oddGroupId)
+                    || oddService.existsWithFixtureIdAndOddGroupId(fixture.getId(), oddGroupId)) {
                 continue;
             }
 
@@ -343,13 +347,17 @@ public class FootballApiServiceImpl implements FootballApiService {
             JsonArray oddsArr = oddGroupEl.getAsJsonObject().get("values").getAsJsonArray();
             for (JsonElement oddsEl : oddsArr) {
                 Odd odd = crateOddFromJsonElement(oddsEl);
-                String oddName = odd.getName();
                 if (odd == null) {
                     logger.warn("addOddFromApiResponse: Error while trying to crate Odd from Json \n" + oddsEl);
                     continue;
-                } else if ((oddName.contains("Over") || oddName.contains("Under")) && !isFormatNumberDotFive(oddName)) {
-                    logger.warn("addOddFromApiResponse: Removing odd that has wrong format, odd value = " + odd.getOdd() + " \n" + oddsEl);
-                    continue;
+                } else {
+                    String oddName = odd.getName();
+                    if ((oddName.contains("Over")
+                            || oddName.contains("Under"))
+                            && !isFormatNumberDotFive(oddName)) {
+                        logger.warn("addOddFromApiResponse: Removing odd that has wrong format, odd value = " + odd.getOdd() + " \n" + oddsEl);
+                        continue;
+                    }
                 }
                 odd.setFixture(fixture);
                 odd.setOddGroup(oddGroup);
@@ -357,7 +365,6 @@ public class FootballApiServiceImpl implements FootballApiService {
                 logger.info("addOddFromApiResponse: Adding odd to list " + odd.getName() + " for fixture " + fixture.getHome().getName() + " - " + fixture.getAway().getName());
             }
 
-            List<Odd> previousOdds = oddService.getOddsForFixtureAndOddGroup(fixture.getId(), oddGroupId);
             // Save all odds that we created
             // Log if error has occurred
             if (oddService.saveOddList(oddList) == null) {
@@ -372,13 +379,17 @@ public class FootballApiServiceImpl implements FootballApiService {
     @Transactional
     private Fixture createFixtureFromJsonElement(JsonElement jsonElement) {
         try {
-            if (!JsonValidation.validateJsonElementFieldIsObject(jsonElement, "fixture") || !JsonValidation.validateJsonElementFieldIsObject(jsonElement, "goals")) {
+            if (!JsonValidation.validateJsonElementFieldIsObject(jsonElement, "fixture")
+                    || !JsonValidation.validateJsonElementFieldIsObject(jsonElement, "goals")) {
                 return null;
             }
 
             JsonElement fixtureElement = jsonElement.getAsJsonObject().get("fixture");
 
-            if (!JsonValidation.validateJsonElementFieldIsNumber(fixtureElement, "id") || !JsonValidation.validateJsonElementFieldIsString(fixtureElement, "date") || !JsonValidation.validateJsonElementFieldIsObject(fixtureElement, "status") || !JsonValidation.validateJsonElementFieldIsString(fixtureElement.getAsJsonObject().get("status"), "short")) {
+            if (!JsonValidation.validateJsonElementFieldIsNumber(fixtureElement, "id")
+                    || !JsonValidation.validateJsonElementFieldIsString(fixtureElement, "date")
+                    || !JsonValidation.validateJsonElementFieldIsObject(fixtureElement, "status")
+                    || !JsonValidation.validateJsonElementFieldIsString(fixtureElement.getAsJsonObject().get("status"), "short")) {
                 return null;
             }
 
@@ -441,7 +452,8 @@ public class FootballApiServiceImpl implements FootballApiService {
         JsonArray bookmakersArr = jsonElement.getAsJsonObject().get("bookmakers").getAsJsonArray();
 
         for (JsonElement bookmaker : bookmakersArr) {
-            if (!JsonValidation.validateJsonElementFieldIsNumber(bookmaker, "id") || !JsonValidation.validateJsonElementFieldIsArray(bookmaker, "bets")) {
+            if (!JsonValidation.validateJsonElementFieldIsNumber(bookmaker, "id")
+                    || !JsonValidation.validateJsonElementFieldIsArray(bookmaker, "bets")) {
                 continue;
             }
 
@@ -466,7 +478,8 @@ public class FootballApiServiceImpl implements FootballApiService {
     }
 
     private OddGroup createOddGroupFromJsonElement(JsonElement jsonElement) {
-        if (!JsonValidation.validateJsonElementFieldIsNumber(jsonElement, "id") || !JsonValidation.validateJsonElementFieldIsString(jsonElement, "name")) {
+        if (!JsonValidation.validateJsonElementFieldIsNumber(jsonElement, "id")
+                || !JsonValidation.validateJsonElementFieldIsString(jsonElement, "name")) {
             return null;
         }
         int oddGroupID = jsonElement.getAsJsonObject().get("id").getAsInt();
@@ -484,13 +497,17 @@ public class FootballApiServiceImpl implements FootballApiService {
 
     private Team createTeamFromJsonElement(JsonElement jsonElement) {
         JsonObject responseObject = jsonElement.getAsJsonObject();
-        if (!responseObject.has("id") || !responseObject.has("name")) {
+        if (!responseObject.has("id")
+                || !responseObject.has("name")) {
             return null;
         }
 
         JsonElement idElement = responseObject.get("id");
         JsonElement nameElement = responseObject.get("name");
-        if (!idElement.isJsonPrimitive() || !idElement.getAsJsonPrimitive().isNumber() || !nameElement.isJsonPrimitive() || !nameElement.getAsJsonPrimitive().isString()) {
+        if (!idElement.isJsonPrimitive()
+                || !idElement.getAsJsonPrimitive().isNumber()
+                || !nameElement.isJsonPrimitive()
+                || !nameElement.getAsJsonPrimitive().isString()) {
             return null;
         }
         Team team = new Team();
@@ -500,7 +517,8 @@ public class FootballApiServiceImpl implements FootballApiService {
     }
 
     private Odd crateOddFromJsonElement(JsonElement jsonElement) {
-        if (!JsonValidation.validateJsonElementFieldIsString(jsonElement, "odd") || !JsonValidation.validateJsonElementFieldIsString(jsonElement, "value")) {
+        if (!JsonValidation.validateJsonElementFieldIsString(jsonElement, "odd")
+                || !JsonValidation.validateJsonElementFieldIsString(jsonElement, "value")) {
             return null;
         }
 

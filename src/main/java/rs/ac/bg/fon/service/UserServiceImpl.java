@@ -150,15 +150,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return user;
         } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
             logger.error("User must be older than 18!");
-            user.setBirthday(null);
+            user.setBirthday(LocalDate.of(1,1,1));
             return user;
         } else if (!Utility.isValidEmail(user.getEmail())) {
             logger.error("User email is invalid, email = " + user.getEmail() + "!");
-            user.setEmail(null);
+            user.setEmail("Invalid Email!");
             return user;
         } else if (userRepository.existsByUsername(user.getUsername())) {
             logger.error("There is already a user with that username!");
-            user.setUsername(null);
+            user.setUsername("-1");
             return user;
         } else if (!userRepository.existsByEmail(user.getEmail())) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -199,16 +199,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             User registeredUser = registerUser(user);
             if (registeredUser == null) {
                 response.addErrorMessage("There is already a user registered with that email!");
-            } else if (registeredUser.getUsername() == null) {
+            } else if (("-1").equals(registeredUser.getUsername())) {
                 response.addErrorMessage("There is already a user registered with that username!");
-            } else if (registeredUser.getBirthday() == null) {
+            } else if (LocalDate.of(1,1,1).isEqual(registeredUser.getBirthday())) {
                 response.addErrorMessage("User age must be greater than 18 to register!");
-            } else if (registeredUser.getEmail() == null) {
+            } else if (("Invalid Email!").equals(registeredUser.getEmail())) {
                 response.addErrorMessage("Invalid email format!");
             } else if (registeredUser.getId() == -1) {
                 response.addErrorMessage("Invalid data for user!");
             } else {
-                response.setData(registeredUser);
                 response.addInfoMessage("Successfully registered!\nWelcome " + user.getUsername() + "!");
             }
         } catch (Exception e) {
@@ -257,7 +256,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                             return UserMapper.userToUserDTO(user);
                         } catch (Exception e) {
                             logger.error("Error while mapping user to user DTO");
-                            throw null;
+                            return null;
                         }
                     }).filter(user -> user != null)
                     .map(userDTO -> {
@@ -267,6 +266,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             Page<UserDTO> userPages = new PageImpl<>(userDtosList, pageable, userDtosList.size());
             PageDTO<UserDTO> pageDTO = PageMapper.pageToPageDTO(userPages);
             response.setData(pageDTO);
+            response.addInfoMessage("Successfully found users!");
         } catch (Exception e) {
             log.error("Error fetching users: " + e);
             response.addErrorMessage("Unable to get users at this time, try again later!");
@@ -342,10 +342,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ApiResponse<?> updateUserApiResponse(UserDTO user) {
         ApiResponse<UserDTO> response = new ApiResponse<>();
         try {
-            User userToUpdate = UserMapper.userDtoToUser(user);
-            userToUpdate = updateUser(userToUpdate);
-            response.setData(UserMapper.userToUserDTO(userToUpdate));
-            response.addInfoMessage("Successfully updated user " + userToUpdate.getUsername() + "!");
+            if (!Utility.isValidEmail(user.getEmail())) {
+                logger.error("User email is invalid, email = " + user.getEmail() + "!");
+                response.addErrorMessage("Invalid Email address!");
+            }else{
+                User userToUpdate = UserMapper.userDtoToUser(user);
+                userToUpdate = updateUser(userToUpdate);
+                UserDTO userDTO = UserMapper.userToUserDTO(userToUpdate);
+                userDTO.setBalance(paymentService.getUserPayments(userDTO.getId()));
+                response.setData(userDTO);
+                response.addInfoMessage("Successfully updated user " + userToUpdate.getUsername() + "!");
+            }
         } catch (Exception e) {
             response.addErrorMessage("Unable to update user " + user.getUsername() + " at this time, try again later!");
         }

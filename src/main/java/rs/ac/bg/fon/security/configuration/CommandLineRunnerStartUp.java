@@ -49,12 +49,14 @@ public class CommandLineRunnerStartUp implements CommandLineRunner {
             logger.info("Successfully saved all Odd Groups");
         }
 
-        if (userRepository.existsByEmail(initialAdminConfig.getEmail()) || userRepository.existsByUsername(initialAdminConfig.getUsername())) return;
+        if (userRepository.existsByEmail(initialAdminConfig.getEmail())
+                || userRepository.existsByUsername(initialAdminConfig.getUsername())) return;
 
         userService.saveRole(new Role(null, "ROLE_CLIENT"));
         userService.saveRole(new Role(null, "ROLE_ADMIN"));
         userService.saveUser(new User(null, initialAdminConfig.getName(), initialAdminConfig.getSurname(),
-                initialAdminConfig.getEmail(), LocalDate.of(1999, 6, 23), initialAdminConfig.getUsername(), initialAdminConfig.getPassword(),
+                initialAdminConfig.getEmail(), LocalDate.of(1999, 6, 23),
+                initialAdminConfig.getUsername(), initialAdminConfig.getPassword(),
                 new ArrayList<>()));
 
         userService.addRoleToUser("janko", "ROLE_CLIENT");

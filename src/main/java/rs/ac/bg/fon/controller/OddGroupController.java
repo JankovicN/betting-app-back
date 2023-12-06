@@ -14,7 +14,7 @@ public class OddGroupController {
     private final OddGroupService oddGroupService;
 
     @GetMapping("/get")
-    public ResponseEntity<?> getOddGroups(@RequestParam Integer fixtureID) {
+    public ResponseEntity<?> getOddGroupsForFixture(@RequestParam Integer fixtureID) {
         if (fixtureID == null) {
             return ApiResponseUtil.errorApiResponse("Fixture data is missing!\nContact support for more information!");
         }

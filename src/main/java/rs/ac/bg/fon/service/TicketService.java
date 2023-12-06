@@ -5,6 +5,7 @@ import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
 import rs.ac.bg.fon.entity.Ticket;
 import rs.ac.bg.fon.utility.ApiResponse;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface TicketService {
@@ -13,7 +14,12 @@ public interface TicketService {
 
     ApiResponse<?> getUserTickets(String username, Pageable pageable);
 
+    ApiResponse<?> getUserTickets(String username, LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
+
     ApiResponse<?> getAllTickets(Pageable pageable);
+
+
+    ApiResponse<?> getAllTickets(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
 
     void processTickets();
 
@@ -26,4 +32,8 @@ public interface TicketService {
     Ticket cancelTicket(Integer ticketID);
 
     ApiResponse<?> cancelTicketApiResponse(Integer ticketID);
+
+    ApiResponse<?> handleGetUserTickets(String username, Optional<String> date, Pageable pageable);
+
+    ApiResponse<?> handleGetAllTickets(Optional<String> date, Pageable pageable);
 }

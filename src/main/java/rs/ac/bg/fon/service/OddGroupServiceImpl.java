@@ -28,7 +28,7 @@ public class OddGroupServiceImpl implements OddGroupService {
 
     @Override
     public ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixture) {
-        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixture), "fixtures");
+        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixture), "odds");
     }
 
     @Override

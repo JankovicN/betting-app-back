@@ -42,16 +42,11 @@ public class TicketMapper {
                     + ", totalWin = " + ticket.getTotalWin() + ", totalOdds = " + ticket.getOdd()
                     + ", state = " + ticket.getState() + ", dateOfPay = " + ticket.getDate() + "]");
         }
-        String state = ticket.getState();
-        switch (state) {
-            case Constants.TICKET_UNPROCESSED:
-            case Constants.TICKET_PROCESSED:
-                state = Constants.WAITING_FOR_RESULTS;
-                break;
-            case Constants.TICKET_PAYOUT:
-                state = Constants.TICKET_WIN;
-                break;
-        }
+        String state = switch (ticket.getState()) {
+            case Constants.TICKET_UNPROCESSED, Constants.TICKET_PROCESSED -> Constants.WAITING_FOR_RESULTS;
+            case Constants.TICKET_PAYOUT -> Constants.TICKET_WIN;
+            default -> ticket.getState();
+        };
 
         TicketBasicDTO ticketDTO = new TicketBasicDTO();
         ticketDTO.setId(ticket.getId());
