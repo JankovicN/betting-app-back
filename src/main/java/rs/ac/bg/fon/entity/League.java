@@ -3,12 +3,12 @@ package rs.ac.bg.fon.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class representing a Football League.
@@ -115,7 +115,7 @@ public class League {
      * Returns the list of Fixture objects that this League contains.
      *
      * @return fixtures as a list of Fixture objects associated with League,
-     *          if fixtures attribute is null then an empty Array List is returned.
+     *         if fixtures attribute is null then an empty Array List is returned.
      */
     public List<Fixture> getFixtures() {
         if (fixtures == null) {
@@ -132,9 +132,6 @@ public class League {
      *             if fixtures is null an empty Array List is assigned instead
      */
     public void setFixtures(List<Fixture> fixtures) {
-        if (fixtures == null)
-            this.fixtures = new ArrayList<>();
-        else
-        this.fixtures = fixtures;
+        this.fixtures = Objects.requireNonNullElseGet(fixtures, ArrayList::new);
     }
 }
