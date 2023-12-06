@@ -76,7 +76,7 @@ public class League {
     }
 
     /**
-     * Sets league ID to value that is provided.
+     * Sets league id to value that is provided.
      *
      * @param id new Integer value for league id.
      * @throws NullPointerException if provided id is null.
@@ -123,7 +123,6 @@ public class League {
         }
         return fixtures;
     }
-
 
     /**
      * Sets list of Fixture objects to value that is provided.
