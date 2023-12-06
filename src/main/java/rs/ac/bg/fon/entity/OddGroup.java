@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class representing Odd Groups, each group is associated with a list of odds.
@@ -116,10 +117,7 @@ public class OddGroup {
      *             if odds is null an empty Array List is assigned instead
      */
     public void setOdds(List<Odd> odds) {
-        if (odds == null)
-            this.odds = new ArrayList<>();
-        else
-            this.odds = odds;
+        this.odds = Objects.requireNonNullElseGet(odds, ArrayList::new);
     }
 
     /**
