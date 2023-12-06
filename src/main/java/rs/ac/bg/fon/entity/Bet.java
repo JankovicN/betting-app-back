@@ -11,7 +11,7 @@ import javax.persistence.*;
 /**
  * Class representing a single bet placed on  ticket.
  *
- * Contains information about the state of the Bet, the odd associated with the bet and the ticket it is placed on.
+ * Contains information about the state of the bet, the odd associated with the bet and the ticket it is placed on.
  * Class attributes: unique id, state, odd and ticket.
  *
  * @author Janko
@@ -31,13 +31,13 @@ public class Bet {
     private Integer id;
 
     /**
-     * State of Bet. Default value is '-', value can be one of states defined in Constants class.
+     * Current state of bet. Default value is '-', value can be one of states defined in Constants class.
      */
     @Column(name = "state")
     private String state = Constants.BET_NOT_FINISHED;
 
     /**
-     * Odd that Bet is placed on - contains information about Fixture that bet is placed on, value and name of Bet.
+     * Odd that bet is placed on - contains information about Fixture that bet is placed on, value and name of bet.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "odd_id", nullable = false)
@@ -45,7 +45,7 @@ public class Bet {
 
     /**
      *
-     * Ticket that contains Bet.
+     * Ticket that contains bet.
      *
      */
     @ManyToOne
@@ -59,7 +59,7 @@ public class Bet {
     }
 
     /**
-     * Returns unique ID of Bet.
+     * Returns unique id of bet.
      *
      * @return id as an Integer value.
      */
@@ -68,22 +68,22 @@ public class Bet {
     }
 
     /**
-     * Sets Bet ID to value that is provided.
+     * Sets bet id to value that is provided.
      *
-     * @param id new Integer value for Bet ID.
+     * @param id new Integer value for bet id.
      * @throws NullPointerException if provided ID is null.
      */
     public void setId(Integer id) {
         if (id == null)
-            throw new NullPointerException("Id can not be null!");
+            throw new NullPointerException("Bet ID can not be null!");
 
         this.id = id;
     }
 
     /**
-     * Returns the current State of the Bet.
+     * Returns the current state of the bet.
      *
-     * @return State as a String value.
+     * @return state as a String value.
      */
     public String getState() {
         return state;
@@ -92,18 +92,18 @@ public class Bet {
     /**
      * Sets state to value that is provided.
      *
-     * @param state new String value for Bet State.
-     * @throws NullPointerException if provided State is null.
+     * @param state new String value for bet state.
+     * @throws NullPointerException if provided state is null.
      */
     public void setState(String state) {
         if (state == null)
-            throw new NullPointerException("State can not be null!");
+            throw new NullPointerException("Bet state can not be null!");
 
         this.state = state;
     }
 
     /**
-     * Returns Odd object which Bet is placed on.
+     * Returns Odd object which bet is placed on.
      *
      * @return odd as an Object of class Odd.
      */
@@ -111,9 +111,8 @@ public class Bet {
         return odd;
     }
 
-
     /**
-     * Sets Odd to the object that is provided.
+     * Sets odd to the object that is provided.
      *
      * @param odd new object of class Odd.
      * @throws NullPointerException if provided odd is null.
@@ -125,7 +124,7 @@ public class Bet {
     }
 
     /**
-     * Returns the Ticket which contains this bet.
+     * Returns the ticket which contains this bet.
      *
      * @return ticket as an object of class Ticket.
      */
@@ -135,7 +134,7 @@ public class Bet {
 
 
     /**
-     * Sets Ticket to the object that is provided.
+     * Sets ticket to the object that is provided.
      *
      * @param ticket new object of class Ticket.
      * @throws NullPointerException if provided ticket is null.

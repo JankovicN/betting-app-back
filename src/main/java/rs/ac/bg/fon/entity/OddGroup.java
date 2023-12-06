@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Class representing Odd Groups, each group is associated with a list of odds.
+ * Class representing odd groups, each group is associated with a list of odds.
  *
  * Contains information about the name of the group and all odds that are in the group.
  * Class attributes: unique id, name, list of odds.
@@ -31,13 +31,13 @@ public class OddGroup {
     private Integer id;
 
     /**
-     * Name of the Odd Group.
+     * Name of the odd group.
      */
     @Column(name = "odd_group_name")
     private String name;
 
     /**
-     * List of Odd objects that are contained in this Odd Group
+     * List of Odd objects that are contained in this odd group
      */
     @JsonManagedReference
     @OneToMany(mappedBy = "oddGroup", fetch = FetchType.LAZY)
@@ -46,7 +46,7 @@ public class OddGroup {
 
 
     /**
-     * Returns a string representation of the Odd Group.
+     * Returns a string representation of the odd group.
      *
      * @return A string representation of the object, either the 'name' attribute
      *  or the result of super.toString() method
@@ -66,7 +66,7 @@ public class OddGroup {
     }
 
     /**
-     * Returns unique ID of Odd Group.
+     * Returns unique ID of odd group.
      *
      * @return id as an Integer value.
      */
@@ -75,21 +75,21 @@ public class OddGroup {
     }
 
     /**
-     * Sets Odd Group ID to value that is provided.
+     * Sets odd group id to value that is provided.
      *
-     * @param id new Integer value  for Odd Group ID.
+     * @param id new Integer value  for odd group id.
      * @throws NullPointerException if provided ID is null.
      */
     public void setId(Integer id) {
         if (id == null)
-            throw new NullPointerException("Id can not be null!");
+            throw new NullPointerException("Odd Group ID can not be null!");
 
         this.id = id;
 
     }
 
     /**
-     * Returns the name of Odd Group.
+     * Returns the name of odd group.
      *
      * @return name as a String value.
      */
@@ -100,7 +100,7 @@ public class OddGroup {
     /**
      * Sets name to value that is provided.
      *
-     * @param name new String value for Odd Group name.
+     * @param name new String value for odd group name.
      * @throws NullPointerException if provided name is null.
      */
     public void setName(String name) {
@@ -111,19 +111,19 @@ public class OddGroup {
     }
 
     /**
-     * Sets list of Odds to value that is provided.
+     * Sets odds to value that is provided.
      *
-     * @param odds new List of Odd objects for odds contained in Odd Group,
-     *             if odds is null an empty Array List is assigned instead
+     * @param odds new List of Odd objects for odds contained in odd group,
+     *             if odds is null, an empty Array List is assigned instead
      */
     public void setOdds(List<Odd> odds) {
         this.odds = Objects.requireNonNullElseGet(odds, ArrayList::new);
     }
 
     /**
-     * Returns the list of Odd objects that Odd Group contains.
+     * Returns list of Odd objects that odd group contains.
      *
-     * @return odds as a list of Odd objects associated with Odd Group,
+     * @return odds as a list of Odd objects associated with odd group,
      *          if odds attribute is null then an empty Array List is returned.
      */
     public List<Odd> getOdds() {

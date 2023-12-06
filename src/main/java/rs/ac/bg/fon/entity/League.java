@@ -33,13 +33,13 @@ public class League {
     private Integer id;
 
     /**
-     * Name of the League.
+     * Name of the league.
      */
     @Column(name = "league_name")
     private String name;
 
     /**
-     * List of Fixture objects that are contained in this League
+     * List of Fixture objects that are contained in this league
      */
     @JsonIgnore
     @OneToMany(mappedBy = "league")
@@ -53,7 +53,7 @@ public class League {
     }
 
     /**
-     * Returns a string representation of a League.
+     * Returns a string representation of a league.
      *
      * @return A string representation of the object, either the 'name' attribute
      *  or the result of super.toString() method
@@ -67,7 +67,7 @@ public class League {
     }
 
     /**
-     * Returns unique ID of League.
+     * Returns unique id of league.
      *
      * @return id as an Integer value.
      */
@@ -76,20 +76,20 @@ public class League {
     }
 
     /**
-     * Sets League ID to value that is provided.
+     * Sets league ID to value that is provided.
      *
-     * @param id new Integer value for League ID.
+     * @param id new Integer value for league ID.
      * @throws NullPointerException if provided ID is null.
      */
     public void setId(Integer id) {
         if (id == null)
-            throw new NullPointerException("Id can not be null!");
+            throw new NullPointerException("League ID can not be null!");
         this.id = id;
     }
 
 
     /**
-     * Returns the name of the League.
+     * Returns the name of the league.
      *
      * @return name as a String value.
      */
@@ -101,7 +101,7 @@ public class League {
     /**
      * Sets name to value that is provided.
      *
-     * @param name new String value for League name.
+     * @param name new String value for league name.
      * @throws NullPointerException if provided name is null.
      */
     public void setName(String name) {
@@ -112,10 +112,10 @@ public class League {
     }
 
     /**
-     * Returns the list of Fixture objects that this League contains.
+     * Returns the list of Fixture objects that this league contains.
      *
-     * @return fixtures as a list of Fixture objects associated with League,
-     *         if fixtures attribute is null then an empty Array List is returned.
+     * @return fixtures as a list of Fixture objects associated with league,
+     *         if fixtures attribute is null, then an empty Array List is returned.
      */
     public List<Fixture> getFixtures() {
         if (fixtures == null) {
@@ -126,10 +126,10 @@ public class League {
 
 
     /**
-     * Sets list of Fixture to value that is provided.
+     * Sets list of Fixture objects to value that is provided.
      *
-     * @param fixtures new List of Fixture objects for fixtures contained in League,
-     *             if fixtures is null an empty Array List is assigned instead
+     * @param fixtures new List of Fixture objects for fixtures contained in league,
+     *             if fixtures is null, an empty Array List is assigned instead
      */
     public void setFixtures(List<Fixture> fixtures) {
         this.fixtures = Objects.requireNonNullElseGet(fixtures, ArrayList::new);
