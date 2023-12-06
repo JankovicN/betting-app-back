@@ -124,7 +124,7 @@ public class Ticket {
      * Sets wager to the object that is provided.
      *
      * @param wager new object of class BigDecimal.
-     * @throws NullPointerException if provided odd is null.
+     * @throws NullPointerException if provided wager is null.
      */
     public void setWager(BigDecimal wager) {
         if (wager == null)
@@ -162,7 +162,7 @@ public class Ticket {
      * Sets totalWin to the object that is provided.
      *
      * @param totalWin new object of class BigDecimal.
-     * @throws NullPointerException if provided odd is null.
+     * @throws NullPointerException if provided totalWin is null.
      */
     public void setTotalWin(BigDecimal totalWin) {
         if (totalWin == null)
