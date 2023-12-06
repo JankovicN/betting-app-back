@@ -120,7 +120,7 @@ public class Fixture {
     /**
      * Sets fixture id to value that is provided.
      *
-     * @param id new Integer value  for fixture id.
+     * @param id new Integer value for fixture id.
      * @throws NullPointerException if provided id is null.
      */
     public void setId(Integer id) {
