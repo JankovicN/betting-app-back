@@ -8,6 +8,15 @@ import rs.ac.bg.fon.constants.Constants;
 
 import javax.persistence.*;
 
+/**
+ * Class representing a single bet placed on  ticket.
+ *
+ * Contains information about the state of the Bet, the odd associated with the bet and the ticket it is placed on.
+ * Class attributes: unique id, state, odd and ticket.
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @AllArgsConstructor
 @Entity
 @Table(name = "bet")
