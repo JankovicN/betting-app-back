@@ -48,7 +48,7 @@ public class BetMapper {
     public static BetInfoDTO betToBetInfoDTO(Bet bet, OddGroup oddGroup, Odd odd, Fixture fixture) throws Exception {
         if (bet.getId() == null || bet.getState() == null || bet.getState().isBlank()
                 || oddGroup.getName() == null || oddGroup.getName().isBlank()
-                || odd.getOdd() == null || odd.getName() == null || odd.getName().isBlank()
+                || odd.getOddValue() == null || odd.getName() == null || odd.getName().isBlank()
                 || fixture.getDate() == null || fixture.getHomeGoals() < 0 || fixture.getAwayGoals() < 0
                 || fixture.getHome() == null || fixture.getHome().getName() == null || fixture.getHome().getName().isBlank()
                 || fixture.getAway() == null || fixture.getAway().getName() == null || fixture.getAway().getName().isBlank()) {
@@ -57,7 +57,7 @@ public class BetMapper {
         BetInfoDTO betDTO = new BetInfoDTO();
         betDTO.setId(bet.getId());
         betDTO.setState(bet.getState());
-        betDTO.setOdd(odd.getOdd());
+        betDTO.setOdd(odd.getOddValue());
         betDTO.setName(odd.getName());
         betDTO.setOddGroupName(oddGroup.getName());
         betDTO.setFixtureDate(Utility.formatDateTime(fixture.getDate()));

@@ -355,7 +355,7 @@ public class FootballApiServiceImpl implements FootballApiService {
                     if ((oddName.contains("Over")
                             || oddName.contains("Under"))
                             && !isFormatNumberDotFive(oddName)) {
-                        logger.warn("addOddFromApiResponse: Removing odd that has wrong format, odd value = " + odd.getOdd() + " \n" + oddsEl);
+                        logger.warn("addOddFromApiResponse: Removing odd that has wrong format, odd value = " + odd.getOddValue() + " \n" + oddsEl);
                         continue;
                     }
                 }
@@ -527,7 +527,7 @@ public class FootballApiServiceImpl implements FootballApiService {
         String oddName = jsonElement.getAsJsonObject().get("value").getAsString();
 
         Odd odd = new Odd();
-        odd.setOdd(oddValue);
+        odd.setOddValue(oddValue);
         odd.setName(oddName);
         return odd;
     }

@@ -12,13 +12,13 @@ import java.util.List;
 public class OddMapper {
 
     public static OddDTO oddToOddDTO(Odd odd) throws Exception {
-        if (odd.getId() == null || odd.getId() < 0 || odd.getName() == null || odd.getName().isBlank() || odd.getOdd() == null || odd.getOdd().compareTo(BigDecimal.ONE) < 0) {
-            throw new Exception("Odd object has invalid fields [id = " + odd.getId() + ", name = " + odd.getName() + ", odd = " + odd.getOdd() + "]");
+        if (odd.getId() == null || odd.getId() < 0 || odd.getName() == null || odd.getName().isBlank() || odd.getOddValue() == null || odd.getOddValue().compareTo(BigDecimal.ONE) < 0) {
+            throw new Exception("Odd object has invalid fields [id = " + odd.getId() + ", name = " + odd.getName() + ", odd = " + odd.getOddValue() + "]");
         }
 
         OddDTO oddDTO = new OddDTO();
         oddDTO.setId(odd.getId());
-        oddDTO.setOdd(odd.getOdd());
+        oddDTO.setOdd(odd.getOddValue());
         oddDTO.setName(odd.getName());
         return oddDTO;
     }

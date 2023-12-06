@@ -148,8 +148,8 @@ public class FixtureServiceImpl implements FixtureService {
         if(existsByLeagueID){
             return false;
         }
-        for ( Fixture f : notStartedByLeague) {
-            if(f!= null && !f.getOdds().isEmpty()){
+        for ( Fixture fixture : notStartedByLeague) {
+            if(fixture!= null && !fixture.getOdds().isEmpty()){
                 existsByLeagueID = true;
             }
         }

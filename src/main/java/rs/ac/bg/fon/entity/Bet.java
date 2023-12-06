@@ -1,9 +1,6 @@
 package rs.ac.bg.fon.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import rs.ac.bg.fon.constants.Constants;
 
 import javax.persistence.*;

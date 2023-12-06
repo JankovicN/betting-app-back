@@ -48,7 +48,7 @@ public class OddGroup {
     /**
      * Returns a string representation of the odd group.
      *
-     * @return A string representation of the object, either the 'name' attribute
+     * @return A string representation of the object, either the 'name' attribute (e.g. Match Winner)
      *  or the result of super.toString() method
      */
     @Override

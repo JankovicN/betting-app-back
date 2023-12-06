@@ -21,6 +21,7 @@ import java.util.Objects;
  * @author Janko
  * @version 1.0
  */
+@Entity
 @AllArgsConstructor
 @Table(name = "fixture")
 public class Fixture {
@@ -89,7 +90,7 @@ public class Fixture {
     /**
      * Returns a string representation of the fixture.
      *
-     * @return A string representation of the object, either in format '[home team name] - [away team name]'
+     * @return A string representation of the object, either in format '[home team name] - [away team name]' (e.g. Arsenal - Brighton)
      *  or the result of super.toString() method
      */
     @Override
@@ -196,7 +197,7 @@ public class Fixture {
     /**
      * Returns the number of goals that home side has scored.
      *
-     * @return homeGoals as a int value.
+     * @return homeGoals as an int value.
      */
     public int getHomeGoals() {
         return homeGoals;

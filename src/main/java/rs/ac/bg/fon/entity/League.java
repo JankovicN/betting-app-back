@@ -55,7 +55,7 @@ public class League {
     /**
      * Returns a string representation of a league.
      *
-     * @return A string representation of the object, either the 'name' attribute
+     * @return A string representation of the object, either the 'name' attribute (e.g. Premier League)
      *  or the result of super.toString() method
      */
     @Override
@@ -78,8 +78,8 @@ public class League {
     /**
      * Sets league ID to value that is provided.
      *
-     * @param id new Integer value for league ID.
-     * @throws NullPointerException if provided ID is null.
+     * @param id new Integer value for league id.
+     * @throws NullPointerException if provided id is null.
      */
     public void setId(Integer id) {
         if (id == null)
@@ -106,7 +106,7 @@ public class League {
      */
     public void setName(String name) {
         if (name == null)
-            throw new NullPointerException("Name can not be null!");
+            throw new NullPointerException("League name can not be null!");
 
         this.name = name;
     }
