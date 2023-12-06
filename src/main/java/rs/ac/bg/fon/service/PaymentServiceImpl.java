@@ -75,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void addPayment(Integer userId, BigDecimal amount, String type) {
         try {
-            if (userId == null || amount == null) {
+            if (userId == null || amount == null || type == null) {
                 logger.error("Error while trying add Payment, invalid data provided!");
             } else if (!canUserPay(userId, amount)) {
                 logger.error("Insufficient funds!");

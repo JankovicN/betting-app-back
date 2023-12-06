@@ -2,7 +2,6 @@ package rs.ac.bg.fon.service;
 
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
 import rs.ac.bg.fon.entity.Fixture;
-import rs.ac.bg.fon.utility.ApiResponse;
 
 import java.util.List;
 

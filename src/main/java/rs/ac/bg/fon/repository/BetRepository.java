@@ -15,7 +15,7 @@ public interface BetRepository extends JpaRepository<Bet, Integer> {
     @Transactional
     @Modifying
     @Query(value = "UPDATE bet b \n" +
-            "JOIN odd o ON b.odds_id = o.odd_id \n" +
+            "JOIN odd o ON b.odd_id = o.odd_id \n" +
             "JOIN odd_group og ON og.odd_group_id = o.odd_group_id \n" +
             "JOIN fixture f ON o.fixture_id = f.fixture_id \n" +
             "SET b.state = \n" +

@@ -1,8 +1,8 @@
 package rs.ac.bg.fon.mappers;
 
 import org.springframework.stereotype.Component;
-import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
+import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.utility.Utility;

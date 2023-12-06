@@ -35,7 +35,7 @@ public class Odd {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "odd_group_id")
-    private OddGroup OddGroup;
+    private OddGroup oddGroup;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,

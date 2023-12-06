@@ -38,6 +38,7 @@ public class Constants {
     public static final String PAYMENT_DEPOSIT = "DEPOSIT";
     public static final String PAYMENT_WITHDRAW = "WITHDRAW";
     public static final String PAYMENT_PAYOUT = "PAYOUT";
+    public static final String PAYMENT_REFUND = "REFUND";
     public static final String PAYMENT_WAGER = "WAGER";
 
 }

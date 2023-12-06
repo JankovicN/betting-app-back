@@ -22,10 +22,13 @@ import rs.ac.bg.fon.mappers.PageMapper;
 import rs.ac.bg.fon.mappers.TicketMapper;
 import rs.ac.bg.fon.repository.TicketRepository;
 import rs.ac.bg.fon.utility.ApiResponse;
+import rs.ac.bg.fon.utility.Utility;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -94,6 +97,20 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    @Override
+    public ApiResponse<?> getUserTickets(String username, LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable) {
+        ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
+        try {
+            Page<Ticket> ticketPage = ticketRepository.findByUserUsernameAndDateOrderByDateDesc(username, startDateTime, endDateTime, pageable);
+            PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
+            response.setData(ticketDtoPage);
+        } catch (Exception e) {
+            response.addErrorMessage("Error getting Tickets for date " + startDateTime + ", try again later!");
+            logger.error("Error getting Tickets for username = " + username + "!", e);
+        }
+        return response;
+    }
+
     private PageDTO<TicketBasicDTO> createPageDtoForTickets(Page<Ticket> tickets, Pageable pageable) throws Exception {
         // Creating a List of TicketBasicDTO,
         // 1. Map the ticket to the DTO
@@ -131,6 +148,21 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public ApiResponse<?> getAllTickets(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable) {
+        ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
+        try {
+            Page<Ticket> ticketPage = ticketRepository.findAllByDateOrderByDateDesc(startDateTime,endDateTime, pageable);
+            PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
+            ticketDtoPage.setTotalPages(ticketPage.getTotalPages());
+            response.setData(ticketDtoPage);
+        } catch (Exception e) {
+            response.addErrorMessage("Error getting Tickets, try again later!");
+            logger.error("Error getting all Tickets!", e);
+        }
+        return response;
+    }
+
+    @Override
     public void processTickets() {
         try {
             LocalDateTime oldDate = LocalDateTime.now().minusMinutes(5);
@@ -147,9 +179,15 @@ public class TicketServiceImpl implements TicketService {
 
         ApiResponse<?> response = new ApiResponse<>();
         try {
-            if (ticketDTO.getUsername() == null || ticketDTO.getUsername().isBlank()) {
+            if (ticketDTO == null) {
+                logger.error("Ticket is null!");
+                response.addErrorMessage("Ticket is invalid!");
+            } else if (ticketDTO.getUsername() == null || ticketDTO.getUsername().isBlank()) {
                 logger.error("Username is missing! \n" + ticketDTO);
                 response.addErrorMessage("Username is missing!");
+            } else if (ticketDTO.getBets()==null || ticketDTO.getBets().isEmpty()){
+                logger.error("Ticket has no bets! \n" + ticketDTO);
+                response.addErrorMessage("Ticket must contain at least one bet!");
             } else {
                 User user = userService.getUser(ticketDTO.getUsername());
                 List<Bet> betList = BetMapper.betDTOListToBetList(ticketDTO.getBets());
@@ -292,7 +330,7 @@ public class TicketServiceImpl implements TicketService {
             LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
             if (canceledTicket.getDate().isBefore(cancelDateTime)) {
                 logger.error("Time for canceling ticket has passed!");
-                canceledTicket.setDate(null);
+                canceledTicket.setDate(LocalDateTime.of(1, 1, 1, 1, 1));
                 return canceledTicket;
             } else if (!canceledTicket.getState().equals(Constants.TICKET_UNPROCESSED)) {
                 logger.error("Ticket state is invalid, it should be \"" + Constants.TICKET_UNPROCESSED + "\", but it is \"" + canceledTicket.getState() + "\"!");
@@ -302,6 +340,11 @@ public class TicketServiceImpl implements TicketService {
             } else {
                 canceledTicket.setState(Constants.TICKET_CANCELED);
                 ticketRepository.save(canceledTicket);
+
+                User user = canceledTicket.getUser();
+                Integer userID = user.getId();
+                paymentService.addPayment(userID, canceledTicket.getWager(), Constants.PAYMENT_REFUND);
+
                 logger.info("Successfully canceled Ticket!");
                 return canceledTicket;
             }
@@ -316,17 +359,17 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public ApiResponse<?> cancelTicketApiResponse(Integer ticketID) {
-        ApiResponse<Ticket> response = new ApiResponse<>();
+        ApiResponse<?> response = new ApiResponse<>();
         try {
             Ticket canceledTicket = cancelTicket(ticketID);
             if (canceledTicket == null) {
                 response.addErrorMessage("Error canceling Ticket, try again later!");
                 logger.info("Error creating response for canceling Ticket!");
-            } else if (canceledTicket.getDate() == null) {
+            } else if (LocalDateTime.of(1, 1, 1, 1, 1).isEqual(canceledTicket.getDate())) {
                 response.addErrorMessage("Time for canceling ticket has passed, ticket can be canceled 5 minutes after being played!");
                 logger.info("Time for canceling ticket has passed!");
             } else if (canceledTicket.getState().equals(Constants.INVALID_DATA)) {
-                response.addErrorMessage("Cannot cancel Ticket, please try again!");
+                response.addErrorMessage("Cannot cancel Ticket!");
                 logger.info("Invalid Ticket state, unable to cancel ticket!");
             } else {
                 response.addInfoMessage("Successfully canceled Ticket!");
@@ -335,6 +378,36 @@ public class TicketServiceImpl implements TicketService {
         } catch (Exception e) {
             response.addErrorMessage("Error canceling Ticket, try again later!");
             logger.info("Error creating response for canceling Ticket!", e);
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> handleGetUserTickets(String username, Optional<String> date, Pageable pageable) {
+        ApiResponse<?> response;
+        if (date.isPresent()) {
+            String dateString = date.get();
+            LocalDate dateValue = Utility.parseDate(dateString);
+            LocalDateTime startDateTime = LocalDateTime.of(dateValue, LocalTime.of(0,0,0));
+            LocalDateTime endDateTime = LocalDateTime.of(dateValue, LocalTime.of(23,59,59));
+            response = getUserTickets(username, startDateTime,endDateTime, pageable);
+        } else {
+            response = getUserTickets(username, pageable);
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> handleGetAllTickets(Optional<String> date, Pageable pageable) {
+        ApiResponse<?> response;
+        if (date.isPresent()) {
+            String dateString = date.get();
+            LocalDate dateValue = Utility.parseDate(dateString);
+            LocalDateTime startDateTime = LocalDateTime.of(dateValue, LocalTime.of(0,0,0));
+            LocalDateTime endDateTime = LocalDateTime.of(dateValue, LocalTime.of(23,59,59));
+            response = getAllTickets(startDateTime,endDateTime, pageable);
+        } else {
+            response = getAllTickets(pageable);
         }
         return response;
     }

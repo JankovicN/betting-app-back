@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.entity.Ticket;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,6 +19,11 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     Page<Ticket> findAllByOrderByDateDesc(Pageable pageable);
+    @Query("SELECT t FROM Ticket t WHERE t.date >= :startDate AND t.date < :endDate ORDER BY t.date DESC")
+    Page<Ticket> findAllByDateOrderByDateDesc(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            Pageable pageable);
 
     @Transactional
     @Modifying
@@ -36,6 +42,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     void updateAllTickets();
 
     Page<Ticket> findByUserUsernameOrderByDateDesc(String username, Pageable pageable);
+
+    @Query("SELECT t FROM Ticket t WHERE t.user.username = :username AND t.date >= :startDate AND t.date < :endDate ORDER BY t.date DESC")
+    Page<Ticket> findByUserUsernameAndDateOrderByDateDesc(
+            @Param("username") String username,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            Pageable pageable);
 
     @Modifying
     @Query("UPDATE Ticket  SET state = '" + Constants.TICKET_PROCESSED + "' WHERE date < :date AND state = '" + Constants.TICKET_UNPROCESSED + "'")

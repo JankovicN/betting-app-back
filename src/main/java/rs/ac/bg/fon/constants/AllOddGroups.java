@@ -17,14 +17,14 @@ import java.util.List;
 @NoArgsConstructor
 public class AllOddGroups {
     private static final Logger logger = LoggerFactory.getLogger(AllOddGroups.class);
-    private static final String BET_GROUPS_FILE = "bet_groups.json";
+    private static final String ODD_GROUPS_FILE = "odd_groups.json";
     private List<OddGroup> allOddGroupsList;
 
     @PostConstruct
     public void init() {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            File oddGroupFile = new File(Constants.RESOURCE_FOLDER + BET_GROUPS_FILE);
+            File oddGroupFile = new File(Constants.RESOURCE_FOLDER + ODD_GROUPS_FILE);
             allOddGroupsList = mapper.readValue(oddGroupFile, new TypeReference<List<OddGroup>>() {
             });
             logger.info("Successfully read json file containing all Odd Groups");

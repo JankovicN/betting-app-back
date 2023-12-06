@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
+import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.entity.OddGroup;
 import rs.ac.bg.fon.mappers.OddGroupMapper;
 import rs.ac.bg.fon.repository.OddGroupRepository;
@@ -28,33 +28,34 @@ public class OddGroupServiceImpl implements OddGroupService {
 
     @Override
     public ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixture) {
-        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixture), "fixtures");
+        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixture), "odds");
     }
 
     @Override
-    public OddGroup getOddGroupWithId(Integer oddGroupID) {
+    public OddGroup getOddGroupWithId(Integer oddGroupId) {
         try {
-            Optional<OddGroup> oddGroup = oddGroupRepository.findById(oddGroupID);
+            Optional<OddGroup> oddGroup = oddGroupRepository.findById(oddGroupId);
             if (oddGroup.isPresent()) {
-                logger.info("Found Odd Group with ID = " + oddGroupID + "!");
+                logger.info("Found Odd Group with ID = " + oddGroupId + "!");
                 return oddGroup.get();
             }
-            logger.warn("No Odd Group found for ID = " + oddGroupID + "!");
+            logger.warn("No Odd Group found for ID = " + oddGroupId + "!");
             return null;
         } catch (Exception e) {
-            logger.error("Error while trying to find Odd Group with ID = " + oddGroupID + "!\n" + e.getMessage());
+            logger.error("Error while trying to find Odd Group with ID = " + oddGroupId + "!\n" + e.getMessage());
             return null;
         }
     }
 
+
     @Override
-    public void deleteOddGroup(Integer oddGroupID) throws Exception {
+    public void deleteOddGroup(Integer oddGroupId) throws Exception {
         try {
-            oddGroupRepository.deleteById(oddGroupID);
-            logger.info("Deleting Odd Group with ID = " + oddGroupID + "!");
+            oddGroupRepository.deleteById(oddGroupId);
+            logger.info("Deleting Odd Group with ID = " + oddGroupId + "!");
         } catch (Exception e) {
-            logger.error("Error while trying to delete Odd Group with ID = " + oddGroupID + "!\n" + e.getMessage());
-            throw new Exception("Error while trying to delete Odd Group with ID = " + oddGroupID + "!");
+            logger.error("Error while trying to delete Odd Group with ID = " + oddGroupId + "!\n" + e.getMessage());
+            throw new Exception("Error while trying to delete Odd Group with ID = " + oddGroupId + "!");
         }
     }
 

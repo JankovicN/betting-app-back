@@ -31,7 +31,7 @@ public class Bet {
      * Odd that Bet is placed on - contains information about Fixture that bet is placed on, value and name of Bet.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "odds_id", nullable = false)
+    @JoinColumn(name = "odd_id", nullable = false)
     private Odd odd;
 
     /**

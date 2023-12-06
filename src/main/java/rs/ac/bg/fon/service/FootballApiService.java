@@ -14,4 +14,5 @@ public interface FootballApiService {
     CompletableFuture<ApiResponse<?>> getFixturesAndOddsFromAPI();
 
 
+    ApiResponse<?> exists(Integer fixtureID, Integer oddGroupID);
 }

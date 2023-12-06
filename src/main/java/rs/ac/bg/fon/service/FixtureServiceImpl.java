@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
-import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.dtos.Fixture.FixtureDTO;
+import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.dtos.Team.TeamDTO;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Team;
@@ -143,7 +143,18 @@ public class FixtureServiceImpl implements FixtureService {
 
     @Override
     public boolean existFixtureByLeagueId(Integer leagueId) {
-        return !getNotStartedByLeague(leagueId).isEmpty();
+        List<Fixture> notStartedByLeague = getNotStartedByLeague(leagueId);
+        boolean existsByLeagueID = notStartedByLeague.isEmpty();
+        if(existsByLeagueID){
+            return false;
+        }
+        for ( Fixture f : notStartedByLeague) {
+            if(f!= null && !f.getOdds().isEmpty()){
+                existsByLeagueID = true;
+            }
+        }
+
+        return existsByLeagueID;
     }
 
 

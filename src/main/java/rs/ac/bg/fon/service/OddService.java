@@ -19,6 +19,6 @@ public interface OddService {
 
     List<OddDTO> createOddDTOList(Integer fixtureId, Integer oddGroupId);
 
-    boolean existsWithFixtureIdAndOddGroupId(Integer oddGroupId, Integer id);
+    boolean existsWithFixtureIdAndOddGroupId(Integer fixtureId, Integer oddGroupId);
 
 }

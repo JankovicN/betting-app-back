@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
-import rs.ac.bg.fon.entity.OddGroup;
 import rs.ac.bg.fon.entity.Odd;
+import rs.ac.bg.fon.entity.OddGroup;
 import rs.ac.bg.fon.mappers.OddMapper;
 import rs.ac.bg.fon.repository.OddRepository;
 

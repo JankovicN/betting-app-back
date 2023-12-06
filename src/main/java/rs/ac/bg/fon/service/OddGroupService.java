@@ -9,13 +9,14 @@ import java.util.List;
 
 public interface OddGroupService {
 
+
     ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixture);
 
     OddGroup saveOddGroup(OddGroup oddGroup);
 
     List<OddGroup> saveOddGroups(List<OddGroup> oddGroups);
 
-    OddGroup getOddGroupWithId(Integer oddGroupID);
+    OddGroup getOddGroupWithId(Integer oddGroupId);
 
     List<OddGroupDTO> getOddGroupsByFixture(Integer fixture);
 
@@ -23,7 +24,7 @@ public interface OddGroupService {
 
     boolean existsWithId(Integer oddGroupId);
 
-    void deleteOddGroup(Integer oddGroupID) throws Exception;
+    void deleteOddGroup(Integer id) throws Exception;
 
 
     List<OddGroupDTO> createOddGroupDTOList(Integer fixtureID, Integer oddGroupID);
