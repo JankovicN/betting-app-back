@@ -18,19 +18,53 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a service layer class responsible for implementing all Odd Group related methods.
+ * Available API method implementations: GET, DELETE
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 public class OddGroupServiceImpl implements OddGroupService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside Odd Group service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(OddGroupServiceImpl.class);
+
+    /**
+     * Instance of Odd Group repository class, responsible for interacting with odd_group table in database.
+     */
     private final OddGroupRepository oddGroupRepository;
+
+    /**
+     * Instance of Odd service class, responsible for executing any logic related to Odd entity.
+     */
     private final OddService oddService;
 
 
+    /**
+     * Returns response for API call, containing list of odd groups and their odds for fixture.
+     *
+     * @param fixtureID Integer value representing id of fixture that fetching is based on.
+     * @return instance of ApiResponse class, containing list of OddGroupDTO objects.
+     *
+     */
     @Override
-    public ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixture) {
-        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixture), "odds");
+    public ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixtureID) {
+        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixtureID), "odds");
     }
 
+    /**
+     * Return OddGroup object with id that is specified.
+     *
+     * @param oddGroupId Integer value representing id of Odd Group.
+     * @return instance of OddGroup class,
+     *         or null if error occurs of if there is no Odd Group with specified id.
+     *
+     */
     @Override
     public OddGroup getOddGroupWithId(Integer oddGroupId) {
         try {
@@ -47,7 +81,12 @@ public class OddGroupServiceImpl implements OddGroupService {
         }
     }
 
-
+    /**
+     * Deletes OddGroup row from database with id that is specified.
+     *
+     * @param oddGroupId Integer value representing id of Odd Group to be deleted.
+     * @throws Exception if there is and error while executing the delete query.
+     */
     @Override
     public void deleteOddGroup(Integer oddGroupId) throws Exception {
         try {
@@ -59,6 +98,15 @@ public class OddGroupServiceImpl implements OddGroupService {
         }
     }
 
+    /**
+     * Creates and transforms list of OddGroup objects to list of OddGroupDTO objects.
+     *
+     * @param fixtureID Integer value of fixture id for which odds are being fetched for.
+     * @param oddGroupID Integer value of odd group for which odds are being fetched for.
+     * @return list of OddGroupDTO objects that are associated with the given fixture and odd group id,
+     *         or empty list if an error occurs.
+     *
+     */
     @Override
     public List<OddGroupDTO> createOddGroupDTOList(Integer fixtureID, Integer oddGroupID) {
         try {
@@ -78,19 +126,35 @@ public class OddGroupServiceImpl implements OddGroupService {
         }
     }
 
+    /**
+     * Returns response for API call with messages indicating the success of  Odd Group deletion from database.
+     *
+     * @param oddGroupID Integer value representing id of Odd Group to be deleted.
+     * @return instance of ApiResponse class,
+     *         containing messages indicating the success of Odd Group deletion from the database.
+     *
+     */
     @Override
-    public ApiResponse<?> deleteOddGroupApiResponse(Integer id) {
+    public ApiResponse<?> deleteOddGroupApiResponse(Integer oddGroupID) {
         ApiResponse response = new ApiResponse();
         try {
-            deleteOddGroup(id);
-            response.addInfoMessage("Successfully deleted Odd Group with ID = " + id);
+            deleteOddGroup(oddGroupID);
+            response.addInfoMessage("Successfully deleted Odd Group with ID = " + oddGroupID);
         } catch (Exception e) {
-            logger.error("Error while trying to delete Odd Group with ID = " + id + "!\n" + e.getMessage());
-            response.addErrorMessage("Unable to delete Odd Group with ID = " + id + "!");
+            logger.error("Error while trying to delete Odd Group with ID = " + oddGroupID + "!\n" + e.getMessage());
+            response.addErrorMessage("Unable to delete Odd Group with ID = " + oddGroupID + "!");
         }
         return response;
     }
 
+    /**
+     * Return list of OddGroupDTO objects that are associated with provided fixture.
+     *
+     * @param fixtureID Integer value representing id of fixture that odds are fetched for.
+     * @return list of OddGroupDTO objects that are contained in fixture with specified id,
+     *         or empty list if an error occurs.
+     *
+     */
     @Override
     public List<OddGroupDTO> getOddGroupsByFixture(Integer fixtureID) {
         try {
@@ -127,6 +191,14 @@ public class OddGroupServiceImpl implements OddGroupService {
         }
     }
 
+    /**
+     * Adds new odd group to database. Returns instance of saved odd group from database.
+     *
+     * @param oddGroup instance of OddGroup class that is being saved.
+     * @return instance of OddGroup class that is saved in database,
+     *         or null if error occurs.
+     *
+     */
     @Transactional
     @Override
     public OddGroup saveOddGroup(OddGroup oddGroup) {
@@ -140,6 +212,14 @@ public class OddGroupServiceImpl implements OddGroupService {
         }
     }
 
+    /**
+     * Adds list of odd groups to database. Returns list of saved odd group from database.
+     *
+     * @param oddGroups list of OddGroup objects are being saved.
+     * @return list of OddGroup objects that are saved in database,
+     *         or empty list if error occurs.
+     *
+     */
     @Transactional
     @Override
     public List<OddGroup> saveOddGroups(List<OddGroup> oddGroups) {
@@ -153,11 +233,26 @@ public class OddGroupServiceImpl implements OddGroupService {
         }
     }
 
+    /**
+     * Checks if odd_group table has any rows, in other word if there are any odd groups saved so far.
+     *
+     * @return boolean value, return true if odd_group table is not empty,
+     *         otherwise return false.
+     *
+     */
     @Override
     public boolean exists() {
         return oddGroupRepository.count() > 0;
     }
 
+    /**
+     * Checks if there is an odd group with specified id
+     *
+     * @param oddGroupId Integer value representing id of odd group that search is based on.
+     * @return boolean value, return true if there is an odd group with that id,
+     *         otherwise return false.
+     *
+     */
     @Override
     public boolean existsWithId(Integer oddGroupId) {
         try {

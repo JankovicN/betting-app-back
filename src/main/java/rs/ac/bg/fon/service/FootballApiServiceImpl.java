@@ -26,18 +26,61 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Represents a service layer class responsible for implementing all logic for interacting with FootballAPI.
+ * Available API method implementations: POST
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class FootballApiServiceImpl implements FootballApiService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside FootballApi service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(FootballApiServiceImpl.class);
+
+    /**
+     * Instance of League service class, responsible for executing any logic related to League entity.
+     */
     private final LeagueService leagueService;
+
+    /**
+     * Instance of Fixture service class, responsible for executing any logic related to Fixture entity.
+     */
     private final FixtureService fixtureService;
+
+    /**
+     * Instance of Odd Group service class, responsible for executing any logic related to OddGroup entity.
+     */
     private final OddGroupService oddGroupService;
+
+    /**
+     * Instance of Team service class, responsible for executing any logic related to Team entity.
+     */
     private final TeamService teamService;
+
+    /**
+     * Instance of Odd service class, responsible for executing any logic related to Odd entity.
+     */
     private final OddService oddService;
+
+    /**
+     * Instance of Gson class, responsible for handling JSON document.
+     */
     private final Gson gsonBuilder = new GsonBuilder().setPrettyPrinting().create();
 
+    /**
+     * Returns array of LocalDateTime objects for range of dates specified.
+     *
+     * @param start instance of LocalDateTime class that represents the start date of the range.
+     * @param end instance of LocalDateTime class that represents the end date of the range.
+     * @return Returns array of LocalDateTime objects, from start date time to end date time.
+     *
+     */
     private LocalDateTime[] getDateRange(LocalDateTime start, LocalDateTime end) {
         long numDays = ChronoUnit.DAYS.between(start, end);
         LocalDateTime[] dates = new LocalDateTime[(int) numDays];
@@ -47,6 +90,14 @@ public class FootballApiServiceImpl implements FootballApiService {
         return dates;
     }
 
+    /**s
+     * Checks if the odd name provided has 2 strings, separated by whitespace and the second part of string ends with '.5'.
+     *
+     * @param oddName String value representing the name of odd.
+     * @return boolean value, return true if String is in right format,
+     *         otherwise return false.
+     *
+     */
     private boolean isFormatNumberDotFive(String oddName) {
         String[] parts = oddName.split(" ");
         if (parts.length == 2) {
@@ -56,6 +107,15 @@ public class FootballApiServiceImpl implements FootballApiService {
         return false;
     }
 
+    /**
+     * Asynchronously retrieves Odd Groups from an external Football API and processes the response.
+     * Exceptions during the process are caught, and error messages are added to the ApiResponse.
+     * The final ApiResponse is then completed and returned in the CompletableFuture.
+     *
+     * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
+     *         containing an ApiResponse with details about the process outcome.
+     *
+     */
     @Transactional
     @Override
     @Async
@@ -107,6 +167,16 @@ public class FootballApiServiceImpl implements FootballApiService {
         return CompletableFuture.completedFuture(apiResponse);
     }
 
+
+    /**
+     * Asynchronously retrieves Odds from an external Football API and processes the response.
+     * Exceptions during the process are caught, and error messages are added to the ApiResponse.
+     * The final ApiResponse is then completed and returned in the CompletableFuture.
+     *
+     * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
+     *         containing an ApiResponse with details about the process outcome.
+     *
+     */
     @Override
     public CompletableFuture<ApiResponse<?>> getOddsFromAPI() {
         ApiResponse<?> apiResponse = new ApiResponse<>();
@@ -161,6 +231,15 @@ public class FootballApiServiceImpl implements FootballApiService {
         return CompletableFuture.completedFuture(apiResponse);
     }
 
+    /**
+     * Asynchronously retrieves Fixtures from an external Football API and processes the response.
+     * Exceptions during the process are caught, and error messages are added to the ApiResponse.
+     * The final ApiResponse is then completed and returned in the CompletableFuture.
+     *
+     * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
+     *         containing an ApiResponse with details about the process outcome.
+     *
+     */
     @Override
     public CompletableFuture<ApiResponse<?>> getFixturesFromAPI() {
         ApiResponse<?> apiResponse = new ApiResponse<>();
@@ -216,6 +295,16 @@ public class FootballApiServiceImpl implements FootballApiService {
         return CompletableFuture.completedFuture(apiResponse);
     }
 
+    /**
+     * Asynchronously retrieves fixtures and odds data from external Football APIs, combining the results into a single ApiResponse.
+     * It uses thenCompose to chain the completion of the fixturesResult with the retrieval of odds data,
+     * so that oddsResult is initiated only after fixturesResult is completed.
+     * InfoMessages and ErrorMessages from both results are merged into one, creating a unified ApiResponse object.
+     *
+     * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
+     *         containing an ApiResponse with merged details from both fixtures and odds responses.
+     *
+     */
     @Override
     public CompletableFuture<ApiResponse<?>> getFixturesAndOddsFromAPI() {
         CompletableFuture<ApiResponse<?>> fixturesResult = getFixturesFromAPI();
@@ -239,6 +328,15 @@ public class FootballApiServiceImpl implements FootballApiService {
         return combinedResult;
     }
 
+    /**
+     * Checks if there are any odds that are associated with fixture and odd group provided.
+     *
+     * @param fixtureID Integer value representing id of fixture.
+     * @param oddGroupID Integer value representing id of odd group.
+     * @return boolean value, return true if there are any odds for fixture and odd group,
+     *         otherwise return false.
+     *
+     */
     @Override
     public ApiResponse<?> exists(Integer fixtureID, Integer oddGroupID) {
         ApiResponse<Boolean> response = new ApiResponse<>();
@@ -246,6 +344,15 @@ public class FootballApiServiceImpl implements FootballApiService {
         return response;
     }
 
+    /**
+     * Creates fixture from JSON element and saves it to database.
+     * If errors occur they are logged.
+     *
+     * @param jsonElement instance of JsonElement class, that contains data  related to fixture.
+     * @param league instance of League class, that fixture is in.
+     * @param apiResponse instance of ApiResponse class, that contains error message if error occurs.
+     *
+     */
     @Transactional
     private void addFixtureFromApiResponse(JsonElement jsonElement, League league, ApiResponse<?> apiResponse) {
 
@@ -296,6 +403,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         }
     }
 
+    /**
+     * Creates list of odds from JSON element and saves them to database.
+     * If errors occur they are logged.
+     *
+     * @param jsonElement instance of JsonElement class, that contains data  related to odds.
+     *
+     */
     @Transactional
     private void addOddFromApiResponse(JsonElement jsonElement) {
         // Checking if JSON field are present and of correct type
@@ -367,7 +481,7 @@ public class FootballApiServiceImpl implements FootballApiService {
 
             // Save all odds that we created
             // Log if error has occurred
-            if (oddService.saveOddList(oddList) == null) {
+            if (oddService.saveOddList(oddList).isEmpty()) {
                 logger.warn("addOddFromApiResponse: Error while trying to save Odd List!");
             } else {
                 logger.info("addOddFromApiResponse: Saving odd list for Odd Group " + oddGroup.getName());
@@ -376,6 +490,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         }
     }
 
+    /**
+     * Creates fixture from JSON element.
+     * If errors occur they are logged.
+     *
+     * @param jsonElement instance of JsonElement class, that contains data related to the fixture.
+     * @return instance of Fixture class created from JSON element.
+     */
     @Transactional
     private Fixture createFixtureFromJsonElement(JsonElement jsonElement) {
         try {
@@ -419,32 +540,71 @@ public class FootballApiServiceImpl implements FootballApiService {
 
     }
 
+    /**
+     * Executes API call for fetching odds, for the provided date and league.
+     *
+     * @param leagueId int value representing id of league.
+     * @param date String value representing date in format yyyy-MM-dd.
+     * @return String value representing body of API response, containing data related to odds.
+     */
     private String oddsApiCall(int leagueId, String date) throws IOException, InterruptedException {
         logger.info("FootballAPI Odds call for getting odds for league");
         String uriString = "https://api-football-v1.p.rapidapi.com/v3/odds?league=" + leagueId + "&season=" + Constants.SEASON + "&date=" + date;
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(uriString)).header("X-RapidAPI-Key", SecretKeys.getApi_key()).header("X-RapidAPI-Host", "api-football-v1.p.rapidapi.com").method("GET", HttpRequest.BodyPublishers.noBody()).build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(uriString))
+                .header("X-RapidAPI-Key", SecretKeys.getApi_key())
+                .header("X-RapidAPI-Host", "api-football-v1.p.rapidapi.com")
+                .method("GET", HttpRequest.BodyPublishers.noBody()).build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         logger.info("Successful FootballAPI Odds call for getting odds for league");
         return response.body();
     }
 
+    /**
+     * Executes API call for fetching fixtures, for the provided date range and league.
+     *
+     * @param leagueId int value representing id of league.
+     * @param dateFrom String value representing date, initial date in the range, in format yyyy-MM-dd.
+     * @param dateTo String value representing date, final date in the range, in format yyyy-MM-dd.
+     * @return String value representing body of API response, containing data related to fixtures.
+     */
     private String fixturesApiCall(int leagueId, String dateFrom, String dateTo) throws IOException, InterruptedException {
         logger.info("FootballAPI Fixtures call for getting fixtures");
         String uriString = "https://api-football-v1.p.rapidapi.com/v3/fixtures?league=" + leagueId + "&season=" + Constants.SEASON + "&from=" + dateFrom + "&to=" + dateTo + "&timezone=Europe%2FBelgrade";
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(uriString)).header("X-RapidAPI-Key", SecretKeys.getApi_key()).header("X-RapidAPI-Host", "api-football-v1.p.rapidapi.com").method("GET", HttpRequest.BodyPublishers.noBody()).build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(uriString))
+                .header("X-RapidAPI-Key", SecretKeys.getApi_key())
+                .header("X-RapidAPI-Host", "api-football-v1.p.rapidapi.com")
+                .method("GET", HttpRequest.BodyPublishers.noBody()).build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         logger.info("Successful Fixtures call for getting fixtures");
         return response.body();
     }
 
+    /**
+     * Executes API call for fetching all odd groups.
+     *
+     * @return String value representing body of API response, containing data related to odd groups.
+     */
     private String oddGroupsApiResponse() throws IOException, InterruptedException {
         logger.info("Creating Football API call for getting Odd Groups.");
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://api-football-v1.p.rapidapi.com/v3/odds/bets")).header("X-RapidAPI-Key", SecretKeys.getApi_key()).header("X-RapidAPI-Host", "api-football-v1.p.rapidapi.com").method("GET", HttpRequest.BodyPublishers.noBody()).build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api-football-v1.p.rapidapi.com/v3/odds/bets"))
+                .header("X-RapidAPI-Key", SecretKeys.getApi_key())
+                .header("X-RapidAPI-Host", "api-football-v1.p.rapidapi.com")
+                .method("GET", HttpRequest.BodyPublishers.noBody()).build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         logger.info("Successful Football API call for getting Odd Groups");
         return response.body();
     }
 
+    /**
+     * Creates JsonArray from JsonElement, containing odds created by Bet365.
+     *
+     * @param jsonElement instance of JsonElement class, that contains data related to odds by bookmaker.
+     * @return instance of JsonArray class, related to odds created by Bet365,
+     *         or null if there are no odds made by Bet365.
+     */
     private JsonArray getBetsArrayFromBookmakerJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementFieldIsArray(jsonElement, "bookmakers")) {
             return null;
@@ -468,6 +628,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         return null;
     }
 
+    /**
+     * Creates JsonArray from String value representing JSON body from API response.
+     *
+     * @param responseBody String value representing JSON body from API response.
+     * @return instance of JsonArray class, that represents response field in API response,
+     *         or null if there is no response field in API response.
+     */
     private JsonArray getResponseArrayFromJson(String responseBody) {
         JsonElement responseEl = gsonBuilder.fromJson(responseBody, JsonElement.class);
         if (!JsonValidation.validateJsonElementFieldIsArray(responseEl, "response")) {
@@ -477,6 +644,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         return responseEl.getAsJsonObject().getAsJsonArray("response");
     }
 
+    /**
+     * Creates odd group from JSON element.
+     *
+     * @param jsonElement instance of JsonElement class, that contains data related to odd group.
+     * @return instance of OddGroup class created from JSON element
+     *         or null if there json element fields are invalid.
+     */
     private OddGroup createOddGroupFromJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementFieldIsNumber(jsonElement, "id")
                 || !JsonValidation.validateJsonElementFieldIsString(jsonElement, "name")) {
@@ -487,6 +661,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         return new OddGroup(oddGroupID, oddGroupName, new ArrayList<>());
     }
 
+    /**
+     * Extracts number of goals from Json Element.
+     *
+     * @param jsonElement instance of JsonElement class, that contains data related to number of goals.
+     * @return int value representing number of goals extracted from JSON element
+     *         or 0 if json element is invalid.
+     */
     private int getTeamGoalsFromJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementIsNumber(jsonElement)) {
             logger.warn("Goal value is invalid [" + jsonElement + "]!");
@@ -495,6 +676,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         return jsonElement.getAsInt();
     }
 
+    /**
+     * Creates team from JSON element.
+     *
+     * @param jsonElement instance of JsonElement class, that contains data related to team.
+     * @return instance of Team class created from JSON element
+     *         or null if there json element fields are invalid.
+     */
     private Team createTeamFromJsonElement(JsonElement jsonElement) {
         JsonObject responseObject = jsonElement.getAsJsonObject();
         if (!responseObject.has("id")
@@ -516,6 +704,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         return team;
     }
 
+    /**
+     * Creates odd from JSON element.
+     *
+     * @param jsonElement instance of JsonElement class, that contains data related to odd.
+     * @return instance of Odd class created from JSON element
+     *         or null if there json element fields are invalid.
+     */
     private Odd crateOddFromJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementFieldIsString(jsonElement, "odd")
                 || !JsonValidation.validateJsonElementFieldIsString(jsonElement, "value")) {
@@ -532,14 +727,34 @@ public class FootballApiServiceImpl implements FootballApiService {
         return odd;
     }
 
+    /**
+     * Returns String that represents date, that is offset by number of days provided, in format 'yyyy-MM-dd'.
+     *
+     * @param days long value representing the number of days that current date is offset by.
+     * @return String value that represents date current offset by number of days.
+     */
     private String currentDateAddOffsetInFormat(long days) {
         return Utility.formatDate(LocalDateTime.now().plusDays(days));
     }
 
+    /**
+     * Returns LocalDateTime date, that is offset by number of days provided.
+     *
+     * @param days long value representing the number of days that current date is offset by.
+     * @return instance of LocalDateTime, that represents current date offset by number of days.
+     */
     private LocalDateTime currentDateAddOffset(long days) {
         return LocalDateTime.now().plusDays(days);
     }
 
+    /**
+     * Updates infoMessages in ApiResponse object,
+     * if they all contain the String value provided, then replace them with a new message.
+     *
+     * @param apiResponse instance of ApiResponse class that is to be updated.
+     * @param containsString String value to be checked for in infoMessages.
+     * @param newMessage String value that replaces infoMessages.
+     */
     private void updateInfoMessages(ApiResponse<?> apiResponse, String containsString, String newMessage) {
         List<String> infoMessages = apiResponse.getInfoMessages();
         boolean noFixturesAdded = infoMessages.stream().allMatch(s -> s.contains(containsString));

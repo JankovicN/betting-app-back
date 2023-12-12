@@ -33,17 +33,51 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Represents a service layer class responsible for implementing all Ticket related methods.
+ * Available API method implementations: GET, POST, PATCH, DELETE
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class TicketServiceImpl implements TicketService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside Ticket service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
+
+    /**
+     * Instance of Ticket repository class, responsible for interacting with ticket table in database.
+     */
     private final TicketRepository ticketRepository;
+
+    /**
+     * Instance of Payment service class, responsible for executing any logic related to Payment entity.
+     */
     private final PaymentService paymentService;
+
+    /**
+     * Instance of User service class, responsible for executing any logic related to User entity.
+     */
     private final UserService userService;
+
+    /**
+     * Instance of Bet service class, responsible for executing any logic related to Bet entity.
+     */
     private final BetService betService;
 
-
+    /**
+     * Adds new ticket to database. Returns instance of saved ticket from database.
+     *
+     * @param ticket instance of Ticket class that is being saved.
+     * @return instance of Ticket class that is saved in database,
+     *         or null if ticket has invalid fields or if error occurs.
+     *
+     */
     private Ticket save(Ticket ticket) {
         try {
             if (ticket == null
@@ -68,6 +102,12 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    /**
+     * Updates the state of all bets and tickets for fixtures that have finished.
+     * Returns response for API call.
+     *
+     * @return instance of ApiResponse class, containing messages regarding the success of the operation
+     */
     @Override
     public ApiResponse<?> updateAllTickets() {
         ApiResponse<List<Ticket>> response = new ApiResponse<>();
@@ -83,6 +123,14 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Returns response for API call, containing tickets user has played.
+     *
+     * @param username String value representing username of user for which we are fetching tickets.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
+     *         or error message if operation fails.
+     */
     @Override
     public ApiResponse<?> getUserTickets(String username, Pageable pageable) {
         ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
@@ -97,6 +145,17 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Returns response for API call, containing tickets user has played for given date range.
+     *
+     * @param username String value representing username of user for which we are fetching tickets.
+     * @param startDateTime instance of LocalDateTime class that represents the start date of the range.
+     * @param endDateTime instance of LocalDateTime class that represents the end date of the range.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
+     *         or error message if operation fails.
+     *
+     */
     @Override
     public ApiResponse<?> getUserTickets(String username, LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable) {
         ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
@@ -111,6 +170,15 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Transforms list of tickets to DTO and adds them to PageDTO.
+     * Returns PageDTO containing list of TicketBasicDTO objects
+     *
+     * @param tickets list of tickets that are to be transformed to DTO.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of PageDTO class, containing TicketBasicDTO objects.
+     *
+     */
     private PageDTO<TicketBasicDTO> createPageDtoForTickets(Page<Ticket> tickets, Pageable pageable) throws Exception {
         // Creating a List of TicketBasicDTO,
         // 1. Map the ticket to the DTO
@@ -132,6 +200,14 @@ public class TicketServiceImpl implements TicketService {
         return PageMapper.pageToPageDTO(basicTicketPage);
     }
 
+    /**
+     * Fetches all tickets that have been played and places them in a page, then it transforms them to DTO.
+     * Returns PageDTO containing list of TicketBasicDTO objects
+     *
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
+     *         or error message if operation fails.
+     */
     @Override
     public ApiResponse<?> getAllTickets(Pageable pageable) {
         ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
@@ -147,6 +223,16 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Fetches all tickets that have been played in a certain date range and places them in a page, then it transforms them to DTO.
+     * Returns PageDTO containing list of TicketBasicDTO objects
+     *
+     * @param startDateTime instance of LocalDateTime class that represents the start date of the range.
+     * @param endDateTime instance of LocalDateTime class that represents the end date of the range.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
+     *         or error message if operation fails.
+     */
     @Override
     public ApiResponse<?> getAllTickets(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable) {
         ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
@@ -162,6 +248,11 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Updates all tickets that have been played in the last 5 minutes.
+     * State changes from UNPROCESSED to PROCESSED.
+     *
+     */
     @Override
     public void processTickets() {
         try {
@@ -173,6 +264,13 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    /**
+     * Transforms ticketDTO to ticket, saves the ticket and returns success message.
+     * If ticketDTo has invalid fields or an error occurs an error message is returned.
+     *
+     * @param ticketDTO instance of TicketDTO class that represents ticket that we get from request body.
+     * @return instance of ApiResponse class, containing messages regarding the success of the operation.
+     */
     @Transactional
     @Override
     public ApiResponse<?> addNewTicketApiResponse(TicketDTO ticketDTO) {
@@ -219,6 +317,11 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Updates ticket state for tickets that have won and adds payment for those tickets.
+     * State changes from WIN to PAYOUT.
+     *
+     */
     @Override
     public void payoutUsers() {
         List<Ticket> listOfTickets = ticketRepository.findByState(Constants.TICKET_WIN);
@@ -231,6 +334,14 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    /**
+     * Fetches all tickets that have are cancelable (their state is UNPROCESSED) for given page.
+     * Returns Page containing list of tickets.
+     *
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance Page class that has an array of tickets in it,
+     *         or empty page if there are no tickets to be canceled for given page.
+     */
     private Page<Ticket> getCancelableTickets(Pageable pageable) {
         try {
             LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
@@ -243,6 +354,15 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    /**
+     * Fetches all tickets that have are cancelable (their state is UNPROCESSED) and played by user for given page.
+     * Returns Page containing list of tickets.
+     *
+     * @param username String value representing username of user for which we are fetching tickets.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance Page class that has an array of tickets in it,
+     *         or empty page if there are no tickets to be canceled for given page.
+     */
     private Page<Ticket> getCancelableTickets(String username, Pageable pageable) {
         try {
             LocalDateTime cancelDateTime = LocalDateTime.now().minusMinutes(5);
@@ -255,6 +375,15 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    /**
+     * Fetches all tickets that have are cancelable (their state is UNPROCESSED) for given page.
+     * Transforms page and tickets to DTO.
+     * Returns PageDTO containing list of TicketCancelDTO objects.
+     *
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, containing PageDTO that has an array of TicketCancelDTO in it,
+     *         or error message if operation fails.
+     */
     private ApiResponse<?> getCancelableTicketsApiResponse(Pageable pageable) {
         ApiResponse<PageDTO<TicketCancelDTO>> response = new ApiResponse<>();
         try {
@@ -272,6 +401,16 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Fetches all tickets that have are cancelable (their state is UNPROCESSED) and played by user for given page.
+     * Transforms page and tickets to DTO.
+     * Returns PageDTO containing list of TicketCancelDTO objects.
+     *
+     * @param username String value representing username of user for which we are fetching tickets.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, containing PageDTO that has an array of TicketCancelDTO in it,
+     *         or error message if operation fails.
+     */
     private ApiResponse<?> getCancelableTicketsApiResponse(String username, Pageable pageable) {
         ApiResponse<PageDTO<TicketCancelDTO>> response = new ApiResponse<>();
         try {
@@ -288,6 +427,15 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Transforms Page object containing tickets to DTO.
+     * Return PageDTO object containing TicketCancelDTO objects.
+     *
+     * @param tickets instance of Page object containing tickets.
+     * @param pageable instance of Pageable class, containing information about current page.
+     * @return instance of PageDTO containing TicketCancelDTO objects.
+     *
+     */
     private PageDTO<TicketCancelDTO> createPageDtoForCancelTickets(Page<Ticket> tickets, Pageable pageable) throws Exception {
         // Creating a List of TicketCancelDTOs,
         // 1. Map the ticket to the DTO
@@ -309,6 +457,14 @@ public class TicketServiceImpl implements TicketService {
         return PageMapper.pageToPageDTO(cancelTicketPage);
     }
 
+    /**
+     * Fetches cancelable tickets for user, if username is provided.
+     *
+     * @param username instance of Optional<String>, representing username of user for which we are fetching tickets.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, containing PageDTO that has an array of TicketCancelDTO in it,
+     *         or error message if operation fails.
+     */
     @Override
     public ApiResponse<?> handleCancelTicketsAPI(Optional<String> username, Pageable pageable) {
         ApiResponse<?> response;
@@ -321,6 +477,14 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Deletes ticket from database based on its id, returns the deleted ticket.
+     *
+     * @param ticketID Integer value representing id of Ticket to be deleted.
+     * @return instance of Ticket object that is deleted from database,
+     *         or null if error occurs.
+     *
+     */
     @Override
     public Ticket cancelTicket(Integer ticketID) {
         try {
@@ -357,6 +521,13 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    /**
+     * Returns response for API call with messages indicating the success of the Ticket deletion from the database.
+     *
+     * @param ticketID Integer value representing id of Ticket to be deleted.
+     * @return instance of ApiResponse class, containing messages regarding the success of the operation.
+     *
+     */
     @Override
     public ApiResponse<?> cancelTicketApiResponse(Integer ticketID) {
         ApiResponse<?> response = new ApiResponse<>();
@@ -381,7 +552,15 @@ public class TicketServiceImpl implements TicketService {
         }
         return response;
     }
-
+    /**
+     * Returns response for API call containing tickets user has played within the specified date range, if provided.
+     *
+     * @param username String value representing username of user for which we are fetching tickets.
+     * @param date instance of Optional<String>, representing the date for which we are fetching tickets.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, data for tickets played by user.
+     *
+     */
     @Override
     public ApiResponse<?> handleGetUserTickets(String username, Optional<String> date, Pageable pageable) {
         ApiResponse<?> response;
@@ -397,6 +576,14 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Returns an API response containing all tickets played within the specified date range, if provided.
+     *
+     * @param date instance of Optional<String>, representing the date for which we are fetching tickets.
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
+     *         or error message if operation fails.
+     */
     @Override
     public ApiResponse<?> handleGetAllTickets(Optional<String> date, Pageable pageable) {
         ApiResponse<?> response;
@@ -412,6 +599,12 @@ public class TicketServiceImpl implements TicketService {
         return response;
     }
 
+    /**
+     * Updates the ticket state to PAYOUT and processes the payment for winning tickets.
+     *
+     * @param ticket instance of Ticket class that is being updated.
+     *
+     */
     @Transactional
     private void payoutUser(Ticket ticket) {
         try {
@@ -427,6 +620,12 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
+    /**
+     * Sets the state and date of new ticket.
+     *
+     * @param ticket instance of Ticket class that is being created.
+     *
+     */
     private void setNewTicketFields(Ticket ticket) {
         if (ticket == null) {
             logger.error("Error setting new ticket values for Ticket = " + ticket + "!");
