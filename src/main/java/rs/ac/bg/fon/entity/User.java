@@ -90,6 +90,7 @@ public class User {
      * Class constructor, sets attributes to their default values and state to "NS".
      */
     public User() {
+        roles = new ArrayList<>();
     }
 
     /**
@@ -150,7 +151,7 @@ public class User {
      * @throws NullPointerException if provided surname is null.
      */
     public void setSurname(String surname) {
-        if (name == null)
+        if (surname == null)
             throw new NullPointerException("Surname of user can not be null!");
         this.surname = surname;
     }
@@ -171,7 +172,7 @@ public class User {
      * @throws NullPointerException if provided email is null.
      */
     public void setEmail(String email) {
-        if (name == null)
+        if (email == null)
             throw new NullPointerException("Email can not be null!");
         this.email = email;
     }
@@ -245,6 +246,9 @@ public class User {
      * @return roles as a Collection of Role Objects.
      */
     public Collection<Role> getRoles() {
+        if(roles==null){
+            roles= new ArrayList<>();
+        }
         return roles;
     }
     /**

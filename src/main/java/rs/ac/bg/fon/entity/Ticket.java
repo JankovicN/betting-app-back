@@ -252,7 +252,7 @@ public class Ticket {
      */
     public void setUser(User user) {
         if (user == null)
-            throw new NullPointerException("User for ticket can not be null!");
+            throw new NullPointerException("Ticket user can not be null!");
         this.user = user;
     }
 }

@@ -204,13 +204,18 @@ public class Fixture {
     }
 
     /**
-     * Sets homeGoals to value that is provided.
+     * Sets homeGoals to value that is provided
+     * or to 0 if value is invalid.
      *
      * @param homeGoals new int value for home goals.
      *
      */
     public void setHomeGoals(int homeGoals) {
-        this.homeGoals = homeGoals;
+        if(homeGoals<0){
+            this.homeGoals = 0;
+        }else{
+            this.homeGoals = homeGoals;
+        }
     }
 
     /**
@@ -223,13 +228,18 @@ public class Fixture {
     }
 
     /**
-     * Sets awayGoals to value that is provided.
+     * Sets awayGoals to value that is provided
+     * or to 0 if value is invalid.
      *
      * @param awayGoals new int value for away goals.
      *
      */
     public void setAwayGoals(int awayGoals) {
-        this.awayGoals = awayGoals;
+        if(awayGoals<0){
+            this.awayGoals = 0;
+        }else{
+            this.awayGoals = awayGoals;
+        }
     }
 
     /**

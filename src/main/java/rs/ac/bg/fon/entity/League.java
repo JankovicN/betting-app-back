@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.management.InvalidAttributeValueException;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

@@ -189,7 +189,7 @@ public class Odd {
      */
     public void setOddGroup(OddGroup oddGroup) {
         if (oddGroup == null)
-            throw new NullPointerException("OddGroup can not be null!");
+            throw new NullPointerException("Odd Group can not be null!");
         this.oddGroup = oddGroup;
     }
 

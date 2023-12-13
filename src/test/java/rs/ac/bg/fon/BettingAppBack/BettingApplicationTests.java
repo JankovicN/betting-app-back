@@ -1,13 +1,12 @@
-package com.betting.app.bettingapp;
+package rs.ac.bg.fon.BettingAppBack;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BettingAppApplicationTests {
+public class BettingApplicationTests {
 
     @Test
     void contextLoads() {
     }
-
 }
