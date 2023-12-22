@@ -77,9 +77,8 @@ public class FootballApiServiceImpl implements FootballApiService {
      * Returns array of LocalDateTime objects for range of dates specified.
      *
      * @param start instance of LocalDateTime class that represents the start date of the range.
-     * @param end instance of LocalDateTime class that represents the end date of the range.
+     * @param end   instance of LocalDateTime class that represents the end date of the range.
      * @return Returns array of LocalDateTime objects, from start date time to end date time.
-     *
      */
     private LocalDateTime[] getDateRange(LocalDateTime start, LocalDateTime end) {
         long numDays = ChronoUnit.DAYS.between(start, end);
@@ -90,13 +89,13 @@ public class FootballApiServiceImpl implements FootballApiService {
         return dates;
     }
 
-    /**s
+    /**
+     * s
      * Checks if the odd name provided has 2 strings, separated by whitespace and the second part of string ends with '.5'.
      *
      * @param oddName String value representing the name of odd.
      * @return boolean value, return true if String is in right format,
-     *         otherwise return false.
-     *
+     * otherwise return false.
      */
     private boolean isFormatNumberDotFive(String oddName) {
         String[] parts = oddName.split(" ");
@@ -113,8 +112,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      * The final ApiResponse is then completed and returned in the CompletableFuture.
      *
      * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
-     *         containing an ApiResponse with details about the process outcome.
-     *
+     * containing an ApiResponse with details about the process outcome.
      */
     @Transactional
     @Override
@@ -174,8 +172,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      * The final ApiResponse is then completed and returned in the CompletableFuture.
      *
      * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
-     *         containing an ApiResponse with details about the process outcome.
-     *
+     * containing an ApiResponse with details about the process outcome.
      */
     @Override
     public CompletableFuture<ApiResponse<?>> getOddsFromAPI() {
@@ -237,8 +234,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      * The final ApiResponse is then completed and returned in the CompletableFuture.
      *
      * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
-     *         containing an ApiResponse with details about the process outcome.
-     *
+     * containing an ApiResponse with details about the process outcome.
      */
     @Override
     public CompletableFuture<ApiResponse<?>> getFixturesFromAPI() {
@@ -302,8 +298,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      * InfoMessages and ErrorMessages from both results are merged into one, creating a unified ApiResponse object.
      *
      * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
-     *         containing an ApiResponse with merged details from both fixtures and odds responses.
-     *
+     * containing an ApiResponse with merged details from both fixtures and odds responses.
      */
     @Override
     public CompletableFuture<ApiResponse<?>> getFixturesAndOddsFromAPI() {
@@ -328,30 +323,14 @@ public class FootballApiServiceImpl implements FootballApiService {
         return combinedResult;
     }
 
-    /**
-     * Checks if there are any odds that are associated with fixture and odd group provided.
-     *
-     * @param fixtureID Integer value representing id of fixture.
-     * @param oddGroupID Integer value representing id of odd group.
-     * @return boolean value, return true if there are any odds for fixture and odd group,
-     *         otherwise return false.
-     *
-     */
-    @Override
-    public ApiResponse<?> exists(Integer fixtureID, Integer oddGroupID) {
-        ApiResponse<Boolean> response = new ApiResponse<>();
-        response.setData(oddService.existsWithFixtureIdAndOddGroupId(fixtureID, oddGroupID));
-        return response;
-    }
 
     /**
      * Creates fixture from JSON element and saves it to database.
      * If errors occur they are logged.
      *
      * @param jsonElement instance of JsonElement class, that contains data  related to fixture.
-     * @param league instance of League class, that fixture is in.
+     * @param league      instance of League class, that fixture is in.
      * @param apiResponse instance of ApiResponse class, that contains error message if error occurs.
-     *
      */
     @Transactional
     private void addFixtureFromApiResponse(JsonElement jsonElement, League league, ApiResponse<?> apiResponse) {
@@ -392,10 +371,6 @@ public class FootballApiServiceImpl implements FootballApiService {
         fixture.setHome(home);
         fixture.setAway(away);
         fixture.setLeague(league);
-//
-//        home.getHome().add(fixture);
-//        away.getAway().add(fixture);
-//        league.getFixtures().add(fixture);
 
         if (fixtureService.save(fixture) == null) {
             logger.info("Error while trying to save Fixture " + fixture + "!");
@@ -408,7 +383,6 @@ public class FootballApiServiceImpl implements FootballApiService {
      * If errors occur they are logged.
      *
      * @param jsonElement instance of JsonElement class, that contains data  related to odds.
-     *
      */
     @Transactional
     private void addOddFromApiResponse(JsonElement jsonElement) {
@@ -544,7 +518,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      * Executes API call for fetching odds, for the provided date and league.
      *
      * @param leagueId int value representing id of league.
-     * @param date String value representing date in format yyyy-MM-dd.
+     * @param date     String value representing date in format yyyy-MM-dd.
      * @return String value representing body of API response, containing data related to odds.
      */
     private String oddsApiCall(int leagueId, String date) throws IOException, InterruptedException {
@@ -565,7 +539,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      *
      * @param leagueId int value representing id of league.
      * @param dateFrom String value representing date, initial date in the range, in format yyyy-MM-dd.
-     * @param dateTo String value representing date, final date in the range, in format yyyy-MM-dd.
+     * @param dateTo   String value representing date, final date in the range, in format yyyy-MM-dd.
      * @return String value representing body of API response, containing data related to fixtures.
      */
     private String fixturesApiCall(int leagueId, String dateFrom, String dateTo) throws IOException, InterruptedException {
@@ -603,7 +577,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      *
      * @param jsonElement instance of JsonElement class, that contains data related to odds by bookmaker.
      * @return instance of JsonArray class, related to odds created by Bet365,
-     *         or null if there are no odds made by Bet365.
+     * or null if there are no odds made by Bet365.
      */
     private JsonArray getBetsArrayFromBookmakerJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementFieldIsArray(jsonElement, "bookmakers")) {
@@ -633,7 +607,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      *
      * @param responseBody String value representing JSON body from API response.
      * @return instance of JsonArray class, that represents response field in API response,
-     *         or null if there is no response field in API response.
+     * or null if there is no response field in API response.
      */
     private JsonArray getResponseArrayFromJson(String responseBody) {
         JsonElement responseEl = gsonBuilder.fromJson(responseBody, JsonElement.class);
@@ -649,7 +623,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      *
      * @param jsonElement instance of JsonElement class, that contains data related to odd group.
      * @return instance of OddGroup class created from JSON element
-     *         or null if there json element fields are invalid.
+     * or null if there json element fields are invalid.
      */
     private OddGroup createOddGroupFromJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementFieldIsNumber(jsonElement, "id")
@@ -666,7 +640,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      *
      * @param jsonElement instance of JsonElement class, that contains data related to number of goals.
      * @return int value representing number of goals extracted from JSON element
-     *         or 0 if json element is invalid.
+     * or 0 if json element is invalid.
      */
     private int getTeamGoalsFromJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementIsNumber(jsonElement)) {
@@ -681,7 +655,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      *
      * @param jsonElement instance of JsonElement class, that contains data related to team.
      * @return instance of Team class created from JSON element
-     *         or null if there json element fields are invalid.
+     * or null if there json element fields are invalid.
      */
     private Team createTeamFromJsonElement(JsonElement jsonElement) {
         JsonObject responseObject = jsonElement.getAsJsonObject();
@@ -709,7 +683,7 @@ public class FootballApiServiceImpl implements FootballApiService {
      *
      * @param jsonElement instance of JsonElement class, that contains data related to odd.
      * @return instance of Odd class created from JSON element
-     *         or null if there json element fields are invalid.
+     * or null if there json element fields are invalid.
      */
     private Odd crateOddFromJsonElement(JsonElement jsonElement) {
         if (!JsonValidation.validateJsonElementFieldIsString(jsonElement, "odd")
@@ -751,9 +725,9 @@ public class FootballApiServiceImpl implements FootballApiService {
      * Updates infoMessages in ApiResponse object,
      * if they all contain the String value provided, then replace them with a new message.
      *
-     * @param apiResponse instance of ApiResponse class that is to be updated.
+     * @param apiResponse    instance of ApiResponse class that is to be updated.
      * @param containsString String value to be checked for in infoMessages.
-     * @param newMessage String value that replaces infoMessages.
+     * @param newMessage     String value that replaces infoMessages.
      */
     private void updateInfoMessages(ApiResponse<?> apiResponse, String containsString, String newMessage) {
         List<String> infoMessages = apiResponse.getInfoMessages();

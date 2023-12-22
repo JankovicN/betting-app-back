@@ -44,26 +44,12 @@ public class OddGroupServiceImpl implements OddGroupService {
      */
     private final OddService oddService;
 
-
-    /**
-     * Returns response for API call, containing list of odd groups and their odds for fixture.
-     *
-     * @param fixtureID Integer value representing id of fixture that fetching is based on.
-     * @return instance of ApiResponse class, containing list of OddGroupDTO objects.
-     *
-     */
-    @Override
-    public ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixtureID) {
-        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixtureID), "odds");
-    }
-
     /**
      * Return OddGroup object with id that is specified.
      *
      * @param oddGroupId Integer value representing id of Odd Group.
      * @return instance of OddGroup class,
-     *         or null if error occurs of if there is no Odd Group with specified id.
-     *
+     * or null if error occurs of if there is no Odd Group with specified id.
      */
     @Override
     public OddGroup getOddGroupWithId(Integer oddGroupId) {
@@ -101,11 +87,10 @@ public class OddGroupServiceImpl implements OddGroupService {
     /**
      * Creates and transforms list of OddGroup objects to list of OddGroupDTO objects.
      *
-     * @param fixtureID Integer value of fixture id for which odds are being fetched for.
+     * @param fixtureID  Integer value of fixture id for which odds are being fetched for.
      * @param oddGroupID Integer value of odd group for which odds are being fetched for.
      * @return list of OddGroupDTO objects that are associated with the given fixture and odd group id,
-     *         or empty list if an error occurs.
-     *
+     * or empty list if an error occurs.
      */
     @Override
     public List<OddGroupDTO> createOddGroupDTOList(Integer fixtureID, Integer oddGroupID) {
@@ -127,33 +112,11 @@ public class OddGroupServiceImpl implements OddGroupService {
     }
 
     /**
-     * Returns response for API call with messages indicating the success of  Odd Group deletion from database.
-     *
-     * @param oddGroupID Integer value representing id of Odd Group to be deleted.
-     * @return instance of ApiResponse class,
-     *         containing messages indicating the success of Odd Group deletion from the database.
-     *
-     */
-    @Override
-    public ApiResponse<?> deleteOddGroupApiResponse(Integer oddGroupID) {
-        ApiResponse response = new ApiResponse();
-        try {
-            deleteOddGroup(oddGroupID);
-            response.addInfoMessage("Successfully deleted Odd Group with ID = " + oddGroupID);
-        } catch (Exception e) {
-            logger.error("Error while trying to delete Odd Group with ID = " + oddGroupID + "!\n" + e.getMessage());
-            response.addErrorMessage("Unable to delete Odd Group with ID = " + oddGroupID + "!");
-        }
-        return response;
-    }
-
-    /**
      * Return list of OddGroupDTO objects that are associated with provided fixture.
      *
      * @param fixtureID Integer value representing id of fixture that odds are fetched for.
      * @return list of OddGroupDTO objects that are contained in fixture with specified id,
-     *         or empty list if an error occurs.
-     *
+     * or empty list if an error occurs.
      */
     @Override
     public List<OddGroupDTO> getOddGroupsByFixture(Integer fixtureID) {
@@ -196,8 +159,7 @@ public class OddGroupServiceImpl implements OddGroupService {
      *
      * @param oddGroup instance of OddGroup class that is being saved.
      * @return instance of OddGroup class that is saved in database,
-     *         or null if error occurs.
-     *
+     * or null if error occurs.
      */
     @Transactional
     @Override
@@ -217,8 +179,7 @@ public class OddGroupServiceImpl implements OddGroupService {
      *
      * @param oddGroups list of OddGroup objects are being saved.
      * @return list of OddGroup objects that are saved in database,
-     *         or empty list if error occurs.
-     *
+     * or empty list if error occurs.
      */
     @Transactional
     @Override
@@ -237,8 +198,7 @@ public class OddGroupServiceImpl implements OddGroupService {
      * Checks if odd_group table has any rows, in other word if there are any odd groups saved so far.
      *
      * @return boolean value, return true if odd_group table is not empty,
-     *         otherwise return false.
-     *
+     * otherwise return false.
      */
     @Override
     public boolean exists() {
@@ -250,8 +210,7 @@ public class OddGroupServiceImpl implements OddGroupService {
      *
      * @param oddGroupId Integer value representing id of odd group that search is based on.
      * @return boolean value, return true if there is an odd group with that id,
-     *         otherwise return false.
-     *
+     * otherwise return false.
      */
     @Override
     public boolean existsWithId(Integer oddGroupId) {
@@ -263,6 +222,37 @@ public class OddGroupServiceImpl implements OddGroupService {
             logger.error("Error while checking if Odd Group with ID = " + oddGroupId + ", exists!\n" + e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Returns response for API call with messages indicating the success of  Odd Group deletion from database.
+     *
+     * @param oddGroupID Integer value representing id of Odd Group to be deleted.
+     * @return instance of ApiResponse class,
+     * containing messages indicating the success of Odd Group deletion from the database.
+     */
+    @Override
+    public ApiResponse<?> deleteOddGroupApiResponse(Integer oddGroupID) {
+        ApiResponse response = new ApiResponse();
+        try {
+            deleteOddGroup(oddGroupID);
+            response.addInfoMessage("Successfully deleted Odd Group with ID = " + oddGroupID);
+        } catch (Exception e) {
+            logger.error("Error while trying to delete Odd Group with ID = " + oddGroupID + "!\n" + e.getMessage());
+            response.addErrorMessage("Unable to delete Odd Group with ID = " + oddGroupID + "!");
+        }
+        return response;
+    }
+
+    /**
+     * Returns response for API call, containing list of odd groups and their odds for fixture.
+     *
+     * @param fixtureID Integer value representing id of fixture that fetching is based on.
+     * @return instance of ApiResponse class, containing list of OddGroupDTO objects.
+     */
+    @Override
+    public ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixtureID) {
+        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixtureID), "odds");
     }
 
 }

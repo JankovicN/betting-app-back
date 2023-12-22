@@ -8,6 +8,9 @@ public class PageMapper {
         if (page == null) {
             throw new Exception("Page is null!");
         }
+        if ( page.getSize()==0) {
+            throw new Exception("Page has no content!");
+        }
 
         PageDTO<T> pageDTO = new PageDTO();
         pageDTO.setContent(page.getContent());

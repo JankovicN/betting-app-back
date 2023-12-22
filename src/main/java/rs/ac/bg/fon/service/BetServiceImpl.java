@@ -42,7 +42,7 @@ public class BetServiceImpl implements BetService {
      *
      * @param bet instance of Bet class that is being saved.
      * @return instance of Bet class that is saved in database,
-     *         or null if error occurs.
+     * or null if error occurs.
      */
     @Override
     public Bet save(Bet bet) {
@@ -59,7 +59,7 @@ public class BetServiceImpl implements BetService {
     /**
      * Updates the state of all bets for fixtures that have finished.
      *
-     * @throws Exception if there is and error while executing the update query.
+     * @throws Exception if there is an error while executing the update query.
      */
     @Override
     public void updateAllBets() throws Exception {
@@ -76,10 +76,9 @@ public class BetServiceImpl implements BetService {
      * Adds list of Bet objects to database.
      *
      * @param betList list of Bet objects that is being saved.
-     * @param ticket instance of Ticket class that bet is associated with.
+     * @param ticket  instance of Ticket class that bet is associated with.
      * @throws Exception if Bet object inside list has invalid odds
      *                   or if an error occurs when saving Bet object
-     *
      */
     @Transactional
     @Override
@@ -109,10 +108,11 @@ public class BetServiceImpl implements BetService {
      *
      * @param ticketId Integer value representing id of Ticket that bets are contained in.
      * @return list of BetInfoDTO objects that are contained in specific ticket
-     *         or empty list if an error occurs.
+     * or empty list if an error occurs.
+     * @throws Exception if there is an error while fetching bets for ticket.
      */
     @Transactional
-    private List<BetInfoDTO> getBetsForTicket(Integer ticketId) {
+    private List<BetInfoDTO> getBetsForTicket(Integer ticketId) throws Exception {
         try {
             List<Bet> betList = betRepository.findAllByTicketId(ticketId);
             logger.info("Successfully got bets for ticket id = " + ticketId + "!\n" + betList);
@@ -137,7 +137,7 @@ public class BetServiceImpl implements BetService {
             return betInfoDTOS;
         } catch (Exception e) {
             logger.error("Error getting bets for ticket id = " + ticketId + "!\n" + e);
-            return new ArrayList<>();
+            throw new Exception("Error getting bets for ticket id = " + ticketId + "!\n" + e);
         }
     }
 
@@ -146,17 +146,21 @@ public class BetServiceImpl implements BetService {
      *
      * @param ticketId Integer value representing id of Ticket that bets are contained in.
      * @return instance of ApiResponse class,
-     *         containing list of bets associated with Ticket,
-     *         or error message if operation fails.
-     *
+     * containing list of bets associated with Ticket,
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> getBetsForTicketApiResponse(Integer ticketId) {
         ApiResponse<List<BetInfoDTO>> response = new ApiResponse<>();
         try {
             List<BetInfoDTO> betList = getBetsForTicket(ticketId);
-            response.setData(betList);
-            logger.info("Successfully got bets for ticket id = " + ticketId + "!\n" + betList);
+            if (betList.isEmpty()) {
+                response.addErrorMessage("Error getting bets for ticket id = " + ticketId + "!");
+                logger.error("Error getting bets for ticket id = " + ticketId + "!\n");
+            } else {
+                logger.info("Successfully got bets for ticket id = " + ticketId + "!\n" + betList);
+                response.setData(betList);
+            }
         } catch (Exception e) {
             response.addErrorMessage("Error getting bets for ticket id = " + ticketId + "!");
             logger.error("Error getting bets for ticket id = " + ticketId + "!\n" + e);

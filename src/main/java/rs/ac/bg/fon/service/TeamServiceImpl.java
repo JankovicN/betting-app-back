@@ -37,8 +37,7 @@ public class TeamServiceImpl implements TeamService {
      *
      * @param team instance of Team class that is being saved.
      * @return instance of Team class that is saved in database,
-     *         or null if error occurs.
-     *
+     * or null if error occurs.
      */
     @Transactional
     @Override
@@ -61,8 +60,7 @@ public class TeamServiceImpl implements TeamService {
      *
      * @param team instance of Team class that is being transformed to DTO.
      * @return instance of TeamDTO object that is a representation of Team object,
-     *         or null if an error occurs.
-     *
+     * or null if an error occurs.
      */
     @Override
     public TeamDTO createTeamDTO(Team team) {
@@ -84,8 +82,7 @@ public class TeamServiceImpl implements TeamService {
      *
      * @param teamID Integer value representing id of Team.
      * @return instance of Optional<Team> class,
-     *         or null if error occurs or if there is no team with specified id.
-     *
+     * or null if error occurs or if there is no team with specified id.
      */
     @Override
     public Optional<Team> findById(Integer teamID) {

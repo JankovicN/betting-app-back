@@ -50,8 +50,7 @@ public class LeagueServiceImpl implements LeagueService {
      *
      * @param league instance of League class that is being saved.
      * @return instance of League class that is saved in database,
-     *         or null if error occurs.
-     *
+     * or null if error occurs.
      */
     @Override
     public League save(League league) {
@@ -70,8 +69,7 @@ public class LeagueServiceImpl implements LeagueService {
      *
      * @param leagues list of League objects are being saved.
      * @return list of League objects that are saved in database,
-     *         or null if error occurs.
-     *
+     * or null if error occurs.
      */
     @Override
     public List<League> saveLeagues(List<League> leagues) {
@@ -89,8 +87,7 @@ public class LeagueServiceImpl implements LeagueService {
      * Return list of all leagues that are in database.
      *
      * @return list of League objects that are in database,
-     *         or empty list if an error occurs.
-     *
+     * or empty list if an error occurs.
      */
     @Override
     public List<League> getAllLeagues() {
@@ -108,8 +105,7 @@ public class LeagueServiceImpl implements LeagueService {
      * Checks if league table has any rows, in other word if there are any leagues saved so far.
      *
      * @return boolean value, return true if league table is not empty,
-     *         otherwise return false.
-     *
+     * otherwise return false.
      */
     @Override
     public boolean exists() {
@@ -120,8 +116,7 @@ public class LeagueServiceImpl implements LeagueService {
      * Returns response for API call, containing list of all leagues, where each league contains fixtures that have not started yet.
      *
      * @return instance of ApiResponse class,
-     *         containing list of League objects, each one containing fixtures which have not started yet.
-     *
+     * containing list of League objects, each one containing fixtures which have not started yet.
      */
     @Override
     public ApiResponse<?> getAllLeaguesWithFixturesApiResponse() {
@@ -157,8 +152,7 @@ public class LeagueServiceImpl implements LeagueService {
      * Returns response for API call, containing list of leagues that have at least one fixture that has not started.
      *
      * @return instance of ApiResponse class,
-     *         containing list of League objects.
-     *
+     * containing list of League objects.
      */
     @Override
     public ApiResponse<?> getAllLeaguesApiResponse() {
@@ -184,33 +178,36 @@ public class LeagueServiceImpl implements LeagueService {
      * Returns response for API call, containing LeagueDTO object along with list of FixtureDTO objects for that league.
      *
      * @param leagueId Integer value representing id of League that search is based on.
-     * @return instance of ApiResponse class,
-     *         containing LeagueDTO object with list of FixtureDTO objects that are associated with that league,
-     *         if there is an error, then ApiResponse object with error message is returned instead.
-     *
+     * @return instance of ApiResponse class containing LeagueDTO object with list of FixtureDTO objects that are associated with that league,
+     * if there is an error, then ApiResponse object with error message is returned instead.
      */
     @Override
     public ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueId) {
-        League league = leagueRepository.findById(leagueId).get();
-        LeagueDTO leagueDTO = new LeagueDTO();
-        if (league != null) {
+        try {
+            League league = leagueRepository.findById(leagueId).get();
+            LeagueDTO leagueDTO;
             try {
                 List<FixtureDTO> fixtures = fixtureService.getFixtureDtoByLeague(leagueId);
                 if (fixtures != null && !fixtures.isEmpty()) {
                     leagueDTO = LeagueMapper.leagueToLeagueDTO(league, fixtures);
+                } else {
+                    ApiResponse<?> response = new ApiResponse<>();
+                    response.addErrorMessage("Unable to get Fixtures for League " + league.getName());
+                    logger.error("Unable to create League DTO List!");
+                    return response;
                 }
             } catch (Exception e) {
                 ApiResponse<?> response = new ApiResponse<>();
-                response.addErrorMessage("Unable to get Fixtures for League " + league.getName());
-                logger.error("Unable to create League DTO List!\n" + e.getMessage());
+                response.addErrorMessage("Unknown error!");
+                logger.error("Unknown error!" + e.getMessage());
                 return response;
             }
-        } else {
+            return ApiResponseUtil.transformObjectToApiResponse(leagueDTO, "leagues");
+        } catch (Exception e) {
             ApiResponse<?> response = new ApiResponse<>();
-            response.addErrorMessage("Unknown error try again later!");
+            response.addErrorMessage("No League is found for id = " + leagueId + "!");
             logger.error("No League is found for ID = " + leagueId + "!");
             return response;
         }
-        return ApiResponseUtil.transformObjectToApiResponse(leagueDTO, "leagues");
     }
 }

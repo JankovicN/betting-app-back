@@ -42,8 +42,7 @@ public class PaymentServiceImpl implements PaymentService {
      * @param userId Integer value representing id of user for which we are checking.
      * @param amount BigDecimal value for the amount we are trying to add/subtract to/from user balance.
      * @return boolean value, return true if user can pay the specified amount,
-     *         otherwise return false.
-     *
+     * otherwise return false.
      */
     @Transactional
     @Override
@@ -64,8 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
      *
      * @param userId Integer value representing id of user for which we are fetching balance.
      * @return BigDecimal value representing user balance,
-     *         or BigDecimal.ZERO (0) if error occurs.
-     *
+     * or BigDecimal of zero if error occurs.
      */
     @Transactional
     @Override
@@ -87,25 +85,28 @@ public class PaymentServiceImpl implements PaymentService {
      * Adds new payment to database, if all checks pass.
      *
      * @param payment instance of Payment class, containing information about the payment amount, type and the user who is making it.
-     *
+     * @return instance of Payment class representing the payment that is added,
+     * or null if any error occurs.
      */
     @Transactional
     @Override
-    public void addPayment(Payment payment) {
+    public Payment addPayment(Payment payment) {
         try {
             if (payment == null
                     || payment.getAmount() == null
                     || payment.getUser() == null) {
                 logger.error("Error while trying add Payment, invalid data provided!");
+                return null;
             } else if (!canUserPay(payment.getUser().getId(), payment.getAmount())) {
                 logger.error("Insufficient funds!");
+                return null;
             } else {
-                paymentRepository.saveAndFlush(payment);
+                return paymentRepository.saveAndFlush(payment);
             }
         } catch (Exception e) {
             logger.error("Error while trying add Payment!", e);
+            return null;
         }
-
     }
 
     /**
@@ -113,17 +114,20 @@ public class PaymentServiceImpl implements PaymentService {
      *
      * @param userId Integer value representing id of user who is making the payment
      * @param amount BigDecimal value representing the payment amount.
-     * @param type String value representing the type of the payment.
-     *
+     * @param type   String value representing the type of the payment.
+     * @return instance of Payment class representing the payment that is added,
+     * or null if any error occurs.
      */
     @Transactional
     @Override
-    public void addPayment(Integer userId, BigDecimal amount, String type) {
+    public Payment addPayment(Integer userId, BigDecimal amount, String type) {
         try {
             if (userId == null || amount == null || type == null) {
                 logger.error("Error while trying add Payment, invalid data provided!");
+                return null;
             } else if (!canUserPay(userId, amount)) {
                 logger.error("Insufficient funds!");
+                return null;
             } else {
                 User user = new User();
                 user.setId(userId);
@@ -131,10 +135,11 @@ public class PaymentServiceImpl implements PaymentService {
                 payment.setAmount(amount);
                 payment.setUser(user);
                 payment.setPaymentType(type);
-                paymentRepository.saveAndFlush(payment);
+                return paymentRepository.saveAndFlush(payment);
             }
         } catch (Exception e) {
             logger.error("Error while trying add Payment!", e);
+            return null;
         }
     }
 
@@ -143,7 +148,6 @@ public class PaymentServiceImpl implements PaymentService {
      *
      * @param userId Integer value representing id of user for which we are fetching balance.
      * @return instance of ApiResponse class, containing balance for specified user.
-     *
      */
     @Override
     public ApiResponse<?> getUserPaymentsApiResponse(Integer userId) {
@@ -154,17 +158,29 @@ public class PaymentServiceImpl implements PaymentService {
      * Returns response for API call, containing information about the success of adding user payment.
      *
      * @param payment instance of PaymentDTO class, containing information about the user and the amount of the payment.
-     * @param type String value representing the type of the payment.
+     * @param type    String value representing the type of the payment.
      * @return instance of ApiResponse class, containing messages regarding the success of the operation.
-     *
      */
     @Override
     public ApiResponse<?> addPaymentApiResponse(PaymentDTO payment, String type) {
         ApiResponse<?> response = new ApiResponse<>();
-        if (canUserPay(payment.getUserId(), payment.getAmount())) {
-            addPayment(payment.getUserId(), payment.getAmount(), type);
-            response.addInfoMessage("Successful transaction!");
-        } else {
+        try {
+            if (payment == null || payment.getUserId() == null
+                    || payment.getAmount() == null) {
+                logger.error("Invalid data for payment!");
+                response.addErrorMessage("Insufficient funds!");
+            } else if (canUserPay(payment.getUserId(), payment.getAmount())) {
+                if (addPayment(payment.getUserId(), payment.getAmount(), type) == null) {
+                    logger.error("Invalid data for adding payment!");
+                    response.addErrorMessage("Insufficient funds!");
+                } else {
+                    response.addInfoMessage("Successful transaction!");
+                }
+            } else {
+                response.addErrorMessage("Insufficient funds!");
+            }
+        } catch (Exception e) {
+            logger.error("Error adding payment, for API call!\n" + e.getMessage());
             response.addErrorMessage("Insufficient funds!");
         }
         return response;

@@ -12,10 +12,10 @@ public interface PaymentService {
 
     BigDecimal getUserPayments(Integer userId);
 
-    void addPayment(Payment payment);
+    Payment addPayment(Payment payment);
 
 
-    void addPayment(Integer userId, BigDecimal amount, String type);
+    Payment addPayment(Integer userId, BigDecimal amount, String type);
 
 
     boolean canUserPay(Integer userId, BigDecimal amount);

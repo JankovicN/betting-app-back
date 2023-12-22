@@ -75,8 +75,7 @@ public class TicketServiceImpl implements TicketService {
      *
      * @param ticket instance of Ticket class that is being saved.
      * @return instance of Ticket class that is saved in database,
-     *         or null if ticket has invalid fields or if error occurs.
-     *
+     * or null if ticket has invalid fields or if error occurs.
      */
     private Ticket save(Ticket ticket) {
         try {
@@ -129,7 +128,7 @@ public class TicketServiceImpl implements TicketService {
      * @param username String value representing username of user for which we are fetching tickets.
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> getUserTickets(String username, Pageable pageable) {
@@ -148,21 +147,25 @@ public class TicketServiceImpl implements TicketService {
     /**
      * Returns response for API call, containing tickets user has played for given date range.
      *
-     * @param username String value representing username of user for which we are fetching tickets.
+     * @param username      String value representing username of user for which we are fetching tickets.
      * @param startDateTime instance of LocalDateTime class that represents the start date of the range.
-     * @param endDateTime instance of LocalDateTime class that represents the end date of the range.
-     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @param endDateTime   instance of LocalDateTime class that represents the end date of the range.
+     * @param pageable      instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
-     *         or error message if operation fails.
-     *
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> getUserTickets(String username, LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable) {
         ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
         try {
-            Page<Ticket> ticketPage = ticketRepository.findByUserUsernameAndDateOrderByDateDesc(username, startDateTime, endDateTime, pageable);
-            PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
-            response.setData(ticketDtoPage);
+            if (startDateTime.isAfter(endDateTime)) {
+                logger.error("Error getting Tickets for date range " + startDateTime + " - " + endDateTime + "!");
+                response.addErrorMessage("Date range is invalid, start date must be before end date!");
+            } else {
+                Page<Ticket> ticketPage = ticketRepository.findByUserUsernameAndDateOrderByDateDesc(username, startDateTime, endDateTime, pageable);
+                PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
+                response.setData(ticketDtoPage);
+            }
         } catch (Exception e) {
             response.addErrorMessage("Error getting Tickets for date " + startDateTime + ", try again later!");
             logger.error("Error getting Tickets for username = " + username + "!", e);
@@ -174,16 +177,11 @@ public class TicketServiceImpl implements TicketService {
      * Transforms list of tickets to DTO and adds them to PageDTO.
      * Returns PageDTO containing list of TicketBasicDTO objects
      *
-     * @param tickets list of tickets that are to be transformed to DTO.
+     * @param tickets  list of tickets that are to be transformed to DTO.
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of PageDTO class, containing TicketBasicDTO objects.
-     *
      */
     private PageDTO<TicketBasicDTO> createPageDtoForTickets(Page<Ticket> tickets, Pageable pageable) throws Exception {
-        // Creating a List of TicketBasicDTO,
-        // 1. Map the ticket to the DTO
-        // 2. Filter if there are any null values ( meaning mapping wasn't successful )
-        // 3. Create a list of DTO objects
         List<TicketBasicDTO> basicTicketDtoList = tickets.map(ticket -> {
             try {
                 return TicketMapper.ticketToTicketBasicDTO(ticket);
@@ -192,11 +190,7 @@ public class TicketServiceImpl implements TicketService {
                 return null;
             }
         }).filter(ticketDTO -> ticketDTO != null).stream().toList();
-
-        // Create a Page instance of TicketBasicDTO List
         Page<TicketBasicDTO> basicTicketPage = new PageImpl<>(basicTicketDtoList, pageable, tickets.getTotalElements());
-
-        // Map the Page instance to PageDTO adn return that value
         return PageMapper.pageToPageDTO(basicTicketPage);
     }
 
@@ -206,7 +200,7 @@ public class TicketServiceImpl implements TicketService {
      *
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> getAllTickets(Pageable pageable) {
@@ -228,19 +222,25 @@ public class TicketServiceImpl implements TicketService {
      * Returns PageDTO containing list of TicketBasicDTO objects
      *
      * @param startDateTime instance of LocalDateTime class that represents the start date of the range.
-     * @param endDateTime instance of LocalDateTime class that represents the end date of the range.
-     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @param endDateTime   instance of LocalDateTime class that represents the end date of the range.
+     * @param pageable      instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> getAllTickets(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable) {
         ApiResponse<PageDTO<TicketBasicDTO>> response = new ApiResponse<>();
         try {
-            Page<Ticket> ticketPage = ticketRepository.findAllByDateOrderByDateDesc(startDateTime,endDateTime, pageable);
-            PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
-            ticketDtoPage.setTotalPages(ticketPage.getTotalPages());
-            response.setData(ticketDtoPage);
+
+            if (startDateTime.isAfter(endDateTime)) {
+                logger.error("Error getting Tickets for date range " + startDateTime + " - " + endDateTime + "!");
+                response.addErrorMessage("Date range is invalid, start date must be before end date!");
+            } else {
+                Page<Ticket> ticketPage = ticketRepository.findAllByDateOrderByDateDesc(startDateTime, endDateTime, pageable);
+                PageDTO<TicketBasicDTO> ticketDtoPage = createPageDtoForTickets(ticketPage, pageable);
+                ticketDtoPage.setTotalPages(ticketPage.getTotalPages());
+                response.setData(ticketDtoPage);
+            }
         } catch (Exception e) {
             response.addErrorMessage("Error getting Tickets, try again later!");
             logger.error("Error getting all Tickets!", e);
@@ -251,7 +251,6 @@ public class TicketServiceImpl implements TicketService {
     /**
      * Updates all tickets that have been played in the last 5 minutes.
      * State changes from UNPROCESSED to PROCESSED.
-     *
      */
     @Override
     public void processTickets() {
@@ -279,11 +278,11 @@ public class TicketServiceImpl implements TicketService {
         try {
             if (ticketDTO == null) {
                 logger.error("Ticket is null!");
-                response.addErrorMessage("Ticket is invalid!");
+                response.addErrorMessage("Ticket is missing!");
             } else if (ticketDTO.getUsername() == null || ticketDTO.getUsername().isBlank()) {
                 logger.error("Username is missing! \n" + ticketDTO);
                 response.addErrorMessage("Username is missing!");
-            } else if (ticketDTO.getBets()==null || ticketDTO.getBets().isEmpty()){
+            } else if (ticketDTO.getBets() == null || ticketDTO.getBets().isEmpty()) {
                 logger.error("Ticket has no bets! \n" + ticketDTO);
                 response.addErrorMessage("Ticket must contain at least one bet!");
             } else {
@@ -320,7 +319,6 @@ public class TicketServiceImpl implements TicketService {
     /**
      * Updates ticket state for tickets that have won and adds payment for those tickets.
      * State changes from WIN to PAYOUT.
-     *
      */
     @Override
     public void payoutUsers() {
@@ -335,12 +333,32 @@ public class TicketServiceImpl implements TicketService {
     }
 
     /**
+     * Updates the ticket state to PAYOUT and processes the payment for winning tickets.
+     *
+     * @param ticket instance of Ticket class that is being updated.
+     */
+    @Transactional
+    private void payoutUser(Ticket ticket) {
+        try {
+            ticket.setState(Constants.TICKET_PAYOUT);
+            ticketRepository.save(ticket);
+            Payment payment = new Payment();
+            payment.setUser(ticket.getUser());
+            payment.setPaymentType(Constants.PAYMENT_PAYOUT);
+            payment.setAmount(ticket.getTotalWin());
+            paymentService.addPayment(payment);
+        } catch (Exception e) {
+            logger.error("Error while paying out Ticket = " + ticket + "!", e);
+        }
+    }
+
+    /**
      * Fetches all tickets that have are cancelable (their state is UNPROCESSED) for given page.
      * Returns Page containing list of tickets.
      *
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance Page class that has an array of tickets in it,
-     *         or empty page if there are no tickets to be canceled for given page.
+     * or empty page if there are no tickets to be canceled for given page.
      */
     private Page<Ticket> getCancelableTickets(Pageable pageable) {
         try {
@@ -361,7 +379,7 @@ public class TicketServiceImpl implements TicketService {
      * @param username String value representing username of user for which we are fetching tickets.
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance Page class that has an array of tickets in it,
-     *         or empty page if there are no tickets to be canceled for given page.
+     * or empty page if there are no tickets to be canceled for given page.
      */
     private Page<Ticket> getCancelableTickets(String username, Pageable pageable) {
         try {
@@ -382,7 +400,7 @@ public class TicketServiceImpl implements TicketService {
      *
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing PageDTO that has an array of TicketCancelDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     private ApiResponse<?> getCancelableTicketsApiResponse(Pageable pageable) {
         ApiResponse<PageDTO<TicketCancelDTO>> response = new ApiResponse<>();
@@ -409,7 +427,7 @@ public class TicketServiceImpl implements TicketService {
      * @param username String value representing username of user for which we are fetching tickets.
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing PageDTO that has an array of TicketCancelDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     private ApiResponse<?> getCancelableTicketsApiResponse(String username, Pageable pageable) {
         ApiResponse<PageDTO<TicketCancelDTO>> response = new ApiResponse<>();
@@ -431,10 +449,9 @@ public class TicketServiceImpl implements TicketService {
      * Transforms Page object containing tickets to DTO.
      * Return PageDTO object containing TicketCancelDTO objects.
      *
-     * @param tickets instance of Page object containing tickets.
+     * @param tickets  instance of Page object containing tickets.
      * @param pageable instance of Pageable class, containing information about current page.
      * @return instance of PageDTO containing TicketCancelDTO objects.
-     *
      */
     private PageDTO<TicketCancelDTO> createPageDtoForCancelTickets(Page<Ticket> tickets, Pageable pageable) throws Exception {
         // Creating a List of TicketCancelDTOs,
@@ -463,7 +480,7 @@ public class TicketServiceImpl implements TicketService {
      * @param username instance of Optional<String>, representing username of user for which we are fetching tickets.
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing PageDTO that has an array of TicketCancelDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> handleCancelTicketsAPI(Optional<String> username, Pageable pageable) {
@@ -482,8 +499,7 @@ public class TicketServiceImpl implements TicketService {
      *
      * @param ticketID Integer value representing id of Ticket to be deleted.
      * @return instance of Ticket object that is deleted from database,
-     *         or null if error occurs.
-     *
+     * or null if error occurs.
      */
     @Override
     public Ticket cancelTicket(Integer ticketID) {
@@ -498,9 +514,9 @@ public class TicketServiceImpl implements TicketService {
                 return canceledTicket;
             } else if (!canceledTicket.getState().equals(Constants.TICKET_UNPROCESSED)) {
                 logger.error("Ticket state is invalid, it should be \"" + Constants.TICKET_UNPROCESSED + "\", but it is \"" + canceledTicket.getState() + "\"!");
-                Ticket invaliTicket = new Ticket();
-                invaliTicket.setState(Constants.INVALID_DATA);
-                return invaliTicket;
+                Ticket invalidTicket = new Ticket();
+                invalidTicket.setState(Constants.INVALID_DATA);
+                return invalidTicket;
             } else {
                 canceledTicket.setState(Constants.TICKET_CANCELED);
                 ticketRepository.save(canceledTicket);
@@ -512,9 +528,6 @@ public class TicketServiceImpl implements TicketService {
                 logger.info("Successfully canceled Ticket!");
                 return canceledTicket;
             }
-        } catch (EntityNotFoundException e) {
-            logger.error("Error while trying to delete Ticket, try again later!", e);
-            return null;
         } catch (Exception e) {
             logger.error("Error while trying to cancel Ticket, try again later!", e);
             return null;
@@ -526,40 +539,34 @@ public class TicketServiceImpl implements TicketService {
      *
      * @param ticketID Integer value representing id of Ticket to be deleted.
      * @return instance of ApiResponse class, containing messages regarding the success of the operation.
-     *
      */
     @Override
     public ApiResponse<?> cancelTicketApiResponse(Integer ticketID) {
         ApiResponse<?> response = new ApiResponse<>();
-        try {
-            Ticket canceledTicket = cancelTicket(ticketID);
-            if (canceledTicket == null) {
-                response.addErrorMessage("Error canceling Ticket, try again later!");
-                logger.info("Error creating response for canceling Ticket!");
-            } else if (LocalDateTime.of(1, 1, 1, 1, 1).isEqual(canceledTicket.getDate())) {
-                response.addErrorMessage("Time for canceling ticket has passed, ticket can be canceled 5 minutes after being played!");
-                logger.info("Time for canceling ticket has passed!");
-            } else if (canceledTicket.getState().equals(Constants.INVALID_DATA)) {
-                response.addErrorMessage("Cannot cancel Ticket!");
-                logger.info("Invalid Ticket state, unable to cancel ticket!");
-            } else {
-                response.addInfoMessage("Successfully canceled Ticket!");
-                logger.info("Successfully created response of cancelable Tickets!");
-            }
-        } catch (Exception e) {
+        Ticket canceledTicket = cancelTicket(ticketID);
+        if (canceledTicket == null) {
             response.addErrorMessage("Error canceling Ticket, try again later!");
-            logger.info("Error creating response for canceling Ticket!", e);
+            logger.info("Error creating response for canceling Ticket!");
+        } else if (canceledTicket.getState().equals(Constants.INVALID_DATA)) {
+            response.addErrorMessage("Cannot cancel Ticket!");
+            logger.info("Invalid Ticket state, unable to cancel ticket!");
+        } else if (LocalDateTime.of(1, 1, 1, 1, 1).isEqual(canceledTicket.getDate())) {
+            response.addErrorMessage("Time for canceling ticket has passed, ticket can be canceled 5 minutes after being played!");
+            logger.info("Time for canceling ticket has passed!");
+        } else {
+            response.addInfoMessage("Successfully canceled Ticket!");
+            logger.info("Successfully created response of cancelable Tickets!");
         }
         return response;
     }
+
     /**
      * Returns response for API call containing tickets user has played within the specified date range, if provided.
      *
      * @param username String value representing username of user for which we are fetching tickets.
-     * @param date instance of Optional<String>, representing the date for which we are fetching tickets.
+     * @param date     instance of Optional<String>, representing the date for which we are fetching tickets.
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, data for tickets played by user.
-     *
      */
     @Override
     public ApiResponse<?> handleGetUserTickets(String username, Optional<String> date, Pageable pageable) {
@@ -567,9 +574,9 @@ public class TicketServiceImpl implements TicketService {
         if (date.isPresent()) {
             String dateString = date.get();
             LocalDate dateValue = Utility.parseDate(dateString);
-            LocalDateTime startDateTime = LocalDateTime.of(dateValue, LocalTime.of(0,0,0));
-            LocalDateTime endDateTime = LocalDateTime.of(dateValue, LocalTime.of(23,59,59));
-            response = getUserTickets(username, startDateTime,endDateTime, pageable);
+            LocalDateTime startDateTime = LocalDateTime.of(dateValue, LocalTime.of(0, 0, 0));
+            LocalDateTime endDateTime = LocalDateTime.of(dateValue, LocalTime.of(23, 59, 59));
+            response = getUserTickets(username, startDateTime, endDateTime, pageable);
         } else {
             response = getUserTickets(username, pageable);
         }
@@ -579,10 +586,10 @@ public class TicketServiceImpl implements TicketService {
     /**
      * Returns an API response containing all tickets played within the specified date range, if provided.
      *
-     * @param date instance of Optional<String>, representing the date for which we are fetching tickets.
+     * @param date     instance of Optional<String>, representing the date for which we are fetching tickets.
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing PageDTO that has an array of TicketBasicDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> handleGetAllTickets(Optional<String> date, Pageable pageable) {
@@ -590,9 +597,9 @@ public class TicketServiceImpl implements TicketService {
         if (date.isPresent()) {
             String dateString = date.get();
             LocalDate dateValue = Utility.parseDate(dateString);
-            LocalDateTime startDateTime = LocalDateTime.of(dateValue, LocalTime.of(0,0,0));
-            LocalDateTime endDateTime = LocalDateTime.of(dateValue, LocalTime.of(23,59,59));
-            response = getAllTickets(startDateTime,endDateTime, pageable);
+            LocalDateTime startDateTime = LocalDateTime.of(dateValue, LocalTime.of(0, 0, 0));
+            LocalDateTime endDateTime = LocalDateTime.of(dateValue, LocalTime.of(23, 59, 59));
+            response = getAllTickets(startDateTime, endDateTime, pageable);
         } else {
             response = getAllTickets(pageable);
         }
@@ -600,31 +607,9 @@ public class TicketServiceImpl implements TicketService {
     }
 
     /**
-     * Updates the ticket state to PAYOUT and processes the payment for winning tickets.
-     *
-     * @param ticket instance of Ticket class that is being updated.
-     *
-     */
-    @Transactional
-    private void payoutUser(Ticket ticket) {
-        try {
-            ticket.setState(Constants.TICKET_PAYOUT);
-            ticketRepository.save(ticket);
-            Payment payment = new Payment();
-            payment.setUser(ticket.getUser());
-            payment.setPaymentType(Constants.PAYMENT_PAYOUT);
-            payment.setAmount(ticket.getTotalWin());
-            paymentService.addPayment(payment);
-        } catch (Exception e) {
-            logger.error("Error while paying out Ticket = " + ticket + "!", e);
-        }
-    }
-
-    /**
      * Sets the state and date of new ticket.
      *
      * @param ticket instance of Ticket class that is being created.
-     *
      */
     private void setNewTicketFields(Ticket ticket) {
         if (ticket == null) {

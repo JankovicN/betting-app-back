@@ -47,9 +47,4 @@ public class FootballApiController {
         return result.thenApply(apiResult -> ApiResponseUtil.handleApiResponse(apiResult));
 
     }
-
-    @GetMapping("/exists")
-    public ResponseEntity<?> getEexists(@RequestParam Integer fixtureID, @RequestParam Integer oddGroupID) {
-        return ApiResponseUtil.handleApiResponse(footballApiService.exists(fixtureID,oddGroupID));
-    }
 }

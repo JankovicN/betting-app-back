@@ -99,8 +99,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param user instance of User class that is being saved.
      * @return instance of User class that is saved in database,
-     *         or null if any user field is invalid or if error occurs.
-     *
+     * or null if any user field is invalid or if error occurs.
      */
     @Override
     public User saveUser(User user) {
@@ -115,9 +114,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     || user.getName().isBlank()) {
                 logger.error("Error while trying to save User, invalid data provided!");
             } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
-                System.out.println(user.getBirthday());
                 logger.error("Error while trying to save User, User must be older than 18!");
-                user.setBirthday(null);
+                return null;
             } else {
                 log.info("Saving user {}  to database", user.getName());
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -134,8 +132,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param role instance of Role class that is being saved.
      * @return instance of Role class that is saved in database,
-     *         or null if role already exists or if error occurs.
-     *
+     * or null if role already exists or if error occurs.
      */
     @Override
     public Role saveRole(Role role) {
@@ -157,18 +154,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param roleName String value of role name that is being added to user.
      * @param username String value of username for user that role is being added to.
-     *
+     * @return instance of User class representing User that role is added to,
+     * or null if error occurs.
      */
     @Override
-    public void addRoleToUser(String username, String roleName) {
+    public User addRoleToUser(String username, String roleName) {
         try {
 
             log.info("Adding role {} to user {}", roleName, username);
             User user = userRepository.findByUsername(username);
             Role role = roleRepository.findByName(roleName);
             user.getRoles().add(role);
+            return user;
         } catch (Exception e) {
             logger.error("Error while trying add Role " + roleName + " to User " + username + "!", e);
+            return null;
         }
     }
 
@@ -177,7 +177,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param username String value representing username of User.
      * @return instance of User class.
-     *
      */
     @Transactional
     @Override
@@ -201,12 +200,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * Fetches all users, whose username contains the given string, for given page.
      *
      * @param filterUsername String value representing part of username that search is based on.
-     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @param pageable       instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of Page class, containing User objects whose username contains the given string.
      */
     private Page<User> getFilteredUsers(String filterUsername, Pageable pageable) {
         log.info("Fetching users whose username contains \'" + filterUsername + "\' pageable");
-        return userRepository.findByUsernameContaining(filterUsername,pageable);
+        return userRepository.findByUsernameContaining(filterUsername, pageable);
     }
 
 
@@ -215,44 +214,48 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param user instance of User class that is being registered.
      * @return instance of User class that is registered,
-     *         or instance of User class that has invalid fields and is not registered.
-     *
+     * or instance of User class that has invalid fields and is not registered.
      */
     @Override
     public User registerUser(User user) {
-
-        if (user == null
-                || user.getUsername() == null
-                || user.getUsername().isBlank()
-                || user.getPassword() == null
-                || user.getPassword().isBlank()
-                || user.getBirthday() == null
-                || user.getName() == null
-                || user.getName().isBlank()
-                || user.getSurname() == null
-                || user.getSurname().isBlank()) {
-            logger.error("Error while trying save User, invalid data provided!");
-            user.setId(-1);
-            return user;
-        } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
-            logger.error("User must be older than 18!");
-            user.setBirthday(LocalDate.of(1,1,1));
-            return user;
-        } else if (!Utility.isValidEmail(user.getEmail())) {
-            logger.error("User email is invalid, email = " + user.getEmail() + "!");
-            user.setEmail("Invalid Email!");
-            return user;
-        } else if (userRepository.existsByUsername(user.getUsername())) {
-            logger.error("There is already a user with that username!");
-            user.setUsername("-1");
-            return user;
-        } else if (!userRepository.existsByEmail(user.getEmail())) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            User newUser = userRepository.save(user);
-            addRoleToUser(user.getUsername(), "ROLE_CLIENT");
-            return newUser;
-        } else {
-            logger.error("User already registered!");
+        try {
+            if (user == null
+                    || user.getUsername() == null
+                    || user.getUsername().isBlank()
+                    || user.getPassword() == null
+                    || user.getPassword().isBlank()
+                    || user.getBirthday() == null
+                    || user.getName() == null
+                    || user.getName().isBlank()
+                    || user.getSurname() == null
+                    || user.getSurname().isBlank()) {
+                logger.error("Error while trying save User, invalid data provided!");
+                user.setId(-1);
+                return user;
+            } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
+                logger.error("User must be older than 18!");
+                user.setBirthday(LocalDate.of(1, 1, 1));
+                return user;
+            } else if (!Utility.isValidEmail(user.getEmail())) {
+                logger.error("User email is invalid, email = " + user.getEmail() + "!");
+                user.setEmail("Invalid Email!");
+                return user;
+            } else if (userRepository.existsByUsername(user.getUsername())) {
+                logger.error("There is already a user with that username!");
+                user.setUsername("-1");
+                return user;
+            } else if (!userRepository.existsByEmail(user.getEmail())) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                User newUser = userRepository.save(user);
+                addRoleToUser(user.getUsername(), "ROLE_CLIENT");
+                return newUser;
+            } else {
+                logger.error("User already registered!");
+                user.setEmail("Email already registered!");
+                return user;
+            }
+        } catch (Exception e) {
+            logger.error("Error registering user!" + e);
             return null;
         }
     }
@@ -265,9 +268,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public User deleteUser(String username) {
-        User user = userRepository.findByUsername(username);
-        userRepository.delete(user);
-        return user;
+        try {
+            User user = userRepository.findByUsername(username);
+            if (user == null) {
+                throw new Exception();
+            }
+            userRepository.delete(user);
+            return user;
+        } catch (Exception e) {
+            logger.error("Error deleting user with username = " + username + "!\n" + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -275,15 +286,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param username String value representing username of User.
      * @return instance of ApiResponse class,
-     *         containing messages indicating the success of User deletion from the database.
-     *
+     * containing messages indicating the success of User deletion from the database.
      */
     @Override
     public ApiResponse<?> deleteUserApiResponse(String username) {
         ApiResponse<User> response = new ApiResponse<>();
         try {
-            response.setData(deleteUser(username));
-            response.addInfoMessage("Successfully deleted user \"" + username + "\".");
+            User deletedUser = deleteUser(username);
+            if (deletedUser == null) {
+                response.addErrorMessage("User with username " + username + " doesn't exist!");
+            } else {
+                response.setData(deletedUser);
+                response.addInfoMessage("Successfully deleted user \"" + username + "\".");
+            }
         } catch (Exception e) {
             response.addErrorMessage("Unable to delete user at this time, try again later!");
         }
@@ -296,8 +311,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param userDTO instance of UserRegistrationDTO class that is attempting to be registered.
      * @return instance of ApiResponse class,
-     *         containing messages indicating the success of User deletion from the database.
-     *
+     * containing messages indicating the success of User deletion from the database.
      */
     @Override
     public ApiResponse<?> registerUserApiResponse(UserRegistrationDTO userDTO) {
@@ -306,10 +320,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             User user = UserMapper.userDtoToUser(userDTO);
             User registeredUser = registerUser(user);
             if (registeredUser == null) {
+                response.addErrorMessage("Error registering user!");
+            } else if (registeredUser.getEmail().equals("Email already registered!")) {
                 response.addErrorMessage("There is already a user registered with that email!");
             } else if (("-1").equals(registeredUser.getUsername())) {
                 response.addErrorMessage("There is already a user registered with that username!");
-            } else if (LocalDate.of(1,1,1).isEqual(registeredUser.getBirthday())) {
+            } else if (LocalDate.of(1, 1, 1).isEqual(registeredUser.getBirthday())) {
                 response.addErrorMessage("User age must be greater than 18 to register!");
             } else if (("Invalid Email!").equals(registeredUser.getEmail())) {
                 response.addErrorMessage("Invalid email format!");
@@ -329,7 +345,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param pageable instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing instance of PageDTO object that has an array of UserDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> getUsersApiResponse(Pageable pageable) {
@@ -342,7 +358,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                             return UserMapper.userToUserDTO(user);
                         } catch (Exception e) {
                             logger.error("Error while mapping user to user DTO");
-                            throw null;
+                            return null;
                         }
                     }).filter(user -> user != null)
                     .map(userDTO -> {
@@ -364,15 +380,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * Returns response for API call containing all users, whose username contains the given string, for given page.
      *
      * @param filterUsername String value representing part of username that search is based on.
-     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @param pageable       instance of Pageable class, contains information about the current page we are fetching.
      * @return instance of ApiResponse class, containing instance of PageDTO object that has an array of UserDTO in it,
-     *         or error message if operation fails.
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> getFilteredUsersApiResponse(String filterUsername, Pageable pageable) {
         ApiResponse<PageDTO<UserDTO>> response = new ApiResponse<>();
         try {
-            Page<User> users = getFilteredUsers(filterUsername,pageable);
+            Page<User> users = getFilteredUsers(filterUsername, pageable);
             log.info("Filtered users: " + users.getContent());
             List<UserDTO> userDtosList = users.map(user -> {
                         try {
@@ -402,7 +418,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param username String value representing username of User.
      * @return instance of ApiResponse class, containing instance of User class.
-     *
      */
     @Override
     public ApiResponse<?> getUserApiResponse(String username) {
@@ -430,13 +445,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param roleName String value of role name that is being added to user.
      * @param username String value of username for user that role is being added to.
      * @return instance of ApiResponse class, containing messages regarding the success of the operation.
-     *
      */
     @Override
     public ApiResponse<?> addRoleToUserApiResponse(String username, String roleName) {
         ApiResponse<User> response = new ApiResponse<>();
         try {
-            addRoleToUser(username, roleName);
+            if (addRoleToUser(username, roleName) == null) {
+                throw new Exception();
+            }
             response.addInfoMessage("Successfully added role " + roleName + "to user " + username + "!");
         } catch (Exception e) {
             response.addErrorMessage("Unable to add role " + roleName + " to user " + username + " at this time, try again later!");
@@ -450,8 +466,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param role instance of Role class that is being saved.
      * @return instance of ApiResponse class, containing instance of Role class that is saved,
-     *         or error message if operation fails.
-     *
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> saveRoleApiResponse(Role role) {
@@ -477,19 +492,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param updatedUser instance of User class that contain updated fields.
      * @return instance of User class that is updated in database.
-     *
      */
     @Override
     public User updateUser(User updatedUser) {
-        User user = userRepository.findByUsername(updatedUser.getUsername());
-        if (updatedUser.getPassword() == null || updatedUser.getPassword().isBlank()) {
-            updatedUser.setPassword(user.getPassword());
+        try {
+            User user = userRepository.findByUsername(updatedUser.getUsername());
+            if (updatedUser.getPassword() == null || updatedUser.getPassword().isBlank()) {
+                updatedUser.setPassword(user.getPassword());
+            }
+            if (updatedUser.getRoles() == null || updatedUser.getRoles().isEmpty()) {
+                updatedUser.setRoles(user.getRoles());
+            }
+            updatedUser.setId(user.getId());
+            return userRepository.save(updatedUser);
+        } catch (Exception e) {
+            logger.error("Error updating user!\n", e.getMessage());
+            return null;
         }
-        if (updatedUser.getRoles() == null || updatedUser.getRoles().isEmpty()) {
-            updatedUser.setRoles(user.getRoles());
-        }
-        updatedUser.setId(user.getId());
-        return userRepository.save(updatedUser);
     }
 
     /**
@@ -498,8 +517,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param user instance of UserDTO class that contain updated fields.
      * @return instance of ApiResponse class, containing instance of User class that is updated in database,
-     *         or error message if operation fails.
-     *
+     * or error message if operation fails.
      */
     @Override
     public ApiResponse<?> updateUserApiResponse(UserDTO user) {
@@ -508,9 +526,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             if (!Utility.isValidEmail(user.getEmail())) {
                 logger.error("User email is invalid, email = " + user.getEmail() + "!");
                 response.addErrorMessage("Invalid Email address!");
-            }else{
+            } else {
                 User userToUpdate = UserMapper.userDtoToUser(user);
                 userToUpdate = updateUser(userToUpdate);
+                if (userToUpdate == null) {
+                    throw new Exception("Error updating user!");
+                }
                 UserDTO userDTO = UserMapper.userToUserDTO(userToUpdate);
                 userDTO.setBalance(paymentService.getUserPayments(userDTO.getId()));
                 response.setData(userDTO);
