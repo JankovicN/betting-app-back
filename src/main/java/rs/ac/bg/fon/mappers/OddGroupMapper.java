@@ -1,8 +1,8 @@
 package rs.ac.bg.fon.mappers;
 
 import org.springframework.stereotype.Component;
-import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
+import rs.ac.bg.fon.dtos.OddGroup.OddGroupDTO;
 import rs.ac.bg.fon.entity.OddGroup;
 
 import java.util.List;

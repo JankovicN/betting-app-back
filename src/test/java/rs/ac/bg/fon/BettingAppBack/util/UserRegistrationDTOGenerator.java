@@ -1,9 +1,7 @@
 package rs.ac.bg.fon.BettingAppBack.util;
 
 import rs.ac.bg.fon.dtos.User.UserRegistrationDTO;
-import rs.ac.bg.fon.entity.User;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -94,13 +94,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
-    /**
-     * Adds new user to database. Returns instance of saved user from database.
-     *
-     * @param user instance of User class that is being saved.
-     * @return instance of User class that is saved in database,
-     * or null if any user field is invalid or if error occurs.
-     */
     @Override
     public User saveUser(User user) {
         try {
@@ -127,13 +120,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return null;
     }
 
-    /**
-     * Adds new role to database. Returns instance of saved role from database.
-     *
-     * @param role instance of Role class that is being saved.
-     * @return instance of Role class that is saved in database,
-     * or null if role already exists or if error occurs.
-     */
     @Override
     public Role saveRole(Role role) {
         try {
@@ -149,14 +135,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    /**
-     * Adds new role to user and saves it to database.
-     *
-     * @param roleName String value of role name that is being added to user.
-     * @param username String value of username for user that role is being added to.
-     * @return instance of User class representing User that role is added to,
-     * or null if error occurs.
-     */
     @Override
     public User addRoleToUser(String username, String roleName) {
         try {
@@ -172,12 +150,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    /**
-     * Return User object with username that is specified.
-     *
-     * @param username String value representing username of User.
-     * @return instance of User class.
-     */
     @Transactional
     @Override
     public User getUser(String username) {
@@ -208,14 +180,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findByUsernameContaining(filterUsername, pageable);
     }
 
-
-    /**
-     * Registers user, saves user to database if all checks pass.
-     *
-     * @param user instance of User class that is being registered.
-     * @return instance of User class that is registered,
-     * or instance of User class that has invalid fields and is not registered.
-     */
     @Override
     public User registerUser(User user) {
         try {
@@ -260,12 +224,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    /**
-     * Deletes User row from database with username that is specified.
-     *
-     * @param username String value representing username of User.
-     * @return instance of User class that is deleted from database.
-     */
     @Override
     public User deleteUser(String username) {
         try {
@@ -281,13 +239,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    /**
-     * Returns response for API call with messages indicating the success of User deletion from database.
-     *
-     * @param username String value representing username of User.
-     * @return instance of ApiResponse class,
-     * containing messages indicating the success of User deletion from the database.
-     */
     @Override
     public ApiResponse<?> deleteUserApiResponse(String username) {
         ApiResponse<User> response = new ApiResponse<>();
@@ -305,14 +256,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return response;
     }
 
-    /**
-     * Transforms UserRegistrationDTO to object of User class and the tries to register that user.
-     * Returns response for API call with messages indicating the success of User registration.
-     *
-     * @param userDTO instance of UserRegistrationDTO class that is attempting to be registered.
-     * @return instance of ApiResponse class,
-     * containing messages indicating the success of User deletion from the database.
-     */
     @Override
     public ApiResponse<?> registerUserApiResponse(UserRegistrationDTO userDTO) {
         ApiResponse<User> response = new ApiResponse<>();
@@ -340,13 +283,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return response;
     }
 
-    /**
-     * Returns response for API call containing all users for given page.
-     *
-     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
-     * @return instance of ApiResponse class, containing instance of PageDTO object that has an array of UserDTO in it,
-     * or error message if operation fails.
-     */
     @Override
     public ApiResponse<?> getUsersApiResponse(Pageable pageable) {
         ApiResponse<PageDTO<UserDTO>> response = new ApiResponse<>();
@@ -376,14 +312,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return response;
     }
 
-    /**
-     * Returns response for API call containing all users, whose username contains the given string, for given page.
-     *
-     * @param filterUsername String value representing part of username that search is based on.
-     * @param pageable       instance of Pageable class, contains information about the current page we are fetching.
-     * @return instance of ApiResponse class, containing instance of PageDTO object that has an array of UserDTO in it,
-     * or error message if operation fails.
-     */
     @Override
     public ApiResponse<?> getFilteredUsersApiResponse(String filterUsername, Pageable pageable) {
         ApiResponse<PageDTO<UserDTO>> response = new ApiResponse<>();
@@ -413,12 +341,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return response;
     }
 
-    /**
-     * Returns response for API call containing User object with username that is specified.
-     *
-     * @param username String value representing username of User.
-     * @return instance of ApiResponse class, containing instance of User class.
-     */
     @Override
     public ApiResponse<?> getUserApiResponse(String username) {
         ApiResponse<UserDTO> response = new ApiResponse<>();
@@ -439,13 +361,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return response;
     }
 
-    /**
-     * Returns response for API call containing information about adding role to user.
-     *
-     * @param roleName String value of role name that is being added to user.
-     * @param username String value of username for user that role is being added to.
-     * @return instance of ApiResponse class, containing messages regarding the success of the operation.
-     */
     @Override
     public ApiResponse<?> addRoleToUserApiResponse(String username, String roleName) {
         ApiResponse<User> response = new ApiResponse<>();
@@ -460,14 +375,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return response;
     }
 
-
-    /**
-     * Adds new role to database. Returns response for API call containing information about the success of the operation.
-     *
-     * @param role instance of Role class that is being saved.
-     * @return instance of ApiResponse class, containing instance of Role class that is saved,
-     * or error message if operation fails.
-     */
     @Override
     public ApiResponse<?> saveRoleApiResponse(Role role) {
         ApiResponse<Role> response = new ApiResponse<>();
@@ -487,12 +394,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return response;
     }
 
-    /**
-     * Updates user data. Returns instance of updated user from database.
-     *
-     * @param updatedUser instance of User class that contain updated fields.
-     * @return instance of User class that is updated in database.
-     */
     @Override
     public User updateUser(User updatedUser) {
         try {
@@ -511,14 +412,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    /**
-     * Transforms UserDTO to User class and then updates that User.
-     * Returns the updated user and information about the success of the operation.
-     *
-     * @param user instance of UserDTO class that contain updated fields.
-     * @return instance of ApiResponse class, containing instance of User class that is updated in database,
-     * or error message if operation fails.
-     */
     @Override
     public ApiResponse<?> updateUserApiResponse(UserDTO user) {
         ApiResponse<UserDTO> response = new ApiResponse<>();

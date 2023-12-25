@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.entity.Ticket;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 

@@ -1,13 +1,9 @@
 package rs.ac.bg.fon.BettingAppBack.util;
 
-import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Bet.BetDTO;
 import rs.ac.bg.fon.dtos.Ticket.TicketDTO;
-import rs.ac.bg.fon.entity.Bet;
-import rs.ac.bg.fon.entity.Ticket;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

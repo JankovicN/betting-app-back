@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import rs.ac.bg.fon.dtos.Bet.BetDTO;
 import rs.ac.bg.fon.dtos.Bet.BetInfoDTO;
 import rs.ac.bg.fon.entity.Bet;
-import rs.ac.bg.fon.entity.OddGroup;
 import rs.ac.bg.fon.entity.Fixture;
 import rs.ac.bg.fon.entity.Odd;
+import rs.ac.bg.fon.entity.OddGroup;
 import rs.ac.bg.fon.utility.Utility;
 
 import java.util.ArrayList;

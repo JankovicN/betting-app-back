@@ -32,13 +32,6 @@ public class TeamServiceImpl implements TeamService {
      */
     private final TeamRepository teamRepository;
 
-    /**
-     * Adds new team to database. Returns instance of saved team from database.
-     *
-     * @param team instance of Team class that is being saved.
-     * @return instance of Team class that is saved in database,
-     * or null if error occurs.
-     */
     @Transactional
     @Override
     public Team save(Team team) {
@@ -55,13 +48,6 @@ public class TeamServiceImpl implements TeamService {
         }
     }
 
-    /**
-     * Transforms Team object to TeamDTO object and returns it.
-     *
-     * @param team instance of Team class that is being transformed to DTO.
-     * @return instance of TeamDTO object that is a representation of Team object,
-     * or null if an error occurs.
-     */
     @Override
     public TeamDTO createTeamDTO(Team team) {
         try {
@@ -77,13 +63,6 @@ public class TeamServiceImpl implements TeamService {
         }
     }
 
-    /**
-     * Return Optional<Team> object for id that is specified.
-     *
-     * @param teamID Integer value representing id of Team.
-     * @return instance of Optional<Team> class,
-     * or null if error occurs or if there is no team with specified id.
-     */
     @Override
     public Optional<Team> findById(Integer teamID) {
         try {

@@ -45,13 +45,6 @@ public class LeagueServiceImpl implements LeagueService {
      */
     private final FixtureService fixtureService;
 
-    /**
-     * Adds new league to database. Returns instance of saved league from database.
-     *
-     * @param league instance of League class that is being saved.
-     * @return instance of League class that is saved in database,
-     * or null if error occurs.
-     */
     @Override
     public League save(League league) {
         try {
@@ -64,13 +57,6 @@ public class LeagueServiceImpl implements LeagueService {
         }
     }
 
-    /**
-     * Adds list of leagues to database. Returns list of saved leagues from database.
-     *
-     * @param leagues list of League objects are being saved.
-     * @return list of League objects that are saved in database,
-     * or null if error occurs.
-     */
     @Override
     public List<League> saveLeagues(List<League> leagues) {
         try {
@@ -83,12 +69,6 @@ public class LeagueServiceImpl implements LeagueService {
         }
     }
 
-    /**
-     * Return list of all leagues that are in database.
-     *
-     * @return list of League objects that are in database,
-     * or empty list if an error occurs.
-     */
     @Override
     public List<League> getAllLeagues() {
         try {
@@ -101,23 +81,11 @@ public class LeagueServiceImpl implements LeagueService {
         }
     }
 
-    /**
-     * Checks if league table has any rows, in other word if there are any leagues saved so far.
-     *
-     * @return boolean value, return true if league table is not empty,
-     * otherwise return false.
-     */
     @Override
     public boolean exists() {
         return leagueRepository.count() > 0;
     }
 
-    /**
-     * Returns response for API call, containing list of all leagues, where each league contains fixtures that have not started yet.
-     *
-     * @return instance of ApiResponse class,
-     * containing list of League objects, each one containing fixtures which have not started yet.
-     */
     @Override
     public ApiResponse<?> getAllLeaguesWithFixturesApiResponse() {
         List<LeagueDTO> leagueDTOS = new ArrayList<>();
@@ -148,12 +116,6 @@ public class LeagueServiceImpl implements LeagueService {
         return ApiResponseUtil.transformListToApiResponse(leagueDTOS, "leagues");
     }
 
-    /**
-     * Returns response for API call, containing list of leagues that have at least one fixture that has not started.
-     *
-     * @return instance of ApiResponse class,
-     * containing list of League objects.
-     */
     @Override
     public ApiResponse<?> getAllLeaguesApiResponse() {
         List<LeagueBasicDTO> leagueDTOS = new ArrayList<>();
@@ -173,14 +135,6 @@ public class LeagueServiceImpl implements LeagueService {
         return ApiResponseUtil.transformListToApiResponse(leagueDTOS, "leagues");
     }
 
-
-    /**
-     * Returns response for API call, containing LeagueDTO object along with list of FixtureDTO objects for that league.
-     *
-     * @param leagueId Integer value representing id of League that search is based on.
-     * @return instance of ApiResponse class containing LeagueDTO object with list of FixtureDTO objects that are associated with that league,
-     * if there is an error, then ApiResponse object with error message is returned instead.
-     */
     @Override
     public ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueId) {
         try {

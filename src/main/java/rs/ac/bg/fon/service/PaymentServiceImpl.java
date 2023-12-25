@@ -36,14 +36,6 @@ public class PaymentServiceImpl implements PaymentService {
      */
     private final PaymentRepository paymentRepository;
 
-    /**
-     * Checks if user can pay the specified amount based on his balance.
-     *
-     * @param userId Integer value representing id of user for which we are checking.
-     * @param amount BigDecimal value for the amount we are trying to add/subtract to/from user balance.
-     * @return boolean value, return true if user can pay the specified amount,
-     * otherwise return false.
-     */
     @Transactional
     @Override
     public boolean canUserPay(Integer userId, BigDecimal amount) {
@@ -58,13 +50,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    /**
-     * Returns the sum of all user payments, in other words his balance.
-     *
-     * @param userId Integer value representing id of user for which we are fetching balance.
-     * @return BigDecimal value representing user balance,
-     * or BigDecimal of zero if error occurs.
-     */
     @Transactional
     @Override
     public BigDecimal getUserPayments(Integer userId) {
@@ -81,13 +66,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    /**
-     * Adds new payment to database, if all checks pass.
-     *
-     * @param payment instance of Payment class, containing information about the payment amount, type and the user who is making it.
-     * @return instance of Payment class representing the payment that is added,
-     * or null if any error occurs.
-     */
     @Transactional
     @Override
     public Payment addPayment(Payment payment) {
@@ -109,15 +87,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    /**
-     * Creates and adds new payment to database, if all checks pass.
-     *
-     * @param userId Integer value representing id of user who is making the payment
-     * @param amount BigDecimal value representing the payment amount.
-     * @param type   String value representing the type of the payment.
-     * @return instance of Payment class representing the payment that is added,
-     * or null if any error occurs.
-     */
     @Transactional
     @Override
     public Payment addPayment(Integer userId, BigDecimal amount, String type) {
@@ -143,24 +112,11 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    /**
-     * Returns response for API call, containing user balance.
-     *
-     * @param userId Integer value representing id of user for which we are fetching balance.
-     * @return instance of ApiResponse class, containing balance for specified user.
-     */
     @Override
     public ApiResponse<?> getUserPaymentsApiResponse(Integer userId) {
         return ApiResponseUtil.transformObjectToApiResponse(getUserPayments(userId), "balance");
     }
 
-    /**
-     * Returns response for API call, containing information about the success of adding user payment.
-     *
-     * @param payment instance of PaymentDTO class, containing information about the user and the amount of the payment.
-     * @param type    String value representing the type of the payment.
-     * @return instance of ApiResponse class, containing messages regarding the success of the operation.
-     */
     @Override
     public ApiResponse<?> addPaymentApiResponse(PaymentDTO payment, String type) {
         ApiResponse<?> response = new ApiResponse<>();

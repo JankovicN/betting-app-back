@@ -36,13 +36,6 @@ public class OddServiceImpl implements OddService {
      */
     private final OddRepository oddRepository;
 
-    /**
-     * Adds new odd to database. Returns instance of saved odd from database.
-     *
-     * @param odd instance of Odd class that is being saved.
-     * @return instance of Odd class that is saved in database,
-     * or null if error occurs.
-     */
     @Override
     public Odd save(Odd odd) {
         try {
@@ -55,13 +48,6 @@ public class OddServiceImpl implements OddService {
         }
     }
 
-    /**
-     * Return Odd object with id that is specified.
-     *
-     * @param oddId Integer value representing id of Odd.
-     * @return instance of Odd class,
-     * or null if error occurs of if there is no Odd with specified id.
-     */
     @Transactional
     @Override
     public Odd getOddById(Integer oddId) {
@@ -80,13 +66,6 @@ public class OddServiceImpl implements OddService {
         }
     }
 
-    /**
-     * Adds list of odds to database. Returns list of saved odds from database.
-     *
-     * @param odds list of Odd objects are being saved.
-     * @return list of Odd objects that are saved in database,
-     * or empty list if error occurs.
-     */
     @Override
     public List<Odd> saveOddList(List<Odd> odds) {
         try {
@@ -99,14 +78,6 @@ public class OddServiceImpl implements OddService {
         }
     }
 
-    /**
-     * Creates list of Odd objects for fixture and oddGroup specified.
-     *
-     * @param fixtureId  Integer value of fixture id for which odds are being fetched for.
-     * @param oddGroupId Integer value of odd group for which odds are being fetched for.
-     * @return list of Odd objects that are associated with the given fixture and odd group id,
-     * or empty list if an error occurs.
-     */
     @Override
     public List<Odd> getOddsForFixtureAndOddGroup(Integer fixtureId, Integer oddGroupId) {
         try {
@@ -120,14 +91,6 @@ public class OddServiceImpl implements OddService {
         }
     }
 
-    /**
-     * Creates and transforms list of Odd objects to list of OddDTO objects, for fixture and oddGroup specified.
-     *
-     * @param fixtureId  Integer value of fixture id for which odds are being fetched for.
-     * @param oddGroupId Integer value of odd group for which odds are being fetched for.
-     * @return list of OddDTO objects that are associated with the given fixture and odd group id,
-     * or empty list if an error occurs.
-     */
     @Override
     public List<OddDTO> createOddDTOList(Integer fixtureId, Integer oddGroupId) {
 
@@ -149,14 +112,6 @@ public class OddServiceImpl implements OddService {
         return oddDTOList;
     }
 
-    /**
-     * Checks if there are any odds for fixture and odd group.
-     *
-     * @param oddGroupId Integer value representing id of odd group that search is based on.
-     * @param fixtureId  Integer value of fixture id for which odds are being fetched for.
-     * @return boolean value, return true if there is an odd for given fixture id and odd group id ,
-     * otherwise return false.
-     */
     @Override
     public boolean existsWithFixtureIdAndOddGroupId(Integer fixtureId, Integer oddGroupId) {
 

@@ -106,14 +106,6 @@ public class FootballApiServiceImpl implements FootballApiService {
         return false;
     }
 
-    /**
-     * Asynchronously retrieves Odd Groups from an external Football API and processes the response.
-     * Exceptions during the process are caught, and error messages are added to the ApiResponse.
-     * The final ApiResponse is then completed and returned in the CompletableFuture.
-     *
-     * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
-     * containing an ApiResponse with details about the process outcome.
-     */
     @Transactional
     @Override
     @Async
@@ -165,15 +157,6 @@ public class FootballApiServiceImpl implements FootballApiService {
         return CompletableFuture.completedFuture(apiResponse);
     }
 
-
-    /**
-     * Asynchronously retrieves Odds from an external Football API and processes the response.
-     * Exceptions during the process are caught, and error messages are added to the ApiResponse.
-     * The final ApiResponse is then completed and returned in the CompletableFuture.
-     *
-     * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
-     * containing an ApiResponse with details about the process outcome.
-     */
     @Override
     public CompletableFuture<ApiResponse<?>> getOddsFromAPI() {
         ApiResponse<?> apiResponse = new ApiResponse<>();
@@ -228,14 +211,6 @@ public class FootballApiServiceImpl implements FootballApiService {
         return CompletableFuture.completedFuture(apiResponse);
     }
 
-    /**
-     * Asynchronously retrieves Fixtures from an external Football API and processes the response.
-     * Exceptions during the process are caught, and error messages are added to the ApiResponse.
-     * The final ApiResponse is then completed and returned in the CompletableFuture.
-     *
-     * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
-     * containing an ApiResponse with details about the process outcome.
-     */
     @Override
     public CompletableFuture<ApiResponse<?>> getFixturesFromAPI() {
         ApiResponse<?> apiResponse = new ApiResponse<>();
@@ -291,15 +266,6 @@ public class FootballApiServiceImpl implements FootballApiService {
         return CompletableFuture.completedFuture(apiResponse);
     }
 
-    /**
-     * Asynchronously retrieves fixtures and odds data from external Football APIs, combining the results into a single ApiResponse.
-     * It uses thenCompose to chain the completion of the fixturesResult with the retrieval of odds data,
-     * so that oddsResult is initiated only after fixturesResult is completed.
-     * InfoMessages and ErrorMessages from both results are merged into one, creating a unified ApiResponse object.
-     *
-     * @return instance of CompletableFuture class representing the asynchronous completion of the operation,
-     * containing an ApiResponse with merged details from both fixtures and odds responses.
-     */
     @Override
     public CompletableFuture<ApiResponse<?>> getFixturesAndOddsFromAPI() {
         CompletableFuture<ApiResponse<?>> fixturesResult = getFixturesFromAPI();
@@ -322,7 +288,6 @@ public class FootballApiServiceImpl implements FootballApiService {
         // Return a new CompletableFuture with additional processing using ApiResponseUtil
         return combinedResult;
     }
-
 
     /**
      * Creates fixture from JSON element and saves it to database.

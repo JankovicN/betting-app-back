@@ -37,13 +37,6 @@ public class BetServiceImpl implements BetService {
      */
     private final BetRepository betRepository;
 
-    /**
-     * Adds new bet to database. Returns instance of saved bet from database.
-     *
-     * @param bet instance of Bet class that is being saved.
-     * @return instance of Bet class that is saved in database,
-     * or null if error occurs.
-     */
     @Override
     public Bet save(Bet bet) {
         try {
@@ -56,11 +49,6 @@ public class BetServiceImpl implements BetService {
         }
     }
 
-    /**
-     * Updates the state of all bets for fixtures that have finished.
-     *
-     * @throws Exception if there is an error while executing the update query.
-     */
     @Override
     public void updateAllBets() throws Exception {
         try {
@@ -72,14 +60,6 @@ public class BetServiceImpl implements BetService {
         }
     }
 
-    /**
-     * Adds list of Bet objects to database.
-     *
-     * @param betList list of Bet objects that is being saved.
-     * @param ticket  instance of Ticket class that bet is associated with.
-     * @throws Exception if Bet object inside list has invalid odds
-     *                   or if an error occurs when saving Bet object
-     */
     @Transactional
     @Override
     public void saveBetsForTicket(List<Bet> betList, Ticket ticket) throws Exception {
@@ -141,14 +121,6 @@ public class BetServiceImpl implements BetService {
         }
     }
 
-    /**
-     * Returns response for API call, containing list of bets that are associated with Ticket.
-     *
-     * @param ticketId Integer value representing id of Ticket that bets are contained in.
-     * @return instance of ApiResponse class,
-     * containing list of bets associated with Ticket,
-     * or error message if operation fails.
-     */
     @Override
     public ApiResponse<?> getBetsForTicketApiResponse(Integer ticketId) {
         ApiResponse<List<BetInfoDTO>> response = new ApiResponse<>();

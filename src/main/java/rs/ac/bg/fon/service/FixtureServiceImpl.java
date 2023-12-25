@@ -49,13 +49,6 @@ public class FixtureServiceImpl implements FixtureService {
      */
     private final TeamService teamService;
 
-    /**
-     * Adds new fixture to database. Returns instance of saved fixture from database.
-     *
-     * @param fixture instance of Fixture class that is being saved.
-     * @return instance of Fixture class that is saved in database,
-     * or null if error occurs.
-     */
     @Override
     public Fixture save(Fixture fixture) {
         try {
@@ -68,13 +61,6 @@ public class FixtureServiceImpl implements FixtureService {
         }
     }
 
-    /**
-     * Return Fixture object for id that is specified.
-     *
-     * @param fixtureID Integer value representing id of Fixture.
-     * @return instance of Fixture class,
-     * or null if error occurs or if there is no fixture with specified id.
-     */
     @Override
     public Fixture getFixtureById(Integer fixtureID) {
         try {
@@ -92,13 +78,6 @@ public class FixtureServiceImpl implements FixtureService {
         }
     }
 
-    /**
-     * Return list of fixtures that have not started and are contained in specified league.
-     *
-     * @param leagueID Integer value representing id of league which contains fixtures.
-     * @return list of Fixture objects that have not started and are contained in league with specified id,
-     * or empty list if an error occurs.
-     */
     @Override
     public List<Fixture> getNotStartedByLeague(Integer leagueID) {
 
@@ -124,13 +103,6 @@ public class FixtureServiceImpl implements FixtureService {
         }
     }
 
-    /**
-     * Return list of fixtures DTOs that are contained in specified league.
-     *
-     * @param leagueID Integer value representing id of league which contains fixtures.
-     * @return list of FixtureDTO objects that are contained in league with specified id,
-     * or empty list if an error occurs.
-     */
     @Override
     public List<FixtureDTO> getFixtureDtoByLeague(Integer leagueID) {
 
@@ -143,13 +115,6 @@ public class FixtureServiceImpl implements FixtureService {
         }
     }
 
-    /**
-     * Transforms and returns list of FixtureDTO objects.
-     *
-     * @param fixtures list of Fixture objects.
-     * @return list of FixtureDTO objects that are representing list of Fixture objects,
-     * or empty list if an error occurs.
-     */
     @Override
     public List<FixtureDTO> createFixtureDTOList(List<Fixture> fixtures) {
         try {
@@ -179,13 +144,6 @@ public class FixtureServiceImpl implements FixtureService {
         }
     }
 
-    /**
-     * Checks if there are any fixtures that have not started for a league with id that is specified.
-     *
-     * @param leagueId Integer value representing id of league which should be checked.
-     * @return boolean value, return true if League contains fixtures that have not started and have valid odds related to them,
-     * otherwise return false.
-     */
     @Override
     public boolean existFixtureByLeagueId(Integer leagueId) {
         List<Fixture> notStartedByLeague = getNotStartedByLeague(leagueId);
