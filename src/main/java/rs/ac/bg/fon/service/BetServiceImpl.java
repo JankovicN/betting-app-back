@@ -15,11 +15,26 @@ import rs.ac.bg.fon.utility.ApiResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a service layer class responsible for implementing all Bet related methods.
+ * Available API method implementations: GET
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class BetServiceImpl implements BetService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside Bet service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(BetServiceImpl.class);
+
+    /**
+     * Instance of Bet repository class, responsible for interacting with bet table in database.
+     */
     private final BetRepository betRepository;
 
     @Override
@@ -68,8 +83,16 @@ public class BetServiceImpl implements BetService {
         }
     }
 
+    /**
+     * Returns list of bets that are contained in Ticket with id that is provided.
+     *
+     * @param ticketId Integer value representing id of Ticket that bets are contained in.
+     * @return list of BetInfoDTO objects that are contained in specific ticket
+     * or empty list if an error occurs.
+     * @throws Exception if there is an error while fetching bets for ticket.
+     */
     @Transactional
-    private List<BetInfoDTO> getBetsForTicket(Integer ticketId) {
+    private List<BetInfoDTO> getBetsForTicket(Integer ticketId) throws Exception {
         try {
             List<Bet> betList = betRepository.findAllByTicketId(ticketId);
             logger.info("Successfully got bets for ticket id = " + ticketId + "!\n" + betList);
@@ -94,7 +117,7 @@ public class BetServiceImpl implements BetService {
             return betInfoDTOS;
         } catch (Exception e) {
             logger.error("Error getting bets for ticket id = " + ticketId + "!\n" + e);
-            return new ArrayList<>();
+            throw new Exception("Error getting bets for ticket id = " + ticketId + "!\n" + e);
         }
     }
 
@@ -103,8 +126,13 @@ public class BetServiceImpl implements BetService {
         ApiResponse<List<BetInfoDTO>> response = new ApiResponse<>();
         try {
             List<BetInfoDTO> betList = getBetsForTicket(ticketId);
-            response.setData(betList);
-            logger.info("Successfully got bets for ticket id = " + ticketId + "!\n" + betList);
+            if (betList.isEmpty()) {
+                response.addErrorMessage("Error getting bets for ticket id = " + ticketId + "!");
+                logger.error("Error getting bets for ticket id = " + ticketId + "!\n");
+            } else {
+                logger.info("Successfully got bets for ticket id = " + ticketId + "!\n" + betList);
+                response.setData(betList);
+            }
         } catch (Exception e) {
             response.addErrorMessage("Error getting bets for ticket id = " + ticketId + "!");
             logger.error("Error getting bets for ticket id = " + ticketId + "!\n" + e);

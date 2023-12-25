@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import rs.ac.bg.fon.service.FootballApiService;
 import rs.ac.bg.fon.utility.ApiResponse;
 import rs.ac.bg.fon.utility.ApiResponseUtil;
@@ -46,10 +48,5 @@ public class FootballApiController {
         CompletableFuture<ApiResponse<?>> result = footballApiService.getFixturesAndOddsFromAPI();
         return result.thenApply(apiResult -> ApiResponseUtil.handleApiResponse(apiResult));
 
-    }
-
-    @GetMapping("/exists")
-    public ResponseEntity<?> getEexists(@RequestParam Integer fixtureID, @RequestParam Integer oddGroupID) {
-        return ApiResponseUtil.handleApiResponse(footballApiService.exists(fixtureID,oddGroupID));
     }
 }

@@ -14,12 +14,26 @@ import rs.ac.bg.fon.utility.ApiResponseUtil;
 
 import java.math.BigDecimal;
 
+/**
+ * Represents a service layer class responsible for implementing all Payment related methods.
+ * Available API method implementations: GET, POST
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside Payment service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
+    /**
+     * Instance of Payment repository class, responsible for interacting with payment table in database.
+     */
     private final PaymentRepository paymentRepository;
 
     @Transactional
@@ -54,31 +68,35 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public void addPayment(Payment payment) {
+    public Payment addPayment(Payment payment) {
         try {
             if (payment == null
                     || payment.getAmount() == null
                     || payment.getUser() == null) {
                 logger.error("Error while trying add Payment, invalid data provided!");
+                return null;
             } else if (!canUserPay(payment.getUser().getId(), payment.getAmount())) {
                 logger.error("Insufficient funds!");
+                return null;
             } else {
-                paymentRepository.saveAndFlush(payment);
+                return paymentRepository.saveAndFlush(payment);
             }
         } catch (Exception e) {
             logger.error("Error while trying add Payment!", e);
+            return null;
         }
-
     }
 
     @Transactional
     @Override
-    public void addPayment(Integer userId, BigDecimal amount, String type) {
+    public Payment addPayment(Integer userId, BigDecimal amount, String type) {
         try {
             if (userId == null || amount == null || type == null) {
                 logger.error("Error while trying add Payment, invalid data provided!");
+                return null;
             } else if (!canUserPay(userId, amount)) {
                 logger.error("Insufficient funds!");
+                return null;
             } else {
                 User user = new User();
                 user.setId(userId);
@@ -86,10 +104,11 @@ public class PaymentServiceImpl implements PaymentService {
                 payment.setAmount(amount);
                 payment.setUser(user);
                 payment.setPaymentType(type);
-                paymentRepository.saveAndFlush(payment);
+                return paymentRepository.saveAndFlush(payment);
             }
         } catch (Exception e) {
             logger.error("Error while trying add Payment!", e);
+            return null;
         }
     }
 
@@ -101,10 +120,23 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public ApiResponse<?> addPaymentApiResponse(PaymentDTO payment, String type) {
         ApiResponse<?> response = new ApiResponse<>();
-        if (canUserPay(payment.getUserId(), payment.getAmount())) {
-            addPayment(payment.getUserId(), payment.getAmount(), type);
-            response.addInfoMessage("Successful transaction!");
-        } else {
+        try {
+            if (payment == null || payment.getUserId() == null
+                    || payment.getAmount() == null) {
+                logger.error("Invalid data for payment!");
+                response.addErrorMessage("Insufficient funds!");
+            } else if (canUserPay(payment.getUserId(), payment.getAmount())) {
+                if (addPayment(payment.getUserId(), payment.getAmount(), type) == null) {
+                    logger.error("Invalid data for adding payment!");
+                    response.addErrorMessage("Insufficient funds!");
+                } else {
+                    response.addInfoMessage("Successful transaction!");
+                }
+            } else {
+                response.addErrorMessage("Insufficient funds!");
+            }
+        } catch (Exception e) {
+            logger.error("Error adding payment, for API call!\n" + e.getMessage());
             response.addErrorMessage("Insufficient funds!");
         }
         return response;

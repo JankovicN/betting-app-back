@@ -18,15 +18,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Represents a service layer class responsible for implementing all Fixture related methods.
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class FixtureServiceImpl implements FixtureService {
-    private static final Logger logger = LoggerFactory.getLogger(FixtureServiceImpl.class);
-    private final FixtureRepository fixtureRepository;
-    private final OddGroupService oddGroupService;
-    private final TeamService teamService;
 
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside Fixture service class.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(FixtureServiceImpl.class);
+
+    /**
+     * Instance of Fixture repository class, responsible for interacting with fixture table in database.
+     */
+    private final FixtureRepository fixtureRepository;
+
+    /**
+     * Instance of Odd Group service class, responsible for executing any logic related to Odd Group entity.
+     */
+    private final OddGroupService oddGroupService;
+
+    /**
+     * Instance of Team service class, responsible for executing any logic related to Team entity.
+     */
+    private final TeamService teamService;
 
     @Override
     public Fixture save(Fixture fixture) {
@@ -64,6 +85,7 @@ public class FixtureServiceImpl implements FixtureService {
             List<Fixture> fixtures = fixtureRepository.findAllByStateAndLeagueIdOrderByDateAsc(Constants.FIXTURE_NOT_STARTED, leagueID);
             if (fixtures == null || fixtures.isEmpty()) {
                 logger.warn("No Fixtures were found for LEAGUE ID = " + leagueID + " and STATE = " + Constants.FIXTURE_NOT_STARTED);
+                return new ArrayList<>();
             } else {
                 logger.info("Successfully found all Fixtures that have LEAGUE ID = " + leagueID + " and STATE = " + Constants.FIXTURE_NOT_STARTED + "!");
                 for (Fixture f : fixtures) {
@@ -102,11 +124,7 @@ public class FixtureServiceImpl implements FixtureService {
                 Optional<Team> home = teamService.findById(fixture.getHome().getId());
                 Optional<Team> away = teamService.findById(fixture.getAway().getId());
 
-                if (home == null || away == null
-                        || !home.isPresent()
-                        || !away.isPresent()
-                        || oddGroupDTOList == null
-                        || oddGroupDTOList.isEmpty()) {
+                if (home == null || away == null || !home.isPresent() || !away.isPresent() || oddGroupDTOList == null || oddGroupDTOList.isEmpty()) {
                     continue;
                 }
 
@@ -126,30 +144,15 @@ public class FixtureServiceImpl implements FixtureService {
         }
     }
 
-//    @Override
-//    public ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueID) {
-//        return ApiResponseUtil.transformListToApiResponse(createFixtureDTOList(getNotStartedByLeague(leagueID)), "fixtures");
-//    }
-//
-//    @Override
-//    public ApiResponse<?> getNotStartedByLeaguesApiCall(List<Integer> leagues) {
-//        List<Fixture> fixtureList = new ArrayList<>();
-//        for (Integer id : leagues) {
-//            List<Fixture> fixturesById = getNotStartedByLeague(id);
-//            fixtureList.addAll(fixturesById);
-//        }
-//        return ApiResponseUtil.transformListToApiResponse(createFixtureDTOList(fixtureList), "fixtures");
-//    }
-
     @Override
     public boolean existFixtureByLeagueId(Integer leagueId) {
         List<Fixture> notStartedByLeague = getNotStartedByLeague(leagueId);
         boolean existsByLeagueID = notStartedByLeague.isEmpty();
-        if(existsByLeagueID){
+        if (existsByLeagueID) {
             return false;
         }
-        for ( Fixture f : notStartedByLeague) {
-            if(f!= null && !f.getOdds().isEmpty()){
+        for (Fixture fixture : notStartedByLeague) {
+            if (fixture != null && !fixture.getOdds().isEmpty()) {
                 existsByLeagueID = true;
             }
         }

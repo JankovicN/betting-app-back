@@ -18,18 +18,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a service layer class responsible for implementing all Odd Group related methods.
+ * Available API method implementations: GET, DELETE
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 public class OddGroupServiceImpl implements OddGroupService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside Odd Group service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(OddGroupServiceImpl.class);
+
+    /**
+     * Instance of Odd Group repository class, responsible for interacting with odd_group table in database.
+     */
     private final OddGroupRepository oddGroupRepository;
+
+    /**
+     * Instance of Odd service class, responsible for executing any logic related to Odd entity.
+     */
     private final OddService oddService;
-
-
-    @Override
-    public ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixture) {
-        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixture), "odds");
-    }
 
     @Override
     public OddGroup getOddGroupWithId(Integer oddGroupId) {
@@ -78,19 +91,6 @@ public class OddGroupServiceImpl implements OddGroupService {
     }
 
     @Override
-    public ApiResponse<?> deleteOddGroupApiResponse(Integer id) {
-        ApiResponse response = new ApiResponse();
-        try {
-            deleteOddGroup(id);
-            response.addInfoMessage("Successfully deleted Odd Group with ID = " + id);
-        } catch (Exception e) {
-            logger.error("Error while trying to delete Odd Group with ID = " + id + "!\n" + e.getMessage());
-            response.addErrorMessage("Unable to delete Odd Group with ID = " + id + "!");
-        }
-        return response;
-    }
-
-    @Override
     public List<OddGroupDTO> getOddGroupsByFixture(Integer fixtureID) {
         try {
             List<OddGroup> oddGroupList = oddGroupRepository.findByOddsFixtureIdOrderByIdAsc(fixtureID);
@@ -126,6 +126,13 @@ public class OddGroupServiceImpl implements OddGroupService {
         }
     }
 
+    /**
+     * Adds new odd group to database. Returns instance of saved odd group from database.
+     *
+     * @param oddGroup instance of OddGroup class that is being saved.
+     * @return instance of OddGroup class that is saved in database,
+     * or null if error occurs.
+     */
     @Transactional
     @Override
     public OddGroup saveOddGroup(OddGroup oddGroup) {
@@ -167,6 +174,24 @@ public class OddGroupServiceImpl implements OddGroupService {
             logger.error("Error while checking if Odd Group with ID = " + oddGroupId + ", exists!\n" + e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public ApiResponse<?> deleteOddGroupApiResponse(Integer oddGroupID) {
+        ApiResponse response = new ApiResponse();
+        try {
+            deleteOddGroup(oddGroupID);
+            response.addInfoMessage("Successfully deleted Odd Group with ID = " + oddGroupID);
+        } catch (Exception e) {
+            logger.error("Error while trying to delete Odd Group with ID = " + oddGroupID + "!\n" + e.getMessage());
+            response.addErrorMessage("Unable to delete Odd Group with ID = " + oddGroupID + "!");
+        }
+        return response;
+    }
+
+    @Override
+    public ApiResponse<?> getOddGroupsByFixtureApiResponse(Integer fixtureID) {
+        return ApiResponseUtil.transformListToApiResponse(getOddGroupsByFixture(fixtureID), "odds");
     }
 
 }

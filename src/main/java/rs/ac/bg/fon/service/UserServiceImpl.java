@@ -32,17 +32,51 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Represents a service layer class responsible for implementing all User and Role related methods.
+ * Available API method implementations: GET, POST, PUT, DELETE
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside User service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
+
+    /**
+     * Instance of User repository class, responsible for interacting with user table in database.
+     */
     private final UserRepository userRepository;
+
+    /**
+     * Instance of User repository class, responsible for interacting with user table in database.
+     */
     private final RoleRepository roleRepository;
+
+    /**
+     * Instance of PasswordEncoder class, responsible for encoding password before it is saved in database.
+     */
     private final PasswordEncoder passwordEncoder;
+
+    /**
+     * Instance of Payment service class, responsible for executing any logic related to Payment entity.
+     */
     private final PaymentService paymentService;
 
+    /**
+     * Finds user for given username and returns his details.
+     *
+     * @param username String value representing username of user it is loading.
+     * @return instance of UserDetails class, containing all data regarding user and his roles.
+     * @throws UsernameNotFoundException if user cannot be found by username provided to method
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
@@ -73,9 +107,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     || user.getName().isBlank()) {
                 logger.error("Error while trying to save User, invalid data provided!");
             } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
-                System.out.println(user.getBirthday());
                 logger.error("Error while trying to save User, User must be older than 18!");
-                user.setBirthday(null);
+                return null;
             } else {
                 log.info("Saving user {}  to database", user.getName());
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -98,20 +131,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return roleRepository.save(role);
         } catch (Exception e) {
             logger.error("Error while trying save Role!", e);
+            return null;
         }
-        return null;
     }
 
     @Override
-    public void addRoleToUser(String username, String roleName) {
+    public User addRoleToUser(String username, String roleName) {
         try {
 
             log.info("Adding role {} to user {}", roleName, username);
             User user = userRepository.findByUsername(username);
             Role role = roleRepository.findByName(roleName);
             user.getRoles().add(role);
+            return user;
         } catch (Exception e) {
             logger.error("Error while trying add Role " + roleName + " to User " + username + "!", e);
+            return null;
         }
     }
 
@@ -122,69 +157,99 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
+    /**
+     * Fetches all users for given page.
+     *
+     * @param pageable instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of Page class, containing User objects.
+     */
     private Page<User> getUsers(Pageable pageable) {
         log.info("Fetching all users pageable");
         return userRepository.findAll(pageable);
     }
 
+    /**
+     * Fetches all users, whose username contains the given string, for given page.
+     *
+     * @param filterUsername String value representing part of username that search is based on.
+     * @param pageable       instance of Pageable class, contains information about the current page we are fetching.
+     * @return instance of Page class, containing User objects whose username contains the given string.
+     */
     private Page<User> getFilteredUsers(String filterUsername, Pageable pageable) {
         log.info("Fetching users whose username contains \'" + filterUsername + "\' pageable");
-        return userRepository.findByUsernameContaining(filterUsername,pageable);
+        return userRepository.findByUsernameContaining(filterUsername, pageable);
     }
 
     @Override
     public User registerUser(User user) {
-
-        if (user == null
-                || user.getUsername() == null
-                || user.getUsername().isBlank()
-                || user.getPassword() == null
-                || user.getPassword().isBlank()
-                || user.getBirthday() == null
-                || user.getName() == null
-                || user.getName().isBlank()
-                || user.getSurname() == null
-                || user.getSurname().isBlank()) {
-            logger.error("Error while trying save User, invalid data provided!");
-            user.setId(-1);
-            return user;
-        } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
-            logger.error("User must be older than 18!");
-            user.setBirthday(LocalDate.of(1,1,1));
-            return user;
-        } else if (!Utility.isValidEmail(user.getEmail())) {
-            logger.error("User email is invalid, email = " + user.getEmail() + "!");
-            user.setEmail("Invalid Email!");
-            return user;
-        } else if (userRepository.existsByUsername(user.getUsername())) {
-            logger.error("There is already a user with that username!");
-            user.setUsername("-1");
-            return user;
-        } else if (!userRepository.existsByEmail(user.getEmail())) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            User newUser = userRepository.save(user);
-            addRoleToUser(user.getUsername(), "ROLE_CLIENT");
-            return newUser;
-        } else {
-            logger.error("User already registered!");
+        try {
+            if (user == null
+                    || user.getUsername() == null
+                    || user.getUsername().isBlank()
+                    || user.getPassword() == null
+                    || user.getPassword().isBlank()
+                    || user.getBirthday() == null
+                    || user.getName() == null
+                    || user.getName().isBlank()
+                    || user.getSurname() == null
+                    || user.getSurname().isBlank()) {
+                logger.error("Error while trying save User, invalid data provided!");
+                user.setId(-1);
+                return user;
+            } else if (user.getBirthday().isAfter(LocalDate.now().minusYears(18))) {
+                logger.error("User must be older than 18!");
+                user.setBirthday(LocalDate.of(1, 1, 1));
+                return user;
+            } else if (!Utility.isValidEmail(user.getEmail())) {
+                logger.error("User email is invalid, email = " + user.getEmail() + "!");
+                user.setEmail("Invalid Email!");
+                return user;
+            } else if (userRepository.existsByUsername(user.getUsername())) {
+                logger.error("There is already a user with that username!");
+                user.setUsername("-1");
+                return user;
+            } else if (!userRepository.existsByEmail(user.getEmail())) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                User newUser = userRepository.save(user);
+                addRoleToUser(user.getUsername(), "ROLE_CLIENT");
+                return newUser;
+            } else {
+                logger.error("User already registered!");
+                user.setEmail("Email already registered!");
+                return user;
+            }
+        } catch (Exception e) {
+            logger.error("Error registering user!" + e);
             return null;
         }
     }
 
     @Override
     public User deleteUser(String username) {
-        User user = userRepository.findByUsername(username);
-        userRepository.delete(user);
-        return user;
+        try {
+            User user = userRepository.findByUsername(username);
+            if (user == null) {
+                throw new Exception();
+            }
+            userRepository.delete(user);
+            return user;
+        } catch (Exception e) {
+            logger.error("Error deleting user with username = " + username + "!\n" + e.getMessage());
+            return null;
+        }
     }
-
 
     @Override
     public ApiResponse<?> deleteUserApiResponse(String username) {
         ApiResponse<User> response = new ApiResponse<>();
         try {
-            response.setData(deleteUser(username));
-            response.addInfoMessage("Successfully deleted user \"" + username + "\".");
+            User deletedUser = deleteUser(username);
+            if (deletedUser == null) {
+                response.addErrorMessage("User with username " + username + " doesn't exist!");
+            } else {
+                response.setData(deletedUser);
+                response.addInfoMessage("Successfully deleted user \"" + username + "\".");
+            }
         } catch (Exception e) {
             response.addErrorMessage("Unable to delete user at this time, try again later!");
         }
@@ -198,10 +263,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             User user = UserMapper.userDtoToUser(userDTO);
             User registeredUser = registerUser(user);
             if (registeredUser == null) {
+                response.addErrorMessage("Error registering user!");
+            } else if (registeredUser.getEmail().equals("Email already registered!")) {
                 response.addErrorMessage("There is already a user registered with that email!");
             } else if (("-1").equals(registeredUser.getUsername())) {
                 response.addErrorMessage("There is already a user registered with that username!");
-            } else if (LocalDate.of(1,1,1).isEqual(registeredUser.getBirthday())) {
+            } else if (LocalDate.of(1, 1, 1).isEqual(registeredUser.getBirthday())) {
                 response.addErrorMessage("User age must be greater than 18 to register!");
             } else if (("Invalid Email!").equals(registeredUser.getEmail())) {
                 response.addErrorMessage("Invalid email format!");
@@ -227,7 +294,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                             return UserMapper.userToUserDTO(user);
                         } catch (Exception e) {
                             logger.error("Error while mapping user to user DTO");
-                            throw null;
+                            return null;
                         }
                     }).filter(user -> user != null)
                     .map(userDTO -> {
@@ -249,7 +316,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ApiResponse<?> getFilteredUsersApiResponse(String filterUsername, Pageable pageable) {
         ApiResponse<PageDTO<UserDTO>> response = new ApiResponse<>();
         try {
-            Page<User> users = getFilteredUsers(filterUsername,pageable);
+            Page<User> users = getFilteredUsers(filterUsername, pageable);
             log.info("Filtered users: " + users.getContent());
             List<UserDTO> userDtosList = users.map(user -> {
                         try {
@@ -298,7 +365,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public ApiResponse<?> addRoleToUserApiResponse(String username, String roleName) {
         ApiResponse<User> response = new ApiResponse<>();
         try {
-            addRoleToUser(username, roleName);
+            if (addRoleToUser(username, roleName) == null) {
+                throw new Exception();
+            }
             response.addInfoMessage("Successfully added role " + roleName + "to user " + username + "!");
         } catch (Exception e) {
             response.addErrorMessage("Unable to add role " + roleName + " to user " + username + " at this time, try again later!");
@@ -327,15 +396,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User updateUser(User updatedUser) {
-        User user = userRepository.findByUsername(updatedUser.getUsername());
-        if (updatedUser.getPassword() == null || updatedUser.getPassword().isBlank()) {
-            updatedUser.setPassword(user.getPassword());
+        try {
+            User user = userRepository.findByUsername(updatedUser.getUsername());
+            if (updatedUser.getPassword() == null || updatedUser.getPassword().isBlank()) {
+                updatedUser.setPassword(user.getPassword());
+            }
+            if (updatedUser.getRoles() == null || updatedUser.getRoles().isEmpty()) {
+                updatedUser.setRoles(user.getRoles());
+            }
+            updatedUser.setId(user.getId());
+            return userRepository.save(updatedUser);
+        } catch (Exception e) {
+            logger.error("Error updating user!\n", e.getMessage());
+            return null;
         }
-        if (updatedUser.getRoles() == null || updatedUser.getRoles().isEmpty()) {
-            updatedUser.setRoles(user.getRoles());
-        }
-        updatedUser.setId(user.getId());
-        return userRepository.save(updatedUser);
     }
 
     @Override
@@ -345,9 +419,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             if (!Utility.isValidEmail(user.getEmail())) {
                 logger.error("User email is invalid, email = " + user.getEmail() + "!");
                 response.addErrorMessage("Invalid Email address!");
-            }else{
+            } else {
                 User userToUpdate = UserMapper.userDtoToUser(user);
                 userToUpdate = updateUser(userToUpdate);
+                if (userToUpdate == null) {
+                    throw new Exception("Error updating user!");
+                }
                 UserDTO userDTO = UserMapper.userToUserDTO(userToUpdate);
                 userDTO.setBalance(paymentService.getUserPayments(userDTO.getId()));
                 response.setData(userDTO);

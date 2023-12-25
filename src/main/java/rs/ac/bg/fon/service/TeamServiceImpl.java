@@ -12,10 +12,24 @@ import rs.ac.bg.fon.repository.TeamRepository;
 
 import java.util.Optional;
 
+/**
+ * Represents a service layer class responsible for implementing all Team related methods.
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @RequiredArgsConstructor
 @Service
 public class TeamServiceImpl implements TeamService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside Team service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
+
+    /**
+     * Instance of Team repository class, responsible for interacting with team table in database.
+     */
     private final TeamRepository teamRepository;
 
     @Transactional
@@ -50,16 +64,16 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Optional<Team> findById(Integer id) {
+    public Optional<Team> findById(Integer teamID) {
         try {
-            if (id == null) {
+            if (teamID == null) {
                 return null;
             }
-            Optional<Team> team = teamRepository.findById(id);
+            Optional<Team> team = teamRepository.findById(teamID);
             logger.info("Successfully found Team " + team + "!");
             return team;
         } catch (Exception e) {
-            logger.error("Error while trying to find Team with ID = " + id + "!\n" + e.getMessage());
+            logger.error("Error while trying to find Team with ID = " + teamID + "!\n" + e.getMessage());
             return null;
         }
     }

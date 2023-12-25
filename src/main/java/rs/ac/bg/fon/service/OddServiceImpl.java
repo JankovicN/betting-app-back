@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import rs.ac.bg.fon.constants.Constants;
 import rs.ac.bg.fon.dtos.Odd.OddDTO;
 import rs.ac.bg.fon.entity.Odd;
-import rs.ac.bg.fon.entity.OddGroup;
 import rs.ac.bg.fon.mappers.OddMapper;
 import rs.ac.bg.fon.repository.OddRepository;
 
@@ -16,12 +15,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Represents a service layer class responsible for implementing all Odd related methods.
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class OddServiceImpl implements OddService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside Odd service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(OddServiceImpl.class);
 
+    /**
+     * Instance of Odd repository class, responsible for interacting with odd table in database.
+     */
     private final OddRepository oddRepository;
 
     @Override
@@ -45,7 +57,6 @@ public class OddServiceImpl implements OddService {
                 logger.info("Successfully found Odd with id: " + oddId + ", odd:  \n" + odd.get() + "!");
                 Odd fetchedOdd = odd.get();
                 fetchedOdd.getFixture();
-                OddGroup oddGroup = fetchedOdd.getOddGroup();
                 return fetchedOdd;
             }
             return null;
@@ -63,7 +74,7 @@ public class OddServiceImpl implements OddService {
             return savedOdds;
         } catch (Exception e) {
             logger.error("Error while trying to save list of Odds!!\n" + e.getMessage());
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -71,8 +82,7 @@ public class OddServiceImpl implements OddService {
     public List<Odd> getOddsForFixtureAndOddGroup(Integer fixtureId, Integer oddGroupId) {
         try {
             List<Odd> oddList = oddRepository.findByFixtureStateAndFixtureIdAndOddGroupId(Constants.FIXTURE_NOT_STARTED, fixtureId, oddGroupId);
-            logger.info("Successfully found list of Odds for fixtureId = " + fixtureId + " and oddGroupId = " + oddGroupId + "!\n" +
-                    "Odd List: " + oddList);
+            logger.info("Successfully found list of Odds for fixtureId = " + fixtureId + " and oddGroupId = " + oddGroupId + "!\n" + "Odd List: " + oddList);
 
             return oddList == null ? new ArrayList<>() : oddList;
         } catch (Exception e) {
@@ -108,7 +118,7 @@ public class OddServiceImpl implements OddService {
         try {
             return oddRepository.existsByFixtureIdAndOddGroupId(fixtureId, oddGroupId);
         } catch (Exception e) {
-            logger.error("Error unnecessary while trying to check if Odds exits for Fixture ID = " + fixtureId + " and Odd Group ID = " + oddGroupId + "!\n" + e.getMessage());
+            logger.error("Error while trying to check if Odds exists for Fixture ID = " + fixtureId + " and Odd Group ID = " + oddGroupId + "!\n" + e.getMessage());
             return false;
         }
     }

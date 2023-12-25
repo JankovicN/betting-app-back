@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 
 @Getter
@@ -32,5 +33,22 @@ public class BetInfoDTO {
                 + ", name = " + name + ", oddGroupName = " + oddGroupName
                 + ", fixtureDate = " + fixtureDate + ", home = " + home
                 + ", away = " + away + ", result = " + result + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        BetInfoDTO other = (BetInfoDTO) obj;
+        // Compare individual fields for equality
+        return Objects.equals(id, other.id) &&
+                Objects.equals(state, other.state) &&
+                Objects.equals(odd, other.odd) &&
+                Objects.equals(name, other.name) &&
+                Objects.equals(oddGroupName, other.oddGroupName) &&
+                Objects.equals(fixtureDate, other.fixtureDate) &&
+                Objects.equals(home, other.home) &&
+                Objects.equals(away, other.away) &&
+                Objects.equals(result, other.result);
     }
 }

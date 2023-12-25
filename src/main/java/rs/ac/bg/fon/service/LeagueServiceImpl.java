@@ -18,12 +18,31 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a service layer class responsible for implementing all League related methods.
+ * Available API method implementations: GET
+ *
+ * @author Janko
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class LeagueServiceImpl implements LeagueService {
+
+    /**
+     * Instance of Logger class, responsible for displaying messages that contain information about the success of methods inside League service class.
+     */
     private static final Logger logger = LoggerFactory.getLogger(LeagueServiceImpl.class);
+
+    /**
+     * Instance of League repository class, responsible for interacting with league table in database.
+     */
     private final LeagueRepository leagueRepository;
+
+    /**
+     * Instance of Fixture service class, responsible for executing any logic related to Fixture entity.
+     */
     private final FixtureService fixtureService;
 
     @Override
@@ -46,7 +65,7 @@ public class LeagueServiceImpl implements LeagueService {
             return savedLeagues;
         } catch (Exception e) {
             logger.error("Error while trying to save Leagues !\n" + e.getMessage());
-            return null;
+            return new ArrayList<>();
         }
     }
 
@@ -118,26 +137,31 @@ public class LeagueServiceImpl implements LeagueService {
 
     @Override
     public ApiResponse<?> getNotStartedByLeagueApiCall(Integer leagueId) {
-        League league = leagueRepository.findById(leagueId).get();
-        LeagueDTO leagueDTO = new LeagueDTO();
-        if (league != null) {
+        try {
+            League league = leagueRepository.findById(leagueId).get();
+            LeagueDTO leagueDTO;
             try {
                 List<FixtureDTO> fixtures = fixtureService.getFixtureDtoByLeague(leagueId);
                 if (fixtures != null && !fixtures.isEmpty()) {
                     leagueDTO = LeagueMapper.leagueToLeagueDTO(league, fixtures);
+                } else {
+                    ApiResponse<?> response = new ApiResponse<>();
+                    response.addErrorMessage("Unable to get Fixtures for League " + league.getName());
+                    logger.error("Unable to create League DTO List!");
+                    return response;
                 }
             } catch (Exception e) {
                 ApiResponse<?> response = new ApiResponse<>();
-                response.addErrorMessage("Unable to get Fixtures for League " + league.getName());
-                logger.error("Unable to create League DTO List!\n" + e.getMessage());
+                response.addErrorMessage("Unknown error!");
+                logger.error("Unknown error!" + e.getMessage());
                 return response;
             }
-        } else {
+            return ApiResponseUtil.transformObjectToApiResponse(leagueDTO, "leagues");
+        } catch (Exception e) {
             ApiResponse<?> response = new ApiResponse<>();
-            response.addErrorMessage("Unknown error try again later!");
+            response.addErrorMessage("No League is found for id = " + leagueId + "!");
             logger.error("No League is found for ID = " + leagueId + "!");
             return response;
         }
-        return ApiResponseUtil.transformObjectToApiResponse(leagueDTO, "leagues");
     }
 }
